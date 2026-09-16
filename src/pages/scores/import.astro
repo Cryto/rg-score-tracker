@@ -12,7 +12,7 @@ import Layout from '../../layouts/Layout.astro';
     <code>play_style</code> is <code>SP</code> or <code>DP</code>. <code>difficulty</code> is one of
     <code>B,N,H,A,L</code>. <code>clear_lamp</code> is one of
     <code>FAILED,ASSIST_CLEAR,EASY_CLEAR,CLEAR,HARD_CLEAR,EX_HARD_CLEAR,FULL_COMBO</code> (or blank).
-    Titles are matched case-insensitively against the song list; unmatched rows are reported below and not imported.
+    Titles are matched case-insensitively against either the song's native title or its romanized title; unmatched rows are reported below and not imported.
   </p>
 
   <textarea id="csv-input" rows="10" style="width:100%; max-width:800px; font-family: monospace;"
@@ -50,13 +50,18 @@ SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
     async function loadCharts() {
       const { data, error } = await supabase
         .from('charts')
-        .select('id, play_style, difficulty, songs ( title )');
+        .select('id, play_style, difficulty, songs ( title, title_english )');
       if (error) return;
       chartLookup = new Map(
-        (data ?? []).map((c: any) => [
-          `${(c.songs?.title ?? '').toLowerCase()}|${c.play_style}|${c.difficulty}`,
-          c.id,
-        ])
+        (data ?? []).flatMap((c: any) => {
+          const entries: [string, number][] = [
+            [`${(c.songs?.title ?? '').toLowerCase()}|${c.play_style}|${c.difficulty}`, c.id],
+          ];
+          if (c.songs?.title_english) {
+            entries.push([`${c.songs.title_english.toLowerCase()}|${c.play_style}|${c.difficulty}`, c.id]);
+          }
+          return entries;
+        })
       );
     }
 

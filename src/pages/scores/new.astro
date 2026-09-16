@@ -43,7 +43,7 @@ import Layout from '../../layouts/Layout.astro';
     const chartSelect = document.getElementById('chart-select') as HTMLSelectElement;
     const status = document.getElementById('status')!;
 
-    let charts: { id: number; label: string }[] = [];
+    let charts: { id: number; label: string; searchText: string }[] = [];
     let selectedChartId: number | null = null;
 
     supabase.auth.getSession().then(({ data }) => {
@@ -53,7 +53,7 @@ import Layout from '../../layouts/Layout.astro';
     async function loadCharts() {
       const { data, error } = await supabase
         .from('charts')
-        .select('id, play_style, difficulty, level, songs ( title )');
+        .select('id, play_style, difficulty, level, songs ( title, title_english )');
       if (error) {
         status.textContent = `Failed to load songs: ${error.message}`;
         return;
@@ -61,6 +61,7 @@ import Layout from '../../layouts/Layout.astro';
       charts = (data ?? []).map((c: any) => ({
         id: c.id,
         label: `${c.songs?.title ?? '?'} [${c.play_style} ${c.difficulty} Lv${c.level}]`,
+        searchText: `${c.songs?.title ?? ''} ${c.songs?.title_english ?? ''}`.toLowerCase(),
       }));
     }
 
@@ -72,7 +73,7 @@ import Layout from '../../layouts/Layout.astro';
         chartSelect.innerHTML = '';
         return;
       }
-      const matches = charts.filter((c) => c.label.toLowerCase().includes(q)).slice(0, 50);
+      const matches = charts.filter((c) => c.searchText.includes(q)).slice(0, 50);
       chartSelect.innerHTML = matches
         .map((c) => `<option value="${c.id}">${c.label}</option>`)
         .join('');

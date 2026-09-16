@@ -82,6 +82,7 @@ import Layout from '../layouts/Layout.astro';
       version: string;
       versionNumber: number | null;
       title: string;
+      titleEnglish: string;
       artist: string;
       style: string;
       difficulty: string;
@@ -106,7 +107,7 @@ import Layout from '../layouts/Layout.astro';
         .from('charts')
         .select(`
           id, play_style, difficulty, level, note_count,
-          songs ( title, artist, versions ( number, name ) ),
+          songs ( title, title_english, artist, versions ( number, name ) ),
           scores ( ex_score, clear_lamp, miss_count )
         `);
 
@@ -120,6 +121,7 @@ import Layout from '../layouts/Layout.astro';
         version: c.songs?.versions?.name ?? 'Unknown',
         versionNumber: c.songs?.versions?.number ?? null,
         title: c.songs?.title ?? '(unknown)',
+        titleEnglish: c.songs?.title_english ?? '',
         artist: c.songs?.artist ?? '',
         style: c.play_style,
         difficulty: c.difficulty,
@@ -166,7 +168,12 @@ import Layout from '../layouts/Layout.astro';
     function render() {
       const f = currentFilters();
       let filtered = rows.filter((r) => {
-        if (f.search && !r.title.toLowerCase().includes(f.search)) return false;
+        if (
+          f.search &&
+          !r.title.toLowerCase().includes(f.search) &&
+          !r.titleEnglish.toLowerCase().includes(f.search)
+        )
+          return false;
         if (f.version && r.version !== f.version) return false;
         if (f.style && r.style !== f.style) return false;
         if (f.difficulty && r.difficulty !== f.difficulty) return false;
@@ -200,7 +207,11 @@ import Layout from '../layouts/Layout.astro';
           const lampLabel = r.lamp ? LAMP_LABELS[r.lamp as keyof typeof LAMP_LABELS] : '—';
           return `<tr>
             <td>${r.version}</td>
-            <td>${escapeHtml(r.title)}</td>
+            <td>${escapeHtml(r.title)}${
+            r.titleEnglish && r.titleEnglish !== r.title
+              ? `<br><span style="color: var(--text-dim); font-size: 0.8em;">${escapeHtml(r.titleEnglish)}</span>`
+              : ''
+          }</td>
             <td>${escapeHtml(r.artist)}</td>
             <td>${r.style}</td>
             <td>${DIFF_LABELS[r.difficulty] ?? r.difficulty}</td>
