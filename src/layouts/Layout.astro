@@ -5,6 +5,10 @@ interface Props {
   title: string;
 }
 const { title } = Astro.props;
+
+// Off by default so a fork doesn't ship with the original owner's site
+// branding. The canonical deployment sets PUBLIC_SHOW_CRYTO_NAV=true.
+const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
 ---
 <!doctype html>
 <html lang="en">
@@ -90,7 +94,7 @@ const { title } = Astro.props;
     </style>
   </head>
   <body>
-    <CrytoNav />
+    {showCrytoNav && <CrytoNav />}
     <nav class="app-nav">
       <a href="/">Song List</a>
       <a href="/scores/new">Add Score</a>
