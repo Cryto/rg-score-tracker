@@ -35,19 +35,33 @@ The `songs`/`charts` tables are populated separately from the app itself, since
 them, bypassing RLS). This is intentional: catalog data should be curated, not
 publicly writable.
 
-To import data, write a script that maps your source (CSV, scraped JSON,
-whatever) into the shape:
+### Importing from iidx-db
 
-```ts
-{ title, artist, genre, bpm_min, bpm_max, versionNumber,
-  charts: [{ playStyle: 'SP' | 'DP', difficulty: 'B'|'N'|'H'|'A'|'L', level, noteCount }] }
+[`db/import/import-iidx-db.mjs`](db/import/import-iidx-db.mjs) imports the
+song/chart catalog from [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db)
+(MIT licensed), whose data is extracted directly from IIDX Infinitas via
+[Reflux](https://github.com/olji/Reflux) — i.e. sourced from the game itself,
+not scraped from a third-party site. Coverage is whatever's currently in
+Infinitas' rotation, not the full arcade back catalog; `debut_version_id` is
+left unset since Infinitas' internal folder grouping doesn't map cleanly to
+arcade version numbers yet.
+
+```sh
+curl -L -o db/import/songs.tsv https://media.githubusercontent.com/media/vanHavel/iidx-db/master/raw_data/songs.tsv
+node --env-file=.env db/import/import-iidx-db.mjs db/import/songs.tsv
 ```
 
-and inserts it using the Supabase JS client with the `SUPABASE_SERVICE_ROLE_KEY`
-from your `.env` (never commit this key, never expose it to the browser — it
-bypasses RLS entirely). No specific source is wired up yet; this repo doesn't
-ship anyone's personal score data or a fixed importer format on purpose, so
-forks can plug in whatever source they prefer.
+Requires `SUPABASE_SERVICE_ROLE_KEY` in your `.env` (never commit this key,
+never expose it to the browser — it bypasses RLS entirely). The script is
+idempotent: re-running it after the source data updates just upserts changes,
+matched by iidx-db's own song ID (`songs.external_id`).
+
+### Other sources
+
+To import from anywhere else, write a script that maps your source into the
+same shape the importer above produces — one row per song plus a list of
+`{ playStyle: 'SP' | 'DP', difficulty: 'B'|'N'|'H'|'A'|'L', level, noteCount }`
+per chart — and upserts via the Supabase JS client with the service role key.
 
 ## Score entry
 

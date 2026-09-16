@@ -29,12 +29,15 @@ create table versions (
 create table songs (
   id serial primary key,
   title text not null,
+  title_english text,
   title_sort text,
   genre text,
   artist text,
   bpm_min integer,
   bpm_max integer,
-  debut_version_id integer references versions(id)
+  debut_version_id integer references versions(id),
+  -- id from an external catalog source (e.g. iidx-db), for idempotent re-imports.
+  external_id text unique
 );
 
 create table charts (

@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# downloaded third-party catalog data, not vendored into the repo
+db/import/*.tsv
+
 # macOS-specific files
 .DS_Store
 
