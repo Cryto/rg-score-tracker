@@ -1,0 +1,100 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <style is:global>
+      :root {
+        --bg: #0f1115;
+        --surface: #171a21;
+        --border: #2a2e38;
+        --text: #e8eaed;
+        --text-dim: #9aa0aa;
+        --accent: #5b9dff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      a { color: var(--accent); }
+      nav {
+        display: flex;
+        gap: 1.5rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      main {
+        padding: 1.5rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      th, td {
+        padding: 0.4rem 0.6rem;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        white-space: nowrap;
+      }
+      th {
+        cursor: pointer;
+        user-select: none;
+        color: var(--text-dim);
+        position: sticky;
+        top: 0;
+        background: var(--bg);
+      }
+      th:hover { color: var(--text); }
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .filters label {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        gap: 0.25rem;
+      }
+      select, input, button {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 0.4rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+      button {
+        cursor: pointer;
+        border-color: var(--accent);
+      }
+      button:hover { background: #1f2430; }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="/">Song List</a>
+      <a href="/scores/new">Add Score</a>
+      <a href="/scores/import">Bulk Import</a>
+    </nav>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

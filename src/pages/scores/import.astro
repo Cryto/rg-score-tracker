@@ -1,0 +1,138 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Bulk Import Scores">
+  <h1>Bulk Import Scores (CSV)</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in — <a href="/login">log in</a> to submit scores.
+  </p>
+
+  <p style="color: var(--text-dim); max-width: 700px;">
+    Expected columns, header row required: <code>title,play_style,difficulty,ex_score,clear_lamp,miss_count</code>.
+    <code>play_style</code> is <code>SP</code> or <code>DP</code>. <code>difficulty</code> is one of
+    <code>B,N,H,A,L</code>. <code>clear_lamp</code> is one of
+    <code>FAILED,ASSIST_CLEAR,EASY_CLEAR,CLEAR,HARD_CLEAR,EX_HARD_CLEAR,FULL_COMBO</code> (or blank).
+    Titles are matched case-insensitively against the song list; unmatched rows are reported below and not imported.
+  </p>
+
+  <textarea id="csv-input" rows="10" style="width:100%; max-width:800px; font-family: monospace;"
+    placeholder="title,play_style,difficulty,ex_score,clear_lamp,miss_count
+SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
+  <div style="margin-top: 0.75rem; display:flex; gap:0.75rem;">
+    <button id="preview-btn">Preview</button>
+    <button id="submit-btn" style="display:none;">Import Matched Rows</button>
+  </div>
+
+  <div id="results" style="margin-top:1.5rem;"></div>
+
+  <script>
+    import { supabase } from '../../lib/supabase';
+
+    const authWarning = document.getElementById('auth-warning')!;
+    const csvInput = document.getElementById('csv-input') as HTMLTextAreaElement;
+    const previewBtn = document.getElementById('preview-btn')!;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const results = document.getElementById('results')!;
+
+    const VALID_STYLES = new Set(['SP', 'DP']);
+    const VALID_DIFFS = new Set(['B', 'N', 'H', 'A', 'L']);
+    const VALID_LAMPS = new Set([
+      'FAILED', 'ASSIST_CLEAR', 'EASY_CLEAR', 'CLEAR', 'HARD_CLEAR', 'EX_HARD_CLEAR', 'FULL_COMBO',
+    ]);
+
+    let chartLookup = new Map<string, number>();
+    let matched: { chart_id: number; ex_score: number | null; clear_lamp: string | null; miss_count: number | null }[] = [];
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) authWarning.style.display = '';
+    });
+
+    async function loadCharts() {
+      const { data, error } = await supabase
+        .from('charts')
+        .select('id, play_style, difficulty, songs ( title )');
+      if (error) return;
+      chartLookup = new Map(
+        (data ?? []).map((c: any) => [
+          `${(c.songs?.title ?? '').toLowerCase()}|${c.play_style}|${c.difficulty}`,
+          c.id,
+        ])
+      );
+    }
+
+    function parseCsv(text: string): string[][] {
+      return text
+        .trim()
+        .split(/\r?\n/)
+        .filter((line) => line.length > 0)
+        .map((line) => line.split(',').map((cell) => cell.trim().replace(/^"|"$/g, '')));
+    }
+
+    previewBtn.addEventListener('click', () => {
+      const rows = parseCsv(csvInput.value);
+      if (rows.length < 2) {
+        results.innerHTML = '<p>No data rows found.</p>';
+        return;
+      }
+      const header = rows[0].map((h) => h.toLowerCase());
+      const idx = {
+        title: header.indexOf('title'),
+        style: header.indexOf('play_style'),
+        diff: header.indexOf('difficulty'),
+        ex: header.indexOf('ex_score'),
+        lamp: header.indexOf('clear_lamp'),
+        miss: header.indexOf('miss_count'),
+      };
+      if (Object.values(idx).some((i) => i === -1)) {
+        results.innerHTML = '<p style="color:#ff8080;">Header row is missing one or more required columns.</p>';
+        return;
+      }
+
+      matched = [];
+      const unmatched: string[] = [];
+      const invalid: string[] = [];
+
+      for (const row of rows.slice(1)) {
+        const title = row[idx.title];
+        const style = row[idx.style]?.toUpperCase();
+        const diff = row[idx.diff]?.toUpperCase();
+        const lamp = row[idx.lamp]?.toUpperCase() || null;
+        const exScore = row[idx.ex] ? Number(row[idx.ex]) : null;
+        const missCount = row[idx.miss] ? Number(row[idx.miss]) : null;
+
+        if (!VALID_STYLES.has(style) || !VALID_DIFFS.has(diff) || (lamp && !VALID_LAMPS.has(lamp))) {
+          invalid.push(row.join(','));
+          continue;
+        }
+        const key = `${title.toLowerCase()}|${style}|${diff}`;
+        const chartId = chartLookup.get(key);
+        if (!chartId) {
+          unmatched.push(row.join(','));
+          continue;
+        }
+        matched.push({ chart_id: chartId, ex_score: exScore, clear_lamp: lamp, miss_count: missCount });
+      }
+
+      results.innerHTML = `
+        <p><strong>${matched.length}</strong> row(s) matched and ready to import.</p>
+        ${unmatched.length ? `<p style="color:#ffb066;">${unmatched.length} row(s) had no matching chart (check title/style/difficulty):</p><pre>${unmatched.join('\n')}</pre>` : ''}
+        ${invalid.length ? `<p style="color:#ff8080;">${invalid.length} row(s) had invalid style/difficulty/lamp values:</p><pre>${invalid.join('\n')}</pre>` : ''}
+      `;
+      submitBtn.style.display = matched.length ? '' : 'none';
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      submitBtn.disabled = true;
+      const { error } = await supabase.from('scores').upsert(matched, { onConflict: 'chart_id' });
+      results.insertAdjacentHTML(
+        'beforeend',
+        error
+          ? `<p style="color:#ff8080;">Import failed: ${error.message}</p>`
+          : `<p style="color:#8fd18f;">Imported ${matched.length} row(s).</p>`
+      );
+      submitBtn.disabled = false;
+    });
+
+    loadCharts();
+  </script>
+</Layout>

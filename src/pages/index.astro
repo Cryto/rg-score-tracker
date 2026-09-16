@@ -1,0 +1,228 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="IIDX Score Tracker">
+  <h1>beatmania IIDX Score Tracker</h1>
+
+  <div class="filters">
+    <label>Search
+      <input id="f-search" type="text" placeholder="Song title..." />
+    </label>
+    <label>Version
+      <select id="f-version"><option value="">All</option></select>
+    </label>
+    <label>Play Style
+      <select id="f-style">
+        <option value="">All</option>
+        <option value="SP">SP</option>
+        <option value="DP">DP</option>
+      </select>
+    </label>
+    <label>Difficulty
+      <select id="f-difficulty">
+        <option value="">All</option>
+        <option value="B">Beginner</option>
+        <option value="N">Normal</option>
+        <option value="H">Hyper</option>
+        <option value="A">Another</option>
+        <option value="L">Leggendaria</option>
+      </select>
+    </label>
+    <label>Min Level
+      <input id="f-level-min" type="number" min="1" max="12" />
+    </label>
+    <label>Max Level
+      <input id="f-level-max" type="number" min="1" max="12" />
+    </label>
+    <label>Lamp
+      <select id="f-lamp">
+        <option value="">All</option>
+        <option value="NONE">No score yet</option>
+        <option value="FAILED">Failed</option>
+        <option value="ASSIST_CLEAR">Assist Clear</option>
+        <option value="EASY_CLEAR">Easy Clear</option>
+        <option value="CLEAR">Clear</option>
+        <option value="HARD_CLEAR">Hard Clear</option>
+        <option value="EX_HARD_CLEAR">EX Hard Clear</option>
+        <option value="FULL_COMBO">Full Combo</option>
+      </select>
+    </label>
+  </div>
+
+  <p id="status" style="color: var(--text-dim);">Loading...</p>
+
+  <table id="chart-table" style="display:none;">
+    <thead>
+      <tr>
+        <th data-key="version">Version</th>
+        <th data-key="title">Title</th>
+        <th data-key="artist">Artist</th>
+        <th data-key="style">Style</th>
+        <th data-key="difficulty">Diff</th>
+        <th data-key="level">Lv</th>
+        <th data-key="ex_score">EX Score</th>
+        <th data-key="grade">Grade</th>
+        <th data-key="lamp">Lamp</th>
+        <th data-key="miss_count">BP</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    import { supabase } from '../lib/supabase';
+    import { computeGrade, LAMP_LABELS, CLEAR_LAMPS } from '../lib/grade';
+
+    const DIFF_LABELS: Record<string, string> = {
+      B: 'Beginner', N: 'Normal', H: 'Hyper', A: 'Another', L: 'Leggendaria',
+    };
+
+    type Row = {
+      chartId: number;
+      version: string;
+      versionNumber: number | null;
+      title: string;
+      artist: string;
+      style: string;
+      difficulty: string;
+      level: number;
+      noteCount: number | null;
+      exScore: number | null;
+      lamp: string | null;
+      missCount: number | null;
+    };
+
+    let rows: Row[] = [];
+    let sortKey = 'level';
+    let sortDir: 1 | -1 = -1;
+
+    const statusEl = document.getElementById('status')!;
+    const tableEl = document.getElementById('chart-table')!;
+    const tbody = tableEl.querySelector('tbody')!;
+    const versionSelect = document.getElementById('f-version') as HTMLSelectElement;
+
+    async function load() {
+      const { data, error } = await supabase
+        .from('charts')
+        .select(`
+          id, play_style, difficulty, level, note_count,
+          songs ( title, artist, versions ( number, name ) ),
+          scores ( ex_score, clear_lamp, miss_count )
+        `);
+
+      if (error) {
+        statusEl.textContent = `Failed to load: ${error.message}`;
+        return;
+      }
+
+      rows = (data ?? []).map((c: any) => ({
+        chartId: c.id,
+        version: c.songs?.versions?.name ?? 'Unknown',
+        versionNumber: c.songs?.versions?.number ?? null,
+        title: c.songs?.title ?? '(unknown)',
+        artist: c.songs?.artist ?? '',
+        style: c.play_style,
+        difficulty: c.difficulty,
+        level: c.level,
+        noteCount: c.note_count,
+        exScore: c.scores?.ex_score ?? null,
+        lamp: c.scores?.clear_lamp ?? null,
+        missCount: c.scores?.miss_count ?? null,
+      }));
+
+      const versions = [...new Set(rows.map((r) => r.version))].sort();
+      for (const v of versions) {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        versionSelect.appendChild(opt);
+      }
+
+      statusEl.style.display = 'none';
+      tableEl.style.display = '';
+      render();
+    }
+
+    function currentFilters() {
+      return {
+        search: (document.getElementById('f-search') as HTMLInputElement).value.trim().toLowerCase(),
+        version: versionSelect.value,
+        style: (document.getElementById('f-style') as HTMLSelectElement).value,
+        difficulty: (document.getElementById('f-difficulty') as HTMLSelectElement).value,
+        levelMin: Number((document.getElementById('f-level-min') as HTMLInputElement).value || 1),
+        levelMax: Number((document.getElementById('f-level-max') as HTMLInputElement).value || 12),
+        lamp: (document.getElementById('f-lamp') as HTMLSelectElement).value,
+      };
+    }
+
+    function render() {
+      const f = currentFilters();
+      let filtered = rows.filter((r) => {
+        if (f.search && !r.title.toLowerCase().includes(f.search)) return false;
+        if (f.version && r.version !== f.version) return false;
+        if (f.style && r.style !== f.style) return false;
+        if (f.difficulty && r.difficulty !== f.difficulty) return false;
+        if (r.level < f.levelMin || r.level > f.levelMax) return false;
+        if (f.lamp === 'NONE' && r.lamp) return false;
+        if (f.lamp && f.lamp !== 'NONE' && r.lamp !== f.lamp) return false;
+        return true;
+      });
+
+      filtered.sort((a: any, b: any) => {
+        let av = a[sortKey];
+        let bv = b[sortKey];
+        if (sortKey === 'grade') {
+          av = computeGrade(a.exScore, a.noteCount);
+          bv = computeGrade(b.exScore, b.noteCount);
+        }
+        if (sortKey === 'lamp') {
+          av = av ? CLEAR_LAMPS.indexOf(av) : -1;
+          bv = bv ? CLEAR_LAMPS.indexOf(bv) : -1;
+        }
+        if (av == null) av = -Infinity;
+        if (bv == null) bv = -Infinity;
+        if (av < bv) return -1 * sortDir;
+        if (av > bv) return 1 * sortDir;
+        return 0;
+      });
+
+      tbody.innerHTML = filtered
+        .map((r) => {
+          const grade = computeGrade(r.exScore, r.noteCount);
+          const lampLabel = r.lamp ? LAMP_LABELS[r.lamp as keyof typeof LAMP_LABELS] : '—';
+          return `<tr>
+            <td>${r.version}</td>
+            <td>${escapeHtml(r.title)}</td>
+            <td>${escapeHtml(r.artist)}</td>
+            <td>${r.style}</td>
+            <td>${DIFF_LABELS[r.difficulty] ?? r.difficulty}</td>
+            <td>${r.level}</td>
+            <td>${r.exScore ?? '—'}</td>
+            <td>${grade}</td>
+            <td>${lampLabel}</td>
+            <td>${r.missCount ?? '—'}</td>
+          </tr>`;
+        })
+        .join('');
+    }
+
+    function escapeHtml(s: string) {
+      return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    }
+
+    for (const id of ['f-search', 'f-version', 'f-style', 'f-difficulty', 'f-level-min', 'f-level-max', 'f-lamp']) {
+      document.getElementById(id)!.addEventListener('input', render);
+    }
+
+    tableEl.querySelectorAll('th[data-key]').forEach((th) => {
+      th.addEventListener('click', () => {
+        const key = (th as HTMLElement).dataset.key!;
+        if (sortKey === key) sortDir = (sortDir * -1) as 1 | -1;
+        else { sortKey = key; sortDir = 1; }
+        render();
+      });
+    });
+
+    load();
+  </script>
+</Layout>

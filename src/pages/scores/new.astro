@@ -1,0 +1,113 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Add Score">
+  <h1>Add / Update Score</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in — <a href="/login">log in</a> to submit scores.
+  </p>
+
+  <form id="score-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
+    <label>Song / Chart
+      <input id="chart-search" type="text" placeholder="Type a song title..." autocomplete="off" />
+      <select id="chart-select" size="6" style="display:none;"></select>
+    </label>
+    <label>EX Score <input id="ex-score" type="number" min="0" /></label>
+    <label>Clear Lamp
+      <select id="clear-lamp">
+        <option value="">— none —</option>
+        <option value="FAILED">Failed</option>
+        <option value="ASSIST_CLEAR">Assist Clear</option>
+        <option value="EASY_CLEAR">Easy Clear</option>
+        <option value="CLEAR">Clear</option>
+        <option value="HARD_CLEAR">Hard Clear</option>
+        <option value="EX_HARD_CLEAR">EX Hard Clear</option>
+        <option value="FULL_COMBO">Full Combo</option>
+      </select>
+    </label>
+    <label>Miss Count (BP) <input id="miss-count" type="number" min="0" /></label>
+    <button type="submit">Submit</button>
+    <p id="status" style="color: var(--text-dim);"></p>
+    <p style="color: var(--text-dim); font-size: 0.85rem;">
+      Fields only ever improve — submitting a worse EX score, lamp, or miss count than
+      your current best will not overwrite it.
+    </p>
+  </form>
+
+  <script>
+    import { supabase } from '../../lib/supabase';
+
+    const authWarning = document.getElementById('auth-warning')!;
+    const form = document.getElementById('score-form') as HTMLFormElement;
+    const searchInput = document.getElementById('chart-search') as HTMLInputElement;
+    const chartSelect = document.getElementById('chart-select') as HTMLSelectElement;
+    const status = document.getElementById('status')!;
+
+    let charts: { id: number; label: string }[] = [];
+    let selectedChartId: number | null = null;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) authWarning.style.display = '';
+    });
+
+    async function loadCharts() {
+      const { data, error } = await supabase
+        .from('charts')
+        .select('id, play_style, difficulty, level, songs ( title )');
+      if (error) {
+        status.textContent = `Failed to load songs: ${error.message}`;
+        return;
+      }
+      charts = (data ?? []).map((c: any) => ({
+        id: c.id,
+        label: `${c.songs?.title ?? '?'} [${c.play_style} ${c.difficulty} Lv${c.level}]`,
+      }));
+    }
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      selectedChartId = null;
+      if (!q) {
+        chartSelect.style.display = 'none';
+        chartSelect.innerHTML = '';
+        return;
+      }
+      const matches = charts.filter((c) => c.label.toLowerCase().includes(q)).slice(0, 50);
+      chartSelect.innerHTML = matches
+        .map((c) => `<option value="${c.id}">${c.label}</option>`)
+        .join('');
+      chartSelect.style.display = matches.length ? '' : 'none';
+    });
+
+    chartSelect.addEventListener('change', () => {
+      selectedChartId = Number(chartSelect.value);
+      searchInput.value = chartSelect.selectedOptions[0]?.textContent ?? '';
+      chartSelect.style.display = 'none';
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!selectedChartId) {
+        status.textContent = 'Pick a song/chart from the dropdown first.';
+        return;
+      }
+      const exScoreVal = (document.getElementById('ex-score') as HTMLInputElement).value;
+      const missCountVal = (document.getElementById('miss-count') as HTMLInputElement).value;
+      const clearLamp = (document.getElementById('clear-lamp') as HTMLSelectElement).value || null;
+
+      const { error } = await supabase.from('scores').upsert(
+        {
+          chart_id: selectedChartId,
+          ex_score: exScoreVal ? Number(exScoreVal) : null,
+          clear_lamp: clearLamp,
+          miss_count: missCountVal ? Number(missCountVal) : null,
+        },
+        { onConflict: 'chart_id' }
+      );
+
+      status.textContent = error ? `Error: ${error.message}` : 'Saved.';
+    });
+
+    loadCharts();
+  </script>
+</Layout>

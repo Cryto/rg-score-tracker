@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Login">
+  <h1>Login</h1>
+  <p style="color: var(--text-dim);">Only the site owner needs to log in — this is what lets you submit scores.</p>
+  <form id="login-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:320px;">
+    <label>Email <input type="email" id="email" required /></label>
+    <label>Password <input type="password" id="password" required /></label>
+    <button type="submit">Log in</button>
+    <p id="status"></p>
+  </form>
+
+  <script>
+    import { supabase } from '../lib/supabase';
+
+    const form = document.getElementById('login-form') as HTMLFormElement;
+    const status = document.getElementById('status')!;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) status.textContent = `Logged in as ${data.session.user.email}`;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (document.getElementById('email') as HTMLInputElement).value;
+      const password = (document.getElementById('password') as HTMLInputElement).value;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      status.textContent = error ? `Error: ${error.message}` : 'Logged in.';
+      if (!error) setTimeout(() => (window.location.href = '/scores/new'), 500);
+    });
+  </script>
+</Layout>
