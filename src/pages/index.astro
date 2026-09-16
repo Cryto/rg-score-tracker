@@ -130,7 +130,15 @@ import Layout from '../layouts/Layout.astro';
         missCount: c.scores?.miss_count ?? null,
       }));
 
-      const versions = [...new Set(rows.map((r) => r.version))].sort();
+      const versionMap = new Map<string, number>();
+      for (const r of rows) {
+        if (!versionMap.has(r.version)) versionMap.set(r.version, r.versionNumber ?? -1);
+      }
+      // substream (number 0) sits chronologically between 1st and 2nd style, not before 1st.
+      const sortKeyFor = (n: number) => (n === 0 ? 1.5 : n);
+      const versions = [...versionMap.keys()].sort(
+        (a, b) => sortKeyFor(versionMap.get(a)!) - sortKeyFor(versionMap.get(b)!)
+      );
       for (const v of versions) {
         const opt = document.createElement('option');
         opt.value = v;
