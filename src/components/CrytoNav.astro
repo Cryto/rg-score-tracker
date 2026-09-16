@@ -1,0 +1,83 @@
+---
+// Ported from cryto.dev's src/components/Nav.astro so visitors have a way
+// back to the main site. Links are absolute (this is a separate domain, not
+// a route within cryto.dev) and styling is self-contained so it doesn't
+// collide with this app's own dark theme below it.
+const links = [
+  { href: 'https://cryto.dev/', label: 'Home' },
+  { href: 'https://cryto.dev/about', label: 'About' },
+  { href: 'https://cryto.dev/projects', label: 'Projects' },
+  { href: 'https://cryto.dev/blog', label: 'Blog' },
+];
+---
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap"
+/>
+<header class="cryto-nav">
+  <nav>
+    <a class="brand" href="https://cryto.dev/">CRYTO.DEV</a>
+    <ul>
+      {links.map((link) => (
+        <li><a href={link.href}>{link.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .cryto-nav {
+    --cn-surface: #1d1f27;
+    --cn-text: #f2f1ec;
+    --cn-muted: #9799a6;
+    --cn-border: #2b2d36;
+    --cn-font-body: 'Work Sans', system-ui, sans-serif;
+    --cn-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    background: var(--cn-surface);
+    border-bottom: 1px solid var(--cn-border);
+    font-family: var(--cn-font-body);
+  }
+
+  nav {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .brand {
+    font-family: var(--cn-font-mono);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: var(--cn-text);
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  li a {
+    color: var(--cn-muted);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  li a:hover {
+    color: var(--cn-text);
+  }
+</style>

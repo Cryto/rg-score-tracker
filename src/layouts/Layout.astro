@@ -1,4 +1,6 @@
 ---
+import CrytoNav from '../components/CrytoNav.astro';
+
 interface Props {
   title: string;
 }
@@ -28,7 +30,7 @@ const { title } = Astro.props;
         color: var(--text);
       }
       a { color: var(--accent); }
-      nav {
+      .app-nav {
         display: flex;
         gap: 1.5rem;
         padding: 1rem 1.5rem;
@@ -88,7 +90,8 @@ const { title } = Astro.props;
     </style>
   </head>
   <body>
-    <nav>
+    <CrytoNav />
+    <nav class="app-nav">
       <a href="/">Song List</a>
       <a href="/scores/new">Add Score</a>
       <a href="/scores/import">Bulk Import</a>
