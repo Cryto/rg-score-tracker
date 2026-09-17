@@ -48,10 +48,18 @@ SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
     });
 
     async function loadCharts() {
-      const { data, error } = await supabase
-        .from('charts')
-        .select('id, play_style, difficulty, songs ( title, title_english )');
-      if (error) return;
+      // Supabase caps a single select at 1000 rows - page through until exhausted.
+      const pageSize = 1000;
+      let data: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data: page, error } = await supabase
+          .from('charts')
+          .select('id, play_style, difficulty, songs ( title, title_english )')
+          .range(from, from + pageSize - 1);
+        if (error) return;
+        data = data.concat(page ?? []);
+        if (!page || page.length < pageSize) break;
+      }
       chartLookup = new Map(
         (data ?? []).flatMap((c: any) => {
           const entries: [string, number][] = [

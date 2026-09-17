@@ -17,8 +17,10 @@ pnpm-debug.log*
 .env
 .env.production
 
-# downloaded third-party catalog data, not vendored into the repo
+# downloaded/generated catalog data and one-off scratch output, not vendored into the repo
 db/import/*.tsv
+db/import/*.csv
+db/import/validation_*.json
 
 # macOS-specific files
 .DS_Store

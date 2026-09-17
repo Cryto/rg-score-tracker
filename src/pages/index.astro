@@ -103,17 +103,25 @@ import Layout from '../layouts/Layout.astro';
     const versionSelect = document.getElementById('f-version') as HTMLSelectElement;
 
     async function load() {
-      const { data, error } = await supabase
-        .from('charts')
-        .select(`
-          id, play_style, difficulty, level, note_count,
-          songs ( title, title_english, artist, versions ( number, name ) ),
-          scores ( ex_score, clear_lamp, miss_count )
-        `);
+      // Supabase caps a single select at 1000 rows - page through until exhausted.
+      const pageSize = 1000;
+      let data: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data: page, error } = await supabase
+          .from('charts')
+          .select(`
+            id, play_style, difficulty, level, note_count,
+            songs ( title, title_english, artist, versions ( number, name ) ),
+            scores ( ex_score, clear_lamp, miss_count )
+          `)
+          .range(from, from + pageSize - 1);
 
-      if (error) {
-        statusEl.textContent = `Failed to load: ${error.message}`;
-        return;
+        if (error) {
+          statusEl.textContent = `Failed to load: ${error.message}`;
+          return;
+        }
+        data = data.concat(page ?? []);
+        if (!page || page.length < pageSize) break;
       }
 
       rows = (data ?? []).map((c: any) => ({
