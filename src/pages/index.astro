@@ -83,6 +83,14 @@ import Layout from '../layouts/Layout.astro';
       <p id="status" style="color: var(--text-dim);">Loading...</p>
 
       <table id="chart-table" style="display:none;">
+        <colgroup>
+          <col />
+          <col style="width:90px" />
+          <col style="width:90px" />
+          <col style="width:70px" />
+          <col style="width:140px" />
+          <col style="width:60px" />
+        </colgroup>
         <thead>
           <tr>
             <th>Title</th>
@@ -125,6 +133,7 @@ import Layout from '../layouts/Layout.astro';
       exScore: number | null;
       lamp: string | null;
       missCount: number | null;
+      scoreUpdatedAt: string | null;
     };
 
     let rows: Row[] = [];
@@ -163,7 +172,7 @@ import Layout from '../layouts/Layout.astro';
           .select(`
             id, play_style, difficulty, level, note_count, chart_label,
             songs ( title, title_english, artist, bpm_min, bpm_max, versions ( number, name ) ),
-            scores ( ex_score, clear_lamp, miss_count )
+            scores ( ex_score, clear_lamp, miss_count, updated_at )
           `)
           .range(from, from + pageSize - 1);
 
@@ -192,11 +201,21 @@ import Layout from '../layouts/Layout.astro';
         exScore: c.scores?.ex_score ?? null,
         lamp: c.scores?.clear_lamp ?? null,
         missCount: c.scores?.miss_count ?? null,
+        scoreUpdatedAt: c.scores?.updated_at ?? null,
       }));
 
-      // Fixed display order (no interactive sorting): chronological version,
-      // then title, style, difficulty, level.
+      // Charts with a score sort by most-recently-updated first, surfacing
+      // your latest plays. Charts with no score yet fall back to the fixed
+      // catalog order (chronological version, then title/style/difficulty/
+      // level) and always sort after every scored chart; that same fixed
+      // order also breaks ties among scored charts.
       rows.sort((a, b) => {
+        const aScored = a.scoreUpdatedAt != null;
+        const bScored = b.scoreUpdatedAt != null;
+        if (aScored !== bScored) return aScored ? -1 : 1;
+        if (aScored && bScored && a.scoreUpdatedAt !== b.scoreUpdatedAt) {
+          return a.scoreUpdatedAt! > b.scoreUpdatedAt! ? -1 : 1;
+        }
         const av = versionSortKey(a.versionNumber ?? -1);
         const bv = versionSortKey(b.versionNumber ?? -1);
         if (av !== bv) return av - bv;
@@ -282,7 +301,7 @@ import Layout from '../layouts/Layout.astro';
           const diffLabel = DIFF_LABELS[r.difficulty] ?? r.difficulty;
           const diffWithChartLabel = r.chartLabel ? `${diffLabel} (${escapeHtml(r.chartLabel)})` : diffLabel;
           return `<tr class="song-row" data-expand="expand-${i}">
-            <td><span class="expand-arrow">▸</span>${escapeHtml(r.title)}
+            <td class="title-cell"><span class="expand-arrow">▸</span>${escapeHtml(r.title)}
               <div class="row-subtitle">${escapeHtml(r.artist)}</div>${
             r.titleEnglish && r.titleEnglish !== r.title
               ? `<div class="row-subtitle">${escapeHtml(r.titleEnglish)}</div>`

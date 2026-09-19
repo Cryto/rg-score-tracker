@@ -65,15 +65,15 @@ per chart — and upserts via the Supabase JS client with the service role key.
 
 ## Score entry
 
-- **Manual**: `/scores/new` — search a song/chart, enter EX score / lamp / miss count.
-- **Bulk CSV**: `/scores/import` — paste a CSV (see column format on that page),
+- **Manual**: `/settings/new` — search a song/chart, enter EX score / lamp / miss count.
+- **Bulk CSV**: `/settings/import` — paste a CSV (see column format on that page),
   preview matches against the catalog, then import.
 
-These routes aren't in the main site nav — reach them via the floating settings
-button (bottom-left) or by URL. They aren't access-controlled beyond that — the
-Postgres RLS policies on `scores` remain the only write guard.
-
-Both require being logged in at `/login`.
+These routes aren't in the main site nav — the floating settings button
+(bottom-left) links to `/login`, which redirects to `/settings` (a hub linking
+to both pages above) once you're signed in, or skips straight there if you're
+already logged in. They aren't access-controlled beyond that — the Postgres
+RLS policies on `scores` remain the only write guard.
 
 ## Branding
 

@@ -18,7 +18,9 @@ import Layout from '../layouts/Layout.astro';
     const status = document.getElementById('status')!;
 
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) status.textContent = `Logged in as ${data.session.user.email}`;
+      // Already logged in (e.g. via the settings button) -- skip straight to
+      // /settings instead of showing the form again.
+      if (data.session) window.location.href = '/settings';
     });
 
     form.addEventListener('submit', async (e) => {
@@ -27,7 +29,7 @@ import Layout from '../layouts/Layout.astro';
       const password = (document.getElementById('password') as HTMLInputElement).value;
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       status.textContent = error ? `Error: ${error.message}` : 'Logged in.';
-      if (!error) setTimeout(() => (window.location.href = '/scores/new'), 500);
+      if (!error) setTimeout(() => (window.location.href = '/settings'), 500);
     });
   </script>
 </Layout>
