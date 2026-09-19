@@ -1,4 +1,4 @@
-export type Grade = 'AAA' | 'AA' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | '—';
+export type Grade = 'MAX' | 'MAX-' | 'AAA' | 'AA' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | '—';
 
 // DJ Level thresholds, as a fraction of max EX score (note_count * 2).
 const THRESHOLDS: [number, Grade][] = [
@@ -13,7 +13,10 @@ const THRESHOLDS: [number, Grade][] = [
 
 export function computeGrade(exScore: number | null, noteCount: number | null): Grade {
   if (exScore == null || noteCount == null || noteCount === 0) return '—';
-  const ratio = exScore / (noteCount * 2);
+  const maxScore = noteCount * 2;
+  if (exScore >= maxScore) return 'MAX';
+  if (exScore === maxScore - 1) return 'MAX-';
+  const ratio = exScore / maxScore;
   for (const [threshold, grade] of THRESHOLDS) {
     if (ratio >= threshold) return grade;
   }

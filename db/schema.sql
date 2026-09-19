@@ -47,6 +47,10 @@ create table charts (
   difficulty chart_difficulty not null,
   level integer not null check (level between 1 and 12),
   note_count integer,
+  -- Optional free-text label, e.g. "Black Another" for charts that are
+  -- Black Another rather than plain Leggendaria (difficulty stays 'L'
+  -- either way -- this only affects the expanded row detail on the site).
+  chart_label text,
   unique (song_id, play_style, difficulty)
 );
 create index charts_song_id_idx on charts(song_id);

@@ -158,6 +158,41 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         min-width: 0;
         overflow-x: auto;
       }
+      .song-row {
+        cursor: pointer;
+      }
+      .song-row:hover { background: var(--surface); }
+      .song-row .expand-arrow {
+        display: inline-block;
+        color: var(--text-dim);
+        margin-right: 0.4rem;
+        transition: transform 0.15s;
+      }
+      .song-row.open .expand-arrow {
+        transform: rotate(90deg);
+      }
+      .row-subtitle {
+        color: var(--text-dim);
+        font-size: 0.8em;
+      }
+      .chart-code {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      .expand-row td {
+        background: var(--surface);
+        white-space: normal;
+        padding: 0.6rem;
+      }
+      .expand-row span {
+        display: inline-block;
+        margin-right: 1.5rem;
+        color: var(--text-dim);
+        font-size: 0.85rem;
+      }
+      .expand-row span strong {
+        color: var(--text);
+        font-weight: 500;
+      }
       select, input, button {
         background: var(--surface);
         border: 1px solid var(--border);
