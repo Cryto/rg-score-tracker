@@ -2,80 +2,112 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout title="IIDX Score Tracker">
-  <h1>beatmania IIDX Score Tracker</h1>
-
-  <div class="filters">
-    <label>Search
-      <input id="f-search" type="text" placeholder="Song title..." />
-    </label>
-    <label>Version
-      <select id="f-version"><option value="">All</option></select>
-    </label>
-    <label>Play Style
-      <select id="f-style">
-        <option value="">All</option>
-        <option value="SP">SP</option>
-        <option value="DP">DP</option>
-      </select>
-    </label>
-    <label>Difficulty
-      <select id="f-difficulty">
-        <option value="">All</option>
-        <option value="B">Beginner</option>
-        <option value="N">Normal</option>
-        <option value="H">Hyper</option>
-        <option value="A">Another</option>
-        <option value="L">Leggendaria</option>
-      </select>
-    </label>
-    <label>Min Level
-      <input id="f-level-min" type="number" min="1" max="12" />
-    </label>
-    <label>Max Level
-      <input id="f-level-max" type="number" min="1" max="12" />
-    </label>
-    <label>Lamp
-      <select id="f-lamp">
-        <option value="">All</option>
-        <option value="NONE">No score yet</option>
-        <option value="FAILED">Failed</option>
-        <option value="ASSIST_CLEAR">Assist Clear</option>
-        <option value="EASY_CLEAR">Easy Clear</option>
-        <option value="CLEAR">Clear</option>
-        <option value="HARD_CLEAR">Hard Clear</option>
-        <option value="EX_HARD_CLEAR">EX Hard Clear</option>
-        <option value="FULL_COMBO">Full Combo</option>
-      </select>
-    </label>
+  <div class="page-header">
+    <h1>beatmania IIDX Score Tracker</h1>
+    <div id="last-updated" class="last-updated"></div>
   </div>
 
-  <p id="status" style="color: var(--text-dim);">Loading...</p>
+  <label class="search-row">Search
+    <input id="f-search" type="text" placeholder="Song title..." />
+  </label>
 
-  <table id="chart-table" style="display:none;">
-    <thead>
-      <tr>
-        <th data-key="version">Version</th>
-        <th data-key="title">Title</th>
-        <th data-key="artist">Artist</th>
-        <th data-key="style">Style</th>
-        <th data-key="difficulty">Diff</th>
-        <th data-key="level">Lv</th>
-        <th data-key="ex_score">EX Score</th>
-        <th data-key="grade">Grade</th>
-        <th data-key="lamp">Lamp</th>
-        <th data-key="miss_count">BP</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="layout">
+    <aside class="filters-sidebar">
+      <div class="filters-heading">Filters</div>
+
+      <div class="filter-group" data-group="style">
+        <button type="button" class="filter-group-header">Play Style<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="SP" /> Single Play</label>
+          <label class="checkbox-row"><input type="checkbox" value="DP" /> Double Play</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="difficulty">
+        <button type="button" class="filter-group-header">Difficulty<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="B" /> Beginner</label>
+          <label class="checkbox-row"><input type="checkbox" value="N" /> Normal</label>
+          <label class="checkbox-row"><input type="checkbox" value="H" /> Hyper</label>
+          <label class="checkbox-row"><input type="checkbox" value="A" /> Another</label>
+          <label class="checkbox-row"><input type="checkbox" value="L" /> Leggendaria</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="grade">
+        <button type="button" class="filter-group-header">Grade<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="AAA" /> AAA</label>
+          <label class="checkbox-row"><input type="checkbox" value="AA" /> AA</label>
+          <label class="checkbox-row"><input type="checkbox" value="A" /> A</label>
+          <label class="checkbox-row"><input type="checkbox" value="B" /> B</label>
+          <label class="checkbox-row"><input type="checkbox" value="C" /> C</label>
+          <label class="checkbox-row"><input type="checkbox" value="D" /> D</label>
+          <label class="checkbox-row"><input type="checkbox" value="E" /> E</label>
+          <label class="checkbox-row"><input type="checkbox" value="F" /> F</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="lamp">
+        <button type="button" class="filter-group-header">Clear Lamp<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="FULL_COMBO" /> Full Combo</label>
+          <label class="checkbox-row"><input type="checkbox" value="EX_HARD_CLEAR" /> EX Hard Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="HARD_CLEAR" /> Hard Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="CLEAR" /> Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="EASY_CLEAR" /> Easy Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="ASSIST_CLEAR" /> Assist Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="FAILED" /> Failed</label>
+          <label class="checkbox-row"><input type="checkbox" value="NONE" /> No score yet</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="level">
+        <button type="button" class="filter-group-header">Level<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((lv) => (
+            <label class="checkbox-row"><input type="checkbox" value={lv} /> Lv. {lv}</label>
+          ))}
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="version">
+        <button type="button" class="filter-group-header">Version<span class="arrow">▸</span></button>
+        <div class="filter-group-content" id="f-version-list"></div>
+      </div>
+    </aside>
+
+    <div class="table-container">
+      <p id="status" style="color: var(--text-dim);">Loading...</p>
+
+      <table id="chart-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Style</th>
+            <th>Diff</th>
+            <th>Lv</th>
+            <th>EX Score</th>
+            <th>Grade</th>
+            <th>Lamp</th>
+            <th>BP</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
   <script>
     import { supabase } from '../lib/supabase';
-    import { computeGrade, LAMP_LABELS, CLEAR_LAMPS } from '../lib/grade';
+    import { computeGrade, LAMP_LABELS } from '../lib/grade';
 
     const DIFF_LABELS: Record<string, string> = {
       B: 'Beginner', N: 'Normal', H: 'Hyper', A: 'Another', L: 'Leggendaria',
     };
+    const DIFF_ORDER = ['B', 'N', 'H', 'A', 'L'];
 
     type Row = {
       chartId: number;
@@ -94,13 +126,30 @@ import Layout from '../layouts/Layout.astro';
     };
 
     let rows: Row[] = [];
-    let sortKey = 'level';
-    let sortDir: 1 | -1 = -1;
 
     const statusEl = document.getElementById('status')!;
     const tableEl = document.getElementById('chart-table')!;
     const tbody = tableEl.querySelector('tbody')!;
-    const versionSelect = document.getElementById('f-version') as HTMLSelectElement;
+    const versionListEl = document.getElementById('f-version-list')!;
+    const lastUpdatedEl = document.getElementById('last-updated')!;
+
+    function formatTimestamp(iso: string | null): string {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+      });
+    }
+
+    async function loadLastUpdated() {
+      const [{ data: sync }, { data: score }] = await Promise.all([
+        supabase.from('catalog_syncs').select('synced_at').order('synced_at', { ascending: false }).limit(1).maybeSingle(),
+        supabase.from('scores').select('updated_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      lastUpdatedEl.innerHTML = `DB last updated: ${formatTimestamp(sync?.synced_at ?? null)}<br>Scores last updated: ${formatTimestamp(score?.updated_at ?? null)}`;
+    }
+
+    // substream (number 0) sits chronologically between 1st and 2nd style, not before 1st.
+    const versionSortKey = (n: number) => (n === 0 ? 1.5 : n);
 
     async function load() {
       // Supabase caps a single select at 1000 rows - page through until exhausted.
@@ -140,73 +189,79 @@ import Layout from '../layouts/Layout.astro';
         missCount: c.scores?.miss_count ?? null,
       }));
 
+      // Fixed display order (no interactive sorting): chronological version,
+      // then title, style, difficulty, level.
+      rows.sort((a, b) => {
+        const av = versionSortKey(a.versionNumber ?? -1);
+        const bv = versionSortKey(b.versionNumber ?? -1);
+        if (av !== bv) return av - bv;
+        if (a.title !== b.title) return a.title.localeCompare(b.title);
+        if (a.style !== b.style) return a.style.localeCompare(b.style);
+        const ad = DIFF_ORDER.indexOf(a.difficulty);
+        const bd = DIFF_ORDER.indexOf(b.difficulty);
+        if (ad !== bd) return ad - bd;
+        return a.level - b.level;
+      });
+
       const versionMap = new Map<string, number>();
       for (const r of rows) {
         if (!versionMap.has(r.version)) versionMap.set(r.version, r.versionNumber ?? -1);
       }
-      // substream (number 0) sits chronologically between 1st and 2nd style, not before 1st.
-      const sortKeyFor = (n: number) => (n === 0 ? 1.5 : n);
       const versions = [...versionMap.keys()].sort(
-        (a, b) => sortKeyFor(versionMap.get(a)!) - sortKeyFor(versionMap.get(b)!)
+        (a, b) => versionSortKey(versionMap.get(a)!) - versionSortKey(versionMap.get(b)!)
       );
       for (const v of versions) {
-        const opt = document.createElement('option');
-        opt.value = v;
-        opt.textContent = v;
-        versionSelect.appendChild(opt);
+        const label = document.createElement('label');
+        label.className = 'checkbox-row';
+        label.innerHTML = `<input type="checkbox" value="${escapeHtml(v)}" /> ${escapeHtml(v)}`;
+        versionListEl.appendChild(label);
       }
+      versionListEl.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('input', render);
+      });
 
       statusEl.style.display = 'none';
       tableEl.style.display = '';
       render();
     }
 
+    function checkedValues(groupName: string): Set<string> {
+      const group = document.querySelector(`.filter-group[data-group="${groupName}"]`)!;
+      const checked = group.querySelectorAll('input[type="checkbox"]:checked');
+      return new Set([...checked].map((el) => (el as HTMLInputElement).value));
+    }
+
     function currentFilters() {
       return {
         search: (document.getElementById('f-search') as HTMLInputElement).value.trim().toLowerCase(),
-        version: versionSelect.value,
-        style: (document.getElementById('f-style') as HTMLSelectElement).value,
-        difficulty: (document.getElementById('f-difficulty') as HTMLSelectElement).value,
-        levelMin: Number((document.getElementById('f-level-min') as HTMLInputElement).value || 1),
-        levelMax: Number((document.getElementById('f-level-max') as HTMLInputElement).value || 12),
-        lamp: (document.getElementById('f-lamp') as HTMLSelectElement).value,
+        versions: checkedValues('version'),
+        styles: checkedValues('style'),
+        difficulties: checkedValues('difficulty'),
+        grades: checkedValues('grade'),
+        lamps: checkedValues('lamp'),
+        levels: checkedValues('level'),
       };
     }
 
     function render() {
       const f = currentFilters();
-      let filtered = rows.filter((r) => {
+      const filtered = rows.filter((r) => {
         if (
           f.search &&
           !r.title.toLowerCase().includes(f.search) &&
           !r.titleEnglish.toLowerCase().includes(f.search)
         )
           return false;
-        if (f.version && r.version !== f.version) return false;
-        if (f.style && r.style !== f.style) return false;
-        if (f.difficulty && r.difficulty !== f.difficulty) return false;
-        if (r.level < f.levelMin || r.level > f.levelMax) return false;
-        if (f.lamp === 'NONE' && r.lamp) return false;
-        if (f.lamp && f.lamp !== 'NONE' && r.lamp !== f.lamp) return false;
+        if (f.versions.size && !f.versions.has(r.version)) return false;
+        if (f.styles.size && !f.styles.has(r.style)) return false;
+        if (f.difficulties.size && !f.difficulties.has(r.difficulty)) return false;
+        if (f.levels.size && !f.levels.has(String(r.level))) return false;
+        if (f.lamps.size) {
+          const lampValue = r.lamp ?? 'NONE';
+          if (!f.lamps.has(lampValue)) return false;
+        }
+        if (f.grades.size && !f.grades.has(computeGrade(r.exScore, r.noteCount))) return false;
         return true;
-      });
-
-      filtered.sort((a: any, b: any) => {
-        let av = a[sortKey];
-        let bv = b[sortKey];
-        if (sortKey === 'grade') {
-          av = computeGrade(a.exScore, a.noteCount);
-          bv = computeGrade(b.exScore, b.noteCount);
-        }
-        if (sortKey === 'lamp') {
-          av = av ? CLEAR_LAMPS.indexOf(av) : -1;
-          bv = bv ? CLEAR_LAMPS.indexOf(bv) : -1;
-        }
-        if (av == null) av = -Infinity;
-        if (bv == null) bv = -Infinity;
-        if (av < bv) return -1 * sortDir;
-        if (av > bv) return 1 * sortDir;
-        return 0;
       });
 
       tbody.innerHTML = filtered
@@ -237,19 +292,17 @@ import Layout from '../layouts/Layout.astro';
       return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
     }
 
-    for (const id of ['f-search', 'f-version', 'f-style', 'f-difficulty', 'f-level-min', 'f-level-max', 'f-lamp']) {
-      document.getElementById(id)!.addEventListener('input', render);
-    }
+    document.getElementById('f-search')!.addEventListener('input', render);
 
-    tableEl.querySelectorAll('th[data-key]').forEach((th) => {
-      th.addEventListener('click', () => {
-        const key = (th as HTMLElement).dataset.key!;
-        if (sortKey === key) sortDir = (sortDir * -1) as 1 | -1;
-        else { sortKey = key; sortDir = 1; }
-        render();
+    document.querySelectorAll('.filter-group').forEach((group) => {
+      const header = group.querySelector('.filter-group-header')!;
+      header.addEventListener('click', () => group.classList.toggle('open'));
+      group.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('input', render);
       });
     });
 
     load();
+    loadLastUpdated();
   </script>
 </Layout>

@@ -186,3 +186,6 @@ console.log(`Unmapped version strings (${unmappedVersionStrings.size} distinct):
 for (const [str, count] of [...unmappedVersionStrings.entries()].sort((a, b) => b[1] - a[1])) {
   console.log(`  ${count}x  "${str}"`);
 }
+
+const { error: syncError } = await supabase.from('catalog_syncs').insert({});
+if (syncError) console.error(`Failed to record catalog sync timestamp: ${syncError.message}`);

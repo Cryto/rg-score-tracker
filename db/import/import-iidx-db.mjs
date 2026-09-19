@@ -131,3 +131,6 @@ for (const line of rows) {
 console.log(
   `Done. Songs upserted: ${songCount}, charts upserted: ${chartCount}, errors: ${errors}, unmapped versions table lookups: ${unmappedVersions}`
 );
+
+const { error: syncError } = await supabase.from('catalog_syncs').insert({});
+if (syncError) console.error(`Failed to record catalog sync timestamp: ${syncError.message}`);

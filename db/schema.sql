@@ -90,16 +90,26 @@ create trigger scores_ratchet
 before insert or update on scores
 for each row execute function ratchet_score();
 
+-- Records when the song/chart catalog was last synced (written by the
+-- import scripts), so the site can show a "DB last updated" timestamp
+-- alongside scores.updated_at ("scores last updated").
+create table catalog_syncs (
+  id serial primary key,
+  synced_at timestamptz not null default now()
+);
+
 -- Row Level Security: anyone can read, only the owner account can write.
 alter table versions enable row level security;
 alter table songs enable row level security;
 alter table charts enable row level security;
 alter table scores enable row level security;
+alter table catalog_syncs enable row level security;
 
 create policy "public read versions" on versions for select using (true);
 create policy "public read songs" on songs for select using (true);
 create policy "public read charts" on charts for select using (true);
 create policy "public read scores" on scores for select using (true);
+create policy "public read catalog_syncs" on catalog_syncs for select using (true);
 
 create policy "owner write scores" on scores
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);

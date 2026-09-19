@@ -69,6 +69,10 @@ per chart — and upserts via the Supabase JS client with the service role key.
 - **Bulk CSV**: `/scores/import` — paste a CSV (see column format on that page),
   preview matches against the catalog, then import.
 
+These routes aren't in the main site nav — reach them via the floating settings
+button (bottom-left) or by URL. They aren't access-controlled beyond that — the
+Postgres RLS policies on `scores` remain the only write guard.
+
 Both require being logged in at `/login`.
 
 ## Branding
