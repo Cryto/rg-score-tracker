@@ -102,20 +102,45 @@ create table catalog_syncs (
   synced_at timestamptz not null default now()
 );
 
+-- Tracks which versions a chart was actually playable in (handles charts
+-- removed from rotation and later reinstated), powering the "Playable in"
+-- filter. Populated separately from schema setup.
+create table chart_availability (
+  chart_id integer not null references charts(id) on delete cascade,
+  version_id integer not null references versions(id),
+  primary key (chart_id, version_id)
+);
+
 -- Row Level Security: anyone can read, only the owner account can write.
 alter table versions enable row level security;
 alter table songs enable row level security;
 alter table charts enable row level security;
 alter table scores enable row level security;
 alter table catalog_syncs enable row level security;
+alter table chart_availability enable row level security;
 
 create policy "public read versions" on versions for select using (true);
 create policy "public read songs" on songs for select using (true);
 create policy "public read charts" on charts for select using (true);
 create policy "public read scores" on scores for select using (true);
 create policy "public read catalog_syncs" on catalog_syncs for select using (true);
+create policy "public read chart_availability" on chart_availability for select using (true);
 
 create policy "owner write scores" on scores
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
 create policy "owner update scores" on scores
+  for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+
+-- Lets the owner insert/update catalog data from the browser (the
+-- /settings/catalog-import page), the same way scores works above. This
+-- widens the owner session's blast radius from "can edit scores" to "can
+-- edit the whole catalog" -- see Key Decisions in the wiki.
+create policy "owner write songs" on songs
+  for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner update songs" on songs
+  for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+
+create policy "owner write charts" on charts
+  for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner update charts" on charts
   for update using (auth.uid() = '<OWNER_UUID>'::uuid);

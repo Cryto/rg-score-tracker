@@ -1,0 +1,197 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Catalog Import/Update" showLogout={true}>
+  <h1>Catalog Import / Update (CSV)</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in — <a href="/login">log in</a> to edit the catalog.
+  </p>
+
+  <p style="color: var(--text-dim); max-width: 760px;">
+    Header row required. First column must be <code>title</code>, matched
+    <strong>case-sensitively</strong> against the existing catalog — a match updates that
+    song, no match inserts a new one. Every other column is optional; a blank cell leaves
+    the existing value alone.
+  </p>
+  <p style="color: var(--text-dim); max-width: 760px;">
+    Song-level columns: <code>title_english</code>, <code>artist</code>, <code>genre</code>,
+    <code>bpm_min</code>, <code>bpm_max</code>, <code>debut_version</code> (matched against
+    the version name, e.g. <code>22 PENDUAL</code>).<br />
+    Chart-level columns (one pair per chart, only set the ones you have):
+    <code>spb_level</code>/<code>spb_notes</code>, <code>spn_level</code>/<code>spn_notes</code>,
+    <code>sph_level</code>/<code>sph_notes</code>, <code>spa_level</code>/<code>spa_notes</code>,
+    <code>spl_level</code>/<code>spl_notes</code>, and the same five with <code>dp</code>.
+  </p>
+
+  <textarea id="csv-input" rows="10" style="width:100%; max-width:900px; font-family: monospace;"
+    placeholder="title,artist,debut_version,spn_level,spa_level
+SAMPLE SONG,Some Artist,22 PENDUAL,5,10"></textarea>
+  <div style="margin-top: 0.75rem; display:flex; gap:0.75rem;">
+    <button id="preview-btn">Preview</button>
+    <button id="submit-btn" style="display:none;">Apply Changes</button>
+  </div>
+
+  <div id="results" style="margin-top:1.5rem;"></div>
+
+  <script>
+    import { supabase } from '../../lib/supabase';
+
+    const CHART_SLOTS = ['spb', 'spn', 'sph', 'spa', 'spl', 'dpb', 'dpn', 'dph', 'dpa', 'dpl'];
+    const SONG_COLUMNS = ['title_english', 'artist', 'genre', 'bpm_min', 'bpm_max'] as const;
+    const NUMERIC_SONG_COLUMNS = new Set(['bpm_min', 'bpm_max']);
+
+    const authWarning = document.getElementById('auth-warning')!;
+    const csvInput = document.getElementById('csv-input') as HTMLTextAreaElement;
+    const previewBtn = document.getElementById('preview-btn')!;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const results = document.getElementById('results')!;
+
+    type SongUpdate = { existingId: number | null; title: string; patch: Record<string, any> };
+    type ChartUpdate = { play_style: string; difficulty: string; level: number; note_count: number | null };
+    type PlannedSong = { song: SongUpdate; charts: ChartUpdate[] };
+
+    let planned: PlannedSong[] = [];
+    let existingByTitle = new Map<string, { id: number }>();
+    let versionByName = new Map<string, number>();
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) authWarning.style.display = '';
+    });
+
+    function parseCsvLine(line: string): string[] {
+      const result: string[] = [];
+      let cur = '', inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inQuotes) {
+          if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQuotes = false; }
+          else cur += c;
+        } else {
+          if (c === '"') inQuotes = true;
+          else if (c === ',') { result.push(cur); cur = ''; }
+          else cur += c;
+        }
+      }
+      result.push(cur);
+      return result.map((s) => s.trim());
+    }
+
+    async function loadLookups() {
+      const pageSize = 1000;
+      let songs: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data, error } = await supabase.from('songs').select('id, title').range(from, from + pageSize - 1);
+        if (error) { results.innerHTML = `<p style="color:#ff8080;">Failed to load songs: ${error.message}</p>`; return; }
+        songs = songs.concat(data ?? []);
+        if (!data || data.length < pageSize) break;
+      }
+      existingByTitle = new Map(songs.map((s) => [s.title, { id: s.id }]));
+
+      const { data: versions, error: vErr } = await supabase.from('versions').select('id, name');
+      if (vErr) { results.innerHTML = `<p style="color:#ff8080;">Failed to load versions: ${vErr.message}</p>`; return; }
+      versionByName = new Map((versions ?? []).map((v: any) => [v.name.toLowerCase(), v.id]));
+    }
+
+    previewBtn.addEventListener('click', () => {
+      const lines = csvInput.value.trim().split(/\r?\n/).filter((l) => l.length > 0);
+      if (lines.length < 2) {
+        results.innerHTML = '<p>No data rows found.</p>';
+        return;
+      }
+      const header = parseCsvLine(lines[0]).map((h) => h.toLowerCase());
+      const titleIdx = header.indexOf('title');
+      if (titleIdx === -1) {
+        results.innerHTML = '<p style="color:#ff8080;">Header row is missing a required "title" column.</p>';
+        return;
+      }
+      const colIdx = (name: string) => header.indexOf(name);
+
+      planned = [];
+      const unmappedVersions = new Set<string>();
+      let updates = 0, inserts = 0;
+
+      for (const line of lines.slice(1)) {
+        const row = parseCsvLine(line);
+        const title = row[titleIdx];
+        if (!title) continue;
+
+        const patch: Record<string, any> = {};
+        for (const col of SONG_COLUMNS) {
+          const idx = colIdx(col);
+          if (idx === -1 || !row[idx]) continue;
+          patch[col] = NUMERIC_SONG_COLUMNS.has(col) ? Number(row[idx]) : row[idx];
+        }
+        const versionIdx = colIdx('debut_version');
+        if (versionIdx !== -1 && row[versionIdx]) {
+          const vId = versionByName.get(row[versionIdx].toLowerCase());
+          if (vId) patch.debut_version_id = vId;
+          else unmappedVersions.add(row[versionIdx]);
+        }
+
+        const existing = existingByTitle.get(title);
+        if (existing) updates++; else inserts++;
+
+        const charts: ChartUpdate[] = [];
+        for (const slot of CHART_SLOTS) {
+          const levelIdx = colIdx(`${slot}_level`);
+          if (levelIdx === -1 || !row[levelIdx]) continue;
+          const notesIdx = colIdx(`${slot}_notes`);
+          charts.push({
+            play_style: slot.slice(0, 2).toUpperCase(),
+            difficulty: slot.slice(2).toUpperCase(),
+            level: Number(row[levelIdx]),
+            note_count: notesIdx !== -1 && row[notesIdx] ? Number(row[notesIdx]) : null,
+          });
+        }
+
+        planned.push({ song: { existingId: existing?.id ?? null, title, patch }, charts });
+      }
+
+      results.innerHTML = `
+        <p><strong>${updates}</strong> song(s) will be updated, <strong>${inserts}</strong> song(s) will be inserted.</p>
+        <p>${planned.reduce((n, p) => n + p.charts.length, 0)} chart row(s) will be upserted.</p>
+        ${unmappedVersions.size ? `<p style="color:#ffb066;">${unmappedVersions.size} debut_version value(s) didn't match any version name (skipped, not guessed):</p><pre>${[...unmappedVersions].join('\n')}</pre>` : ''}
+      `;
+      submitBtn.style.display = planned.length ? '' : 'none';
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      submitBtn.disabled = true;
+      let songErrors = 0, chartErrors = 0, songsWritten = 0, chartsWritten = 0;
+
+      for (const { song, charts } of planned) {
+        let songId = song.existingId;
+        if (songId) {
+          if (Object.keys(song.patch).length > 0) {
+            const { error } = await supabase.from('songs').update(song.patch).eq('id', songId);
+            if (error) { songErrors++; continue; }
+          }
+        } else {
+          const { data, error } = await supabase.from('songs').insert({ title: song.title, ...song.patch }).select('id').single();
+          if (error || !data) { songErrors++; continue; }
+          songId = data.id;
+        }
+        songsWritten++;
+
+        if (charts.length > 0) {
+          const rows = charts.map((c) => ({ song_id: songId, play_style: c.play_style, difficulty: c.difficulty, level: c.level, note_count: c.note_count }));
+          const { error } = await supabase.from('charts').upsert(rows, { onConflict: 'song_id,play_style,difficulty' });
+          if (error) chartErrors++; else chartsWritten += charts.length;
+        }
+      }
+
+      const { error: syncError } = await supabase.from('catalog_syncs').insert({});
+
+      results.insertAdjacentHTML(
+        'beforeend',
+        `<p style="color:#8fd18f;">Done. ${songsWritten} song(s) written, ${chartsWritten} chart(s) upserted.</p>
+         ${songErrors ? `<p style="color:#ff8080;">${songErrors} song write error(s).</p>` : ''}
+         ${chartErrors ? `<p style="color:#ff8080;">${chartErrors} chart write error(s).</p>` : ''}
+         ${syncError ? `<p style="color:#ffb066;">Note: failed to record catalog sync timestamp: ${syncError.message}</p>` : ''}`
+      );
+      submitBtn.disabled = false;
+    });
+
+    loadLookups();
+  </script>
+</Layout>

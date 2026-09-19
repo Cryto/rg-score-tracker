@@ -1,10 +1,24 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-<Layout title="Settings">
+<Layout title="Settings" showLogout={true}>
   <h1>Settings</h1>
-  <ul style="line-height: 2;">
-    <li><a href="/settings/new">Add / Update a single score</a></li>
-    <li><a href="/settings/import">Bulk import scores from CSV</a></li>
-  </ul>
+  <div class="settings-grid">
+    <a class="settings-card" href="/settings/new">
+      <strong>Add / Update a Score</strong>
+      <span>Search a song/chart, enter EX score, lamp, and miss count manually.</span>
+    </a>
+    <a class="settings-card" href="/settings/import">
+      <strong>Bulk Import (CSV)</strong>
+      <span>Paste a CSV of scores, matched by song title, and import in bulk.</span>
+    </a>
+    <a class="settings-card" href="/settings/import-json">
+      <strong>Import from JSON Export</strong>
+      <span>Upload a native score-export file, matched exactly by song ID.</span>
+    </a>
+    <a class="settings-card" href="/settings/catalog-import">
+      <strong>Catalog Import / Update (CSV)</strong>
+      <span>Add or update songs and charts themselves — titles, levels, BPM, and more.</span>
+    </a>
+  </div>
 </Layout>

@@ -3,8 +3,9 @@ import CrytoNav from '../components/CrytoNav.astro';
 
 interface Props {
   title: string;
+  showLogout?: boolean;
 }
-const { title } = Astro.props;
+const { title, showLogout = false } = Astro.props;
 
 // Off by default so a fork doesn't ship with the original owner's site
 // branding. The canonical deployment sets PUBLIC_SHOW_CRYTO_NAV=true.
@@ -68,7 +69,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         user-select: none;
         color: var(--text-dim);
         position: sticky;
-        top: 0;
+        top: var(--search-sticky-height, 0px);
         background: var(--bg);
       }
       .page-header {
@@ -91,7 +92,11 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         color: var(--text-dim);
         gap: 0.25rem;
         max-width: 320px;
-        margin: 1rem 0;
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--bg);
       }
       .layout {
         display: flex;
@@ -111,6 +116,28 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         border-bottom: 1px solid var(--border);
         padding-bottom: 0.5rem;
         margin-bottom: 0.25rem;
+      }
+      .view-toggle {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .view-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.6rem 0.3rem;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+      .view-btn svg { width: 1.1rem; height: 1.1rem; }
+      .view-btn.active {
+        color: var(--text);
+        border-color: var(--accent);
       }
       .filter-group {
         border-bottom: 1px solid var(--border);
@@ -235,6 +262,29 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         border-color: var(--accent);
       }
       .scores-fab svg { width: 1.4rem; height: 1.4rem; }
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+        max-width: 900px;
+      }
+      .settings-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 1rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        text-decoration: none;
+      }
+      .settings-card:hover { border-color: var(--accent); }
+      .settings-card strong { font-size: 0.95rem; }
+      .settings-card span { color: var(--text-dim); font-size: 0.85rem; }
+      .logout-fab {
+        left: 4.75rem;
+      }
     </style>
   </head>
   <body>
@@ -253,5 +303,23 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
       </svg>
     </a>
+    {showLogout && (
+      <button id="logout-fab" class="scores-fab logout-fab" aria-label="Log out" title="Log out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    )}
+    {showLogout && (
+      <script>
+        import { supabase } from '../lib/supabase';
+        document.getElementById('logout-fab')!.addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          window.location.href = '/';
+        });
+      </script>
+    )}
   </body>
 </html>

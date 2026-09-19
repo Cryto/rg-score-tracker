@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Import Scores (JSON)" showLogout={true}>
+  <h1>Import Scores from JSON Export</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in — <a href="/login">log in</a> to submit scores.
+  </p>
+
+  <p style="color: var(--text-dim); max-width: 700px;">
+    Upload a <code>scores.json</code> export (the native score-export format, keyed by
+    numeric song ID). Matched against the catalog via <code>songs.external_id</code> —
+    songs not in the catalog are reported as unmatched, not inserted.
+  </p>
+
+  <input id="json-file" type="file" accept="application/json,.json" />
+  <div style="margin-top: 0.75rem; display:flex; gap:0.75rem;">
+    <button id="preview-btn" disabled>Preview</button>
+    <button id="submit-btn" style="display:none;">Import Matched Scores</button>
+  </div>
+
+  <div id="results" style="margin-top:1.5rem;"></div>
+
+  <script>
+    import { supabase } from '../../lib/supabase';
+    import { CLEAR_LAMPS } from '../../lib/grade';
+
+    const authWarning = document.getElementById('auth-warning')!;
+    const fileInput = document.getElementById('json-file') as HTMLInputElement;
+    const previewBtn = document.getElementById('preview-btn') as HTMLButtonElement;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const results = document.getElementById('results')!;
+
+    type ParsedScore = {
+      chart_id: number;
+      ex_score: number | null;
+      clear_lamp: string | null;
+      miss_count: number | null;
+    };
+
+    let fileContent: any = null;
+    let matched: ParsedScore[] = [];
+    let chartLookup = new Map<string, number>();
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) authWarning.style.display = '';
+    });
+
+    async function loadChartLookup() {
+      // Supabase caps a single select at 1000 rows - page through until exhausted.
+      const pageSize = 1000;
+      let data: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data: page, error } = await supabase
+          .from('charts')
+          .select('id, play_style, difficulty, songs ( external_id )')
+          .range(from, from + pageSize - 1);
+        if (error) {
+          results.innerHTML = `<p style="color:#ff8080;">Failed to load catalog: ${error.message}</p>`;
+          return;
+        }
+        data = data.concat(page ?? []);
+        if (!page || page.length < pageSize) break;
+      }
+      chartLookup = new Map(
+        (data ?? [])
+          .filter((c: any) => c.songs?.external_id)
+          .map((c: any) => [`${c.songs.external_id}|${c.play_style}|${c.difficulty}`, c.id])
+      );
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      previewBtn.disabled = !file;
+      submitBtn.style.display = 'none';
+      results.innerHTML = '';
+      fileContent = null;
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          fileContent = JSON.parse(reader.result as string);
+        } catch (err: any) {
+          results.innerHTML = `<p style="color:#ff8080;">Invalid JSON: ${err.message}</p>`;
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    previewBtn.addEventListener('click', () => {
+      if (!fileContent) return;
+
+      matched = [];
+      const unmatched: string[] = [];
+      let noPlayCount = 0;
+
+      for (const [songId, chartMap] of Object.entries<any>(fileContent)) {
+        if (songId === '__meta') continue;
+        const externalId = songId.padStart(5, '0');
+
+        for (const [chartCode, score] of Object.entries<any>(chartMap)) {
+          const playStyle = chartCode.slice(0, 2).toUpperCase();
+          const difficulty = chartCode.slice(2).toUpperCase();
+          const key = `${externalId}|${playStyle}|${difficulty}`;
+          const chartId = chartLookup.get(key);
+
+          if (score.clear_type === 0) {
+            noPlayCount++;
+            continue;
+          }
+          if (!chartId) {
+            unmatched.push(`${songId} ${chartCode}`);
+            continue;
+          }
+          matched.push({
+            chart_id: chartId,
+            ex_score: score.ex_score ?? null,
+            clear_lamp: score.clear_type ? CLEAR_LAMPS[score.clear_type - 1] : null,
+            miss_count: score.miss_count ?? null,
+          });
+        }
+      }
+
+      results.innerHTML = `
+        <p><strong>${matched.length}</strong> chart score(s) matched and ready to import.</p>
+        <p style="color: var(--text-dim);">${noPlayCount} chart(s) with no play (clear_type 0) skipped.</p>
+        ${unmatched.length ? `<p style="color:#ffb066;">${unmatched.length} chart(s) had no matching song/chart in the catalog (external_id not found):</p><pre>${unmatched.slice(0, 100).join('\n')}${unmatched.length > 100 ? `\n… and ${unmatched.length - 100} more` : ''}</pre>` : ''}
+      `;
+      submitBtn.style.display = matched.length ? '' : 'none';
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      submitBtn.disabled = true;
+      const { error } = await supabase.from('scores').upsert(matched, { onConflict: 'chart_id' });
+      results.insertAdjacentHTML(
+        'beforeend',
+        error
+          ? `<p style="color:#ff8080;">Import failed: ${error.message}</p>`
+          : `<p style="color:#8fd18f;">Imported ${matched.length} score(s).</p>`
+      );
+      submitBtn.disabled = false;
+    });
+
+    loadChartLookup();
+  </script>
+</Layout>
