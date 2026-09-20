@@ -105,27 +105,29 @@ import Layout from '../layouts/Layout.astro';
 
       <p id="status" style="color: var(--text-dim);">Loading...</p>
 
-      <table id="chart-table" style="display:none;">
-        <colgroup>
-          <col />
-          <col style="width:90px" />
-          <col style="width:90px" />
-          <col style="width:70px" />
-          <col style="width:140px" />
-          <col style="width:60px" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Chart</th>
-            <th>EX Score</th>
-            <th>Grade</th>
-            <th>Lamp</th>
-            <th>BP</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-scroll">
+        <table id="chart-table" style="display:none;">
+          <colgroup>
+            <col />
+            <col style="width:90px" />
+            <col style="width:90px" />
+            <col style="width:70px" />
+            <col style="width:140px" />
+            <col style="width:60px" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Chart</th>
+              <th>EX Score</th>
+              <th>Grade</th>
+              <th>Lamp</th>
+              <th>BP</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
 
       <div id="stats-container" style="display:none;"></div>
     </div>
@@ -178,16 +180,9 @@ import Layout from '../layouts/Layout.astro';
     const versionListEl = document.getElementById('f-version-list')!;
     const playableInListEl = document.getElementById('f-playable-in-list')!;
     const lastUpdatedEl = document.getElementById('last-updated')!;
-    const toolbarEl = document.querySelector('.table-toolbar') as HTMLElement;
     const filtersSidebarEl = document.getElementById('filters-sidebar')!;
     const filtersToggleBtn = document.getElementById('filters-toggle-btn')!;
     const sidebarBackdropEl = document.getElementById('sidebar-backdrop')!;
-
-    function updateToolbarStickyHeight() {
-      document.documentElement.style.setProperty('--toolbar-sticky-height', `${toolbarEl.offsetHeight}px`);
-    }
-    updateToolbarStickyHeight();
-    window.addEventListener('resize', updateToolbarStickyHeight);
 
     function closeSidebar() {
       filtersSidebarEl.classList.remove('open');

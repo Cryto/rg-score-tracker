@@ -101,7 +101,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         user-select: none;
         color: var(--text-dim);
         position: sticky;
-        top: calc(var(--header-sticky-height, 0px) + var(--toolbar-sticky-height, 0px));
+        top: 0;
         background: var(--bg);
         background-clip: padding-box;
       }
@@ -266,6 +266,8 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       .table-container {
         flex: 1;
         min-width: 0;
+      }
+      .table-scroll {
         overflow-x: auto;
       }
       .song-row {
