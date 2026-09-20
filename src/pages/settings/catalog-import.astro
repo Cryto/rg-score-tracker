@@ -1,7 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-<Layout title="Catalog Import/Update" showLogout={true}>
+<Layout title="Catalog Import/Update" showLogout={true} showHome={true} settingsMode={true}>
+  <a href="/settings" class="back-link">← Back to Settings</a>
   <h1>Catalog Import / Update (CSV)</h1>
   <p id="auth-warning" style="display:none; color: #ff8080;">
     You're not logged in — <a href="/login">log in</a> to edit the catalog.

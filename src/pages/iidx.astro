@@ -1,0 +1,482 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="IIDX Score Tracker">
+  <div class="page-header">
+    <h1>beatmania IIDX Score Tracker</h1>
+    <div id="last-updated" class="last-updated"></div>
+  </div>
+
+  <div class="layout">
+    <aside class="filters-sidebar" id="filters-sidebar">
+      <div class="filters-heading">View</div>
+      <div class="view-toggle">
+        <button type="button" class="view-btn active" data-view="list">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          List
+        </button>
+        <button type="button" class="view-btn" data-view="stats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Statistics
+        </button>
+      </div>
+
+      <div class="filters-heading">Filters</div>
+
+      <div class="filter-group" data-group="style">
+        <button type="button" class="filter-group-header">Play Style<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="SP" /> Single Play</label>
+          <label class="checkbox-row"><input type="checkbox" value="DP" /> Double Play</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="difficulty">
+        <button type="button" class="filter-group-header">Difficulty<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="B" /> Beginner</label>
+          <label class="checkbox-row"><input type="checkbox" value="N" /> Normal</label>
+          <label class="checkbox-row"><input type="checkbox" value="H" /> Hyper</label>
+          <label class="checkbox-row"><input type="checkbox" value="A" /> Another</label>
+          <label class="checkbox-row"><input type="checkbox" value="L" /> Leggendaria</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="grade">
+        <button type="button" class="filter-group-header">Grade<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="MAX" /> MAX</label>
+          <label class="checkbox-row"><input type="checkbox" value="MAX-" /> MAX-</label>
+          <label class="checkbox-row"><input type="checkbox" value="AAA" /> AAA</label>
+          <label class="checkbox-row"><input type="checkbox" value="AA" /> AA</label>
+          <label class="checkbox-row"><input type="checkbox" value="A" /> A</label>
+          <label class="checkbox-row"><input type="checkbox" value="B" /> B</label>
+          <label class="checkbox-row"><input type="checkbox" value="C" /> C</label>
+          <label class="checkbox-row"><input type="checkbox" value="D" /> D</label>
+          <label class="checkbox-row"><input type="checkbox" value="E" /> E</label>
+          <label class="checkbox-row"><input type="checkbox" value="F" /> F</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="lamp">
+        <button type="button" class="filter-group-header">Clear Lamp<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="FULL_COMBO" /> Full Combo</label>
+          <label class="checkbox-row"><input type="checkbox" value="EX_HARD_CLEAR" /> EX Hard Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="HARD_CLEAR" /> Hard Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="CLEAR" /> Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="EASY_CLEAR" /> Easy Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="ASSIST_CLEAR" /> Assist Clear</label>
+          <label class="checkbox-row"><input type="checkbox" value="FAILED" /> Failed</label>
+          <label class="checkbox-row"><input type="checkbox" value="NONE" /> No score yet</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="level">
+        <button type="button" class="filter-group-header">Level<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((lv) => (
+            <label class="checkbox-row"><input type="checkbox" value={lv} /> Lv. {lv}</label>
+          ))}
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="version">
+        <button type="button" class="filter-group-header">Version<span class="arrow">▸</span></button>
+        <div class="filter-group-content" id="f-version-list"></div>
+      </div>
+
+      <div class="filter-group" data-group="playable-in">
+        <button type="button" class="filter-group-header">Playable In<span class="arrow">▸</span></button>
+        <div class="filter-group-content" id="f-playable-in-list"></div>
+      </div>
+    </aside>
+
+    <div class="table-container">
+      <div class="table-toolbar">
+        <button type="button" id="filters-toggle-btn" class="filters-toggle-btn" aria-label="Toggle filters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+          Filters
+        </button>
+        <label class="search-row">Search
+          <input id="f-search" type="text" placeholder="Song title..." />
+        </label>
+      </div>
+
+      <p id="status" style="color: var(--text-dim);">Loading...</p>
+
+      <table id="chart-table" style="display:none;">
+        <colgroup>
+          <col />
+          <col style="width:90px" />
+          <col style="width:90px" />
+          <col style="width:70px" />
+          <col style="width:140px" />
+          <col style="width:60px" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Chart</th>
+            <th>EX Score</th>
+            <th>Grade</th>
+            <th>Lamp</th>
+            <th>BP</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="stats-container" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <script>
+    import { supabase } from '../lib/supabase';
+    import { computeGrade, LAMP_LABELS } from '../lib/grade';
+
+    const DIFF_LABELS: Record<string, string> = {
+      B: 'Beginner', N: 'Normal', H: 'Hyper', A: 'Another', L: 'Leggendaria',
+    };
+    const STYLE_LABELS: Record<string, string> = { SP: 'Single Play', DP: 'Double Play' };
+    const DIFF_ORDER = ['B', 'N', 'H', 'A', 'L'];
+    const GRADE_ORDER = ['MAX', 'MAX-', 'AAA', 'AA', 'A', 'B', 'C', 'D', 'E', 'F'];
+    const LAMP_ORDER = ['FULL_COMBO', 'EX_HARD_CLEAR', 'HARD_CLEAR', 'CLEAR', 'EASY_CLEAR', 'ASSIST_CLEAR', 'FAILED', 'NONE'];
+    const LAMP_ROW_LABELS: Record<string, string> = { ...LAMP_LABELS, NONE: 'No score yet' };
+
+    let viewMode: 'list' | 'stats' = 'list';
+
+    type Row = {
+      chartId: number;
+      version: string;
+      versionNumber: number | null;
+      title: string;
+      titleEnglish: string;
+      artist: string;
+      style: string;
+      difficulty: string;
+      level: number;
+      noteCount: number | null;
+      bpmMin: number | null;
+      bpmMax: number | null;
+      chartLabel: string | null;
+      exScore: number | null;
+      lamp: string | null;
+      missCount: number | null;
+      scoreUpdatedAt: string | null;
+      playableIn: string[];
+    };
+
+    let rows: Row[] = [];
+
+    const statusEl = document.getElementById('status')!;
+    const tableEl = document.getElementById('chart-table')!;
+    const tbody = tableEl.querySelector('tbody')!;
+    const statsContainerEl = document.getElementById('stats-container')!;
+    const versionListEl = document.getElementById('f-version-list')!;
+    const playableInListEl = document.getElementById('f-playable-in-list')!;
+    const lastUpdatedEl = document.getElementById('last-updated')!;
+    const toolbarEl = document.querySelector('.table-toolbar') as HTMLElement;
+    const filtersSidebarEl = document.getElementById('filters-sidebar')!;
+    const filtersToggleBtn = document.getElementById('filters-toggle-btn')!;
+    const sidebarBackdropEl = document.getElementById('sidebar-backdrop')!;
+
+    function updateToolbarStickyHeight() {
+      document.documentElement.style.setProperty('--toolbar-sticky-height', `${toolbarEl.offsetHeight}px`);
+    }
+    updateToolbarStickyHeight();
+    window.addEventListener('resize', updateToolbarStickyHeight);
+
+    function closeSidebar() {
+      filtersSidebarEl.classList.remove('open');
+      sidebarBackdropEl.classList.remove('open');
+    }
+    filtersToggleBtn.addEventListener('click', () => {
+      filtersSidebarEl.classList.toggle('open');
+      sidebarBackdropEl.classList.toggle('open');
+    });
+    sidebarBackdropEl.addEventListener('click', closeSidebar);
+
+    function formatTimestamp(iso: string | null): string {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+      });
+    }
+
+    async function loadLastUpdated() {
+      const [{ data: sync }, { data: score }] = await Promise.all([
+        supabase.from('catalog_syncs').select('synced_at').order('synced_at', { ascending: false }).limit(1).maybeSingle(),
+        supabase.from('scores').select('updated_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      lastUpdatedEl.innerHTML = `DB last updated: ${formatTimestamp(sync?.synced_at ?? null)}<br>Scores last updated: ${formatTimestamp(score?.updated_at ?? null)}`;
+    }
+
+    // substream (number 0) sits chronologically between 1st and 2nd style, not before 1st.
+    const versionSortKey = (n: number) => (n === 0 ? 1.5 : n);
+
+    async function load() {
+      // Supabase caps a single select at 1000 rows - page through until exhausted.
+      const pageSize = 1000;
+      let data: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data: page, error } = await supabase
+          .from('charts')
+          .select(`
+            id, play_style, difficulty, level, note_count, chart_label,
+            songs ( title, title_english, artist, bpm_min, bpm_max, versions ( number, name ) ),
+            scores ( ex_score, clear_lamp, miss_count, updated_at ),
+            chart_availability ( versions ( name ) )
+          `)
+          .range(from, from + pageSize - 1);
+
+        if (error) {
+          statusEl.textContent = `Failed to load: ${error.message}`;
+          return;
+        }
+        data = data.concat(page ?? []);
+        if (!page || page.length < pageSize) break;
+      }
+
+      rows = (data ?? []).map((c: any) => ({
+        chartId: c.id,
+        version: c.songs?.versions?.name ?? 'Unknown',
+        versionNumber: c.songs?.versions?.number ?? null,
+        title: c.songs?.title ?? '(unknown)',
+        titleEnglish: c.songs?.title_english ?? '',
+        artist: c.songs?.artist ?? '',
+        style: c.play_style,
+        difficulty: c.difficulty,
+        level: c.level,
+        noteCount: c.note_count,
+        bpmMin: c.songs?.bpm_min ?? null,
+        bpmMax: c.songs?.bpm_max ?? null,
+        chartLabel: c.chart_label ?? null,
+        playableIn: (c.chart_availability ?? []).map((a: any) => a.versions?.name).filter(Boolean),
+        exScore: c.scores?.ex_score ?? null,
+        lamp: c.scores?.clear_lamp ?? null,
+        missCount: c.scores?.miss_count ?? null,
+        scoreUpdatedAt: c.scores?.updated_at ?? null,
+      }));
+
+      // Charts with a score sort by most-recently-updated first, surfacing
+      // your latest plays. Charts with no score yet fall back to the fixed
+      // catalog order (chronological version, then title/style/difficulty/
+      // level) and always sort after every scored chart; that same fixed
+      // order also breaks ties among scored charts.
+      rows.sort((a, b) => {
+        const aScored = a.scoreUpdatedAt != null;
+        const bScored = b.scoreUpdatedAt != null;
+        if (aScored !== bScored) return aScored ? -1 : 1;
+        if (aScored && bScored && a.scoreUpdatedAt !== b.scoreUpdatedAt) {
+          return a.scoreUpdatedAt! > b.scoreUpdatedAt! ? -1 : 1;
+        }
+        const av = versionSortKey(a.versionNumber ?? -1);
+        const bv = versionSortKey(b.versionNumber ?? -1);
+        if (av !== bv) return av - bv;
+        if (a.title !== b.title) return a.title.localeCompare(b.title);
+        if (a.style !== b.style) return a.style.localeCompare(b.style);
+        const ad = DIFF_ORDER.indexOf(a.difficulty);
+        const bd = DIFF_ORDER.indexOf(b.difficulty);
+        if (ad !== bd) return ad - bd;
+        return a.level - b.level;
+      });
+
+      const versionMap = new Map<string, number>();
+      for (const r of rows) {
+        if (!versionMap.has(r.version)) versionMap.set(r.version, r.versionNumber ?? -1);
+      }
+      const versions = [...versionMap.keys()].sort(
+        (a, b) => versionSortKey(versionMap.get(a)!) - versionSortKey(versionMap.get(b)!)
+      );
+      for (const v of versions) {
+        const label = document.createElement('label');
+        label.className = 'checkbox-row';
+        label.innerHTML = `<input type="checkbox" value="${escapeHtml(v)}" /> ${escapeHtml(v)}`;
+        versionListEl.appendChild(label);
+
+        const playableLabel = document.createElement('label');
+        playableLabel.className = 'checkbox-row';
+        playableLabel.innerHTML = `<input type="checkbox" value="${escapeHtml(v)}" /> ${escapeHtml(v)}`;
+        playableInListEl.appendChild(playableLabel);
+      }
+      versionListEl.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('input', render);
+      });
+      playableInListEl.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('input', render);
+      });
+
+      statusEl.style.display = 'none';
+      tableEl.style.display = '';
+      render();
+    }
+
+    function checkedValues(groupName: string): Set<string> {
+      const group = document.querySelector(`.filter-group[data-group="${groupName}"]`)!;
+      const checked = group.querySelectorAll('input[type="checkbox"]:checked');
+      return new Set([...checked].map((el) => (el as HTMLInputElement).value));
+    }
+
+    function currentFilters() {
+      return {
+        search: (document.getElementById('f-search') as HTMLInputElement).value.trim().toLowerCase(),
+        versions: checkedValues('version'),
+        playableIn: checkedValues('playable-in'),
+        styles: checkedValues('style'),
+        difficulties: checkedValues('difficulty'),
+        grades: checkedValues('grade'),
+        lamps: checkedValues('lamp'),
+        levels: checkedValues('level'),
+      };
+    }
+
+    function pivotTable(title: string, rowLabels: string[], rowKeyOf: (label: string) => string, counts: Map<string, number[]>): string {
+      const colTotals = Array(12).fill(0);
+      let grandTotal = 0;
+      const bodyRows = rowLabels
+        .map((label) => {
+          const key = rowKeyOf(label);
+          const rowCounts = counts.get(key) ?? Array(12).fill(0);
+          const rowTotal = rowCounts.reduce((a, b) => a + b, 0);
+          if (rowTotal === 0) return '';
+          rowCounts.forEach((c, i) => (colTotals[i] += c));
+          grandTotal += rowTotal;
+          return `<tr><th>${escapeHtml(label)}</th>${rowCounts
+            .map((c) => `<td>${c || ''}</td>`)
+            .join('')}<td><strong>${rowTotal}</strong></td></tr>`;
+        })
+        .join('');
+      const headerCols = Array.from({ length: 12 }, (_, i) => `<th>${i + 1}</th>`).join('');
+      const totalRow = `<tr><th>Total</th>${colTotals.map((c) => `<td><strong>${c || ''}</strong></td>`).join('')}<td><strong>${grandTotal}</strong></td></tr>`;
+      return `<h2 style="font-size:1rem; margin: 1.5rem 0 0.5rem;">${escapeHtml(title)}</h2>
+        <table><thead><tr><th></th>${headerCols}<th>Total</th></tr></thead><tbody>${bodyRows}${totalRow}</tbody></table>`;
+    }
+
+    function renderStats(filtered: Row[]) {
+      const gradeCounts = new Map<string, number[]>();
+      for (const g of GRADE_ORDER) gradeCounts.set(g, Array(12).fill(0));
+      for (const r of filtered) {
+        const g = computeGrade(r.exScore, r.noteCount);
+        if (g === '—') continue;
+        gradeCounts.get(g)![r.level - 1]++;
+      }
+
+      const lampCounts = new Map<string, number[]>();
+      for (const l of LAMP_ORDER) lampCounts.set(l, Array(12).fill(0));
+      for (const r of filtered) {
+        const key = r.lamp ?? 'NONE';
+        lampCounts.get(key)![r.level - 1]++;
+      }
+
+      statsContainerEl.innerHTML =
+        pivotTable('Grade × Level', GRADE_ORDER, (g) => g, gradeCounts) +
+        pivotTable('Lamp × Level', LAMP_ORDER.map((l) => LAMP_ROW_LABELS[l]), (label) => LAMP_ORDER.find((l) => LAMP_ROW_LABELS[l] === label)!, lampCounts);
+    }
+
+    function render() {
+      const f = currentFilters();
+      const filtered = rows.filter((r) => {
+        if (
+          f.search &&
+          !r.title.toLowerCase().includes(f.search) &&
+          !r.titleEnglish.toLowerCase().includes(f.search)
+        )
+          return false;
+        if (f.versions.size && !f.versions.has(r.version)) return false;
+        if (f.playableIn.size && !r.playableIn.some((v) => f.playableIn.has(v))) return false;
+        if (f.styles.size && !f.styles.has(r.style)) return false;
+        if (f.difficulties.size && !f.difficulties.has(r.difficulty)) return false;
+        if (f.levels.size && !f.levels.has(String(r.level))) return false;
+        if (f.lamps.size) {
+          const lampValue = r.lamp ?? 'NONE';
+          if (!f.lamps.has(lampValue)) return false;
+        }
+        if (f.grades.size && !f.grades.has(computeGrade(r.exScore, r.noteCount))) return false;
+        return true;
+      });
+
+      if (viewMode === 'stats') {
+        renderStats(filtered);
+        return;
+      }
+
+      tbody.innerHTML = filtered
+        .map((r, i) => {
+          const grade = computeGrade(r.exScore, r.noteCount);
+          const lampLabel = r.lamp ? LAMP_LABELS[r.lamp as keyof typeof LAMP_LABELS] : '—';
+          const chartCode = `${r.style}${r.difficulty} ${r.level}`;
+          const bpm = r.bpmMin == null
+            ? '—'
+            : r.bpmMax != null && r.bpmMax !== r.bpmMin
+              ? `${r.bpmMin}–${r.bpmMax}`
+              : `${r.bpmMin}`;
+          const diffLabel = DIFF_LABELS[r.difficulty] ?? r.difficulty;
+          const diffWithChartLabel = r.chartLabel ? `${diffLabel} (${escapeHtml(r.chartLabel)})` : diffLabel;
+          return `<tr class="song-row" data-expand="expand-${i}">
+            <td class="title-cell"><span class="expand-arrow">▸</span>${escapeHtml(r.title)}
+              <div class="row-subtitle">${escapeHtml(r.artist)}</div>${
+            r.titleEnglish && r.titleEnglish !== r.title
+              ? `<div class="row-subtitle">${escapeHtml(r.titleEnglish)}</div>`
+              : ''
+          }</td>
+            <td class="chart-code">${chartCode}</td>
+            <td>${r.exScore ?? '—'}</td>
+            <td>${grade}</td>
+            <td>${lampLabel}</td>
+            <td>${r.missCount ?? '—'}</td>
+          </tr>
+          <tr class="expand-row" id="expand-${i}" style="display:none;">
+            <td colspan="6">
+              <span><strong>Version:</strong> ${escapeHtml(r.version)}</span>
+              <span><strong>Style:</strong> ${STYLE_LABELS[r.style] ?? r.style}</span>
+              <span><strong>Difficulty:</strong> ${diffWithChartLabel}</span>
+              <span><strong>Level:</strong> ${r.level}</span>
+              <span><strong>BPM:</strong> ${bpm}</span>
+              <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
+            </td>
+          </tr>`;
+        })
+        .join('');
+    }
+
+    function escapeHtml(s: string) {
+      return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    }
+
+    tbody.addEventListener('click', (e) => {
+      const row = (e.target as HTMLElement).closest('tr.song-row') as HTMLElement | null;
+      if (!row) return;
+      const expandRow = document.getElementById(row.dataset.expand!) as HTMLElement | null;
+      if (!expandRow) return;
+      const isOpen = expandRow.style.display !== 'none';
+      expandRow.style.display = isOpen ? 'none' : '';
+      row.classList.toggle('open', !isOpen);
+    });
+
+    document.querySelectorAll('.view-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        viewMode = (btn as HTMLElement).dataset.view as 'list' | 'stats';
+        document.querySelectorAll('.view-btn').forEach((b) => b.classList.toggle('active', b === btn));
+        tableEl.style.display = viewMode === 'list' ? '' : 'none';
+        statsContainerEl.style.display = viewMode === 'stats' ? '' : 'none';
+        render();
+      });
+    });
+
+    document.getElementById('f-search')!.addEventListener('input', render);
+
+    document.querySelectorAll('.filter-group').forEach((group) => {
+      const header = group.querySelector('.filter-group-header')!;
+      header.addEventListener('click', () => group.classList.toggle('open'));
+      group.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        cb.addEventListener('input', render);
+      });
+    });
+
+    load();
+    loadLastUpdated();
+  </script>
+</Layout>
