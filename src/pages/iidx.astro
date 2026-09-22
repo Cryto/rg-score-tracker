@@ -311,8 +311,33 @@ import Layout from '../layouts/Layout.astro';
 
       statusEl.style.display = 'none';
       tableEl.style.display = '';
+      pinTitleColumnWidth();
       render();
     }
+
+    // With table-layout: fixed, the title column has no explicit width so it
+    // fills whatever space the other (fixed-width) columns leave. Browsers
+    // are supposed to derive that from the first row only, but toggling a
+    // colspan expand-row can make them recompute it against the expand-row's
+    // content instead, shrinking the title column. Pinning an explicit pixel
+    // width (recomputed on resize) sidesteps that recalculation entirely.
+    // These sums must match the col-chart/col-ex/col-grade/col-lamp/col-bp
+    // widths in Layout.astro (desktop and the <=768px breakpoint).
+    const OTHER_COLS_WIDTH_DESKTOP = 90 + 90 + 70 + 140 + 60;
+    const OTHER_COLS_WIDTH_MOBILE = 64 + 56 + 100;
+    const mobileMedia = window.matchMedia('(max-width: 768px)');
+    const colTitleEl = tableEl.querySelector('col.col-title') as HTMLTableColElement;
+    const tableScrollEl = tableEl.parentElement as HTMLElement;
+    function pinTitleColumnWidth() {
+      const otherWidth = mobileMedia.matches ? OTHER_COLS_WIDTH_MOBILE : OTHER_COLS_WIDTH_DESKTOP;
+      // Measure the scroll container, not the table itself: the table's own
+      // rendered width depends on the column widths we're about to set, so
+      // measuring it here would create a self-referential feedback loop.
+      const availableWidth = tableScrollEl.clientWidth;
+      colTitleEl.style.width = `${Math.max(0, availableWidth - otherWidth)}px`;
+    }
+    new ResizeObserver(pinTitleColumnWidth).observe(tableScrollEl);
+    mobileMedia.addEventListener('change', pinTitleColumnWidth);
 
     function checkedValues(groupName: string): Set<string> {
       const group = document.querySelector(`.filter-group[data-group="${groupName}"]`)!;
