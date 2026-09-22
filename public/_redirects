@@ -1,0 +1,11 @@
+# Netlify redirects -- first matching rule wins.
+
+# Old domain -> new domain. The renamed game pages go straight to their new
+# paths (one hop instead of two); everything else keeps its path.
+https://iidx.cryto.dev/hololive-dreams  https://rg.cryto.dev/holodori/  301!
+https://iidx.cryto.dev/djmax-respect-v  https://rg.cryto.dev/djmax/     301!
+https://iidx.cryto.dev/*                https://rg.cryto.dev/:splat     301!
+
+# Renamed game pages.
+/hololive-dreams  /holodori/  301!
+/djmax-respect-v  /djmax/     301!

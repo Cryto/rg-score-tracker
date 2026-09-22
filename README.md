@@ -81,5 +81,5 @@ By default the app is unbranded — just its own dark theme, no references to
 the original author's site. Setting `PUBLIC_SHOW_CRYTO_NAV=true` in `.env`
 adds a cryto.dev-branded header bar (`src/components/CrytoNav.astro`) above
 the app's own nav; this only makes sense for the canonical deployment at
-[iidx.cryto.dev](https://iidx.cryto.dev). Leave it unset on a fork, or delete
+[rg.cryto.dev](https://rg.cryto.dev). Leave it unset on a fork, or delete
 `CrytoNav.astro` entirely if you don't need the toggle.
