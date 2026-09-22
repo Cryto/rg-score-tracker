@@ -18,9 +18,19 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     <label>English title <span class="hd-optional">(optional)</span>
       <input id="title-en" type="text" autocomplete="off" />
     </label>
-    <label>Singer <span class="hd-optional">(optional)</span>
+    <label>Credited singer / unit <span class="hd-optional">(optional)</span>
       <input id="artist" type="text" autocomplete="off" />
     </label>
+    <div class="hd-members" id="members-field">
+      <label for="member-input">Members <span class="hd-optional">(optional — individual members in this song)</span></label>
+      <div id="member-chips" class="hd-chips"></div>
+      <div class="hd-member-row">
+        <input id="member-input" type="text" list="member-names" autocomplete="off" placeholder="Add a member..." />
+        <button type="button" id="add-member">Add</button>
+      </div>
+      <datalist id="member-names"></datalist>
+      <p id="members-note" class="hd-members-note"></p>
+    </div>
     <fieldset class="hd-level-inputs">
       <legend>Difficulty levels</legend>
       {DIFFICULTIES.map((d) => (
@@ -54,11 +64,39 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     .hd-level-inputs label { display: flex; flex-direction: column; gap: 0.25rem; }
     .hd-level-inputs span { color: var(--diff); font-weight: 700; font-size: 0.85rem; }
     .hd-level-inputs input { width: 100%; border-color: var(--diff); text-align: center; font-weight: 700; }
+    .hd-members { display: flex; flex-direction: column; gap: 0.35rem; }
+    .hd-member-row { display: flex; gap: 0.4rem; }
+    .hd-member-row input { flex: 1; min-width: 0; }
+    .hd-members-note { margin: 0; font-size: 0.8rem; color: var(--text-dim); }
+  </style>
+
+  <!-- Global: chips are created from JS, which Astro's scoped styles can't reach. -->
+  <style is:global>
+    .hd-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .hd-chips:empty { display: none; }
+    .hd-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.25rem 0.15rem 0.6rem;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .hd-chip button {
+      border: none;
+      background: none;
+      padding: 0 0.3rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      line-height: 1;
+    }
   </style>
 
   <script>
     import { getSupabase } from '../../lib/supabase';
-    import { DIFFICULTIES } from '../../lib/holodori';
+    import { DIFFICULTIES, GROUP_NAMES } from '../../lib/holodori';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;
@@ -72,9 +110,57 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     const status = document.getElementById('status')!;
     const levelInputs = [...document.querySelectorAll<HTMLInputElement>('[data-difficulty]')];
 
-    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; levels: Record<string, number | null> };
+    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; members: string[]; levels: Record<string, number | null> };
     let existing = new Map<string, ExistingSong>();
     let match: ExistingSong | null = null;
+
+    // Members: individual people related to the song, stored separately from
+    // the credited singer/unit (songs.members, migration 0002).
+    const membersField = document.getElementById('members-field')!;
+    const memberInput = document.getElementById('member-input') as HTMLInputElement;
+    const memberChips = document.getElementById('member-chips')!;
+    const memberNames = document.getElementById('member-names')!;
+    const membersNote = document.getElementById('members-note')!;
+    let members: string[] = [];
+    let membersSupported = true;
+    const splitCredit = (s: string | null) => (s ? s.split(/\s*(?:,|、|&)\s*/).map((x) => x.trim()).filter(Boolean) : []);
+
+    function renderChips() {
+      memberChips.innerHTML = '';
+      for (const name of members) {
+        const chip = document.createElement('span');
+        chip.className = 'hd-chip';
+        chip.textContent = name;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = '✕';
+        remove.setAttribute('aria-label', `Remove ${name}`);
+        remove.addEventListener('click', () => {
+          members = members.filter((m) => m !== name);
+          renderChips();
+        });
+        chip.append(remove);
+        memberChips.append(chip);
+      }
+    }
+
+    function addMember() {
+      const name = memberInput.value.trim();
+      if (name && !members.some((m) => m.toLowerCase() === name.toLowerCase())) {
+        members.push(name);
+        renderChips();
+      }
+      memberInput.value = '';
+      memberInput.focus();
+    }
+    document.getElementById('add-member')!.addEventListener('click', addMember);
+    // Enter adds the member instead of submitting the form.
+    memberInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addMember();
+      }
+    });
 
     // Same looseness as the level-sheet importer: ignore width, case, spacing, punctuation.
     const norm = (s: string) => s.normalize('NFKC').toLowerCase().replace(/[\s・·.,!?~〜☆★♡♪'’"“”()[\]「」『』:\-‐―–—_/]/g, '');
@@ -88,9 +174,17 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       supabase.auth.getSession().then(({ data }) => {
         if (!data.session) authWarning.style.display = '';
       });
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('songs')
-        .select('id, title_jp, title_en, artist_jp, artist_en, charts ( difficulty, level )');
+        .select('id, title_jp, title_en, artist_jp, artist_en, members, charts ( difficulty, level )');
+      // Database without migration 0002: work without members.
+      if (error && /members/.test(error.message)) {
+        membersSupported = false;
+        membersField.style.display = 'none';
+        ({ data, error } = await supabase
+          .from('songs')
+          .select('id, title_jp, title_en, artist_jp, artist_en, charts ( difficulty, level )'));
+      }
       if (error) {
         status.textContent = `Failed to load songs: ${error.message}`;
         return;
@@ -100,6 +194,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       existing = new Map();
       const songsList: ExistingSong[] = (data ?? []).map((s: any) => ({
         id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artist: s.artist_en ?? s.artist_jp,
+        members: s.members ?? [],
         levels: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, c.level])),
       }));
       for (const s of songsList) {
@@ -108,6 +203,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       }
       datalist.innerHTML = '';
       for (const s of songsList) datalist.append(new Option(s.titleEn && s.titleEn !== s.titleJp ? s.titleEn : '', s.titleJp));
+      // Suggest every known individual: names in credits (minus groups) plus added members.
+      const known = new Set<string>();
+      for (const s of songsList) {
+        for (const n of splitCredit(s.artist)) if (!GROUP_NAMES.has(n)) known.add(n);
+        for (const n of s.members) known.add(n);
+      }
+      memberNames.innerHTML = '';
+      for (const n of [...known].sort((a, b) => a.localeCompare(b))) memberNames.append(new Option(n));
     }
 
     // Typing (or picking) an existing title switches to edit mode and shows its current values.
@@ -120,13 +223,21 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
         titleEnEl.placeholder = match.titleEn ?? '';
         artistEl.placeholder = match.artist ?? '';
         for (const input of levelInputs) input.value = match.levels[input.dataset.difficulty!]?.toString() ?? '';
+        members = [...match.members];
+        const credited = splitCredit(match.artist).filter((n) => !GROUP_NAMES.has(n));
+        membersNote.textContent = credited.length
+          ? `Already counted from the credit: ${credited.join(', ')} — no need to add them.`
+          : '';
         submitBtn.textContent = 'Update Song';
       } else {
         matchNote.textContent = titleEl.value.trim() ? 'New song.' : '';
         titleEnEl.placeholder = artistEl.placeholder = '';
         for (const input of levelInputs) input.value = '';
+        members = [];
+        membersNote.textContent = '';
         submitBtn.textContent = 'Add Song';
       }
+      renderChips();
     });
 
     form.addEventListener('submit', async (e) => {
@@ -145,9 +256,17 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       status.textContent = 'Saving...';
 
       // Existing song: only send fields that were filled in, so blanks keep current values.
-      const songFields: Record<string, string> = {};
+      const songFields: Record<string, unknown> = {};
       if (titleEnEl.value.trim()) songFields.title_en = titleEnEl.value.trim();
       if (artistEl.value.trim()) songFields.artist_en = artistEl.value.trim();
+      // A name typed but not yet added with Enter/Add still counts.
+      if (memberInput.value.trim()) addMember();
+      // Members are shown pre-filled, so save them whenever they differ from
+      // what's stored (including removing all of them).
+      const storedMembers = match?.members ?? [];
+      if (membersSupported && (members.length !== storedMembers.length || members.some((m, i) => m !== storedMembers[i]))) {
+        songFields.members = members.length ? members : null;
+      }
 
       let songId: number;
       if (match) {

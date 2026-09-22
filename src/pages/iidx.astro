@@ -23,6 +23,7 @@ import Layout from '../layouts/Layout.astro';
       </div>
 
       <div class="filters-heading">Filters</div>
+      <button type="button" id="reset-filters-btn" class="reset-filters-btn">Reset filters</button>
 
       <div class="filter-group" data-group="style">
         <button type="button" class="filter-group-header">Play Style<span class="arrow">▸</span></button>
@@ -198,6 +199,12 @@ import Layout from '../layouts/Layout.astro';
     filtersToggleBtn.addEventListener('click', () => setSidebarOpen(!filtersSidebarEl.classList.contains('open')));
     sidebarBackdropEl.addEventListener('click', () => setSidebarOpen(false));
     document.getElementById('sidebar-close-btn')!.addEventListener('click', () => setSidebarOpen(false));
+
+    // Clears every sidebar filter (not the main search box).
+    document.getElementById('reset-filters-btn')!.addEventListener('click', () => {
+      filtersSidebarEl.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+      render();
+    });
 
     function formatTimestamp(iso: string | null): string {
       if (!iso) return '—';

@@ -30,6 +30,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       </div>
 
       <div class="filters-heading">Filters</div>
+      <button type="button" id="reset-filters-btn" class="reset-filters-btn">Reset filters</button>
 
       <div class="filter-group" data-group="difficulty">
         <button type="button" class="filter-group-header">Difficulty<span class="arrow">▸</span></button>
@@ -305,7 +306,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       id: number; titleJp: string; titleEn: string | null; artistJp: string | null; artistEn: string | null;
       category: 'original' | 'cover' | null; officialOrder: number | null; jacketUrl: string | null;
       charts: Chart[]; lastUpdated: string | null; searchText: string;
-      singers: string[];
+      // credited: individual names split from the credit (may include groups);
+      // members: extra members added on /settings/holodori-song; singers: both.
+      credited: string[]; members: string[]; singers: string[];
     };
 
     // Duets/groups are stored as "A, B" or "A & B" (same order in EN and JP),
@@ -383,11 +386,20 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       // Supabase caps a single select at 1000 rows - page through until exhausted.
       const pageSize = 1000;
       let data: any[] = [];
+      // `members` comes from migration 0002; fall back to loading without it
+      // on a database that doesn't have the column yet.
+      let withMembers = true;
       for (let from = 0; ; from += pageSize) {
         const { data: page, error } = await supabase
           .from('songs')
-          .select('id, title_jp, title_en, artist_jp, artist_en, category, official_order, jacket_url, charts ( id, difficulty, level, scores ( score, clear_lamp, updated_at ) )')
+          .select(`id, title_jp, title_en, artist_jp, artist_en,${withMembers ? ' members,' : ''} category, official_order, jacket_url, charts ( id, difficulty, level, scores ( score, clear_lamp, updated_at ) )`)
           .range(from, from + pageSize - 1);
+        if (error && withMembers && /members/.test(error.message)) {
+          withMembers = false;
+          data = [];
+          from = -pageSize;
+          continue;
+        }
         if (error) {
           statusEl.textContent = `Failed to load: ${error.message}`;
           return;
@@ -408,8 +420,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         return {
           id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artistJp: s.artist_jp, artistEn: s.artist_en,
           category: s.category, officialOrder: s.official_order, jacketUrl: s.jacket_url, charts, lastUpdated,
-          searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
-          singers: splitSingers(s.artist_en ?? s.artist_jp),
+          searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...(s.members ?? [])].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+          credited: splitSingers(s.artist_en ?? s.artist_jp),
+          members: s.members ?? [],
+          singers: [...new Set([...splitSingers(s.artist_en ?? s.artist_jp), ...(s.members ?? [])])],
         };
       });
 
@@ -438,12 +452,15 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const counts = new Map<string, number>();
       const jpName = new Map<string, string>();
       for (const song of songs) {
+        // JP names line up index-for-index with the EN credit.
         const jp = splitSingers(song.artistJp);
-        song.singers.forEach((name, i) => {
-          if (GROUP_NAMES.has(name)) return;
-          counts.set(name, (counts.get(name) ?? 0) + 1);
-          if (jp.length === song.singers.length && jp[i] !== name) jpName.set(name, jp[i]);
+        song.credited.forEach((name, i) => {
+          if (jp.length === song.credited.length && jp[i] !== name) jpName.set(name, jp[i]);
         });
+        for (const name of song.singers) {
+          if (GROUP_NAMES.has(name)) continue;
+          counts.set(name, (counts.get(name) ?? 0) + 1);
+        }
       }
       singerListEl.innerHTML = [...counts]
         .sort(([a], [b]) => a.localeCompare(b))
@@ -456,6 +473,16 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         .join('');
       singerListEl.querySelectorAll('input').forEach((cb) => cb.addEventListener('input', render));
     }
+    // Clears every sidebar filter (not the main search box).
+    document.getElementById('reset-filters-btn')!.addEventListener('click', () => {
+      filtersSidebarEl.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+      levelMinEl.value = '';
+      levelMaxEl.value = '';
+      singerSearchEl.value = '';
+      singerSearchEl.dispatchEvent(new Event('input'));
+      render();
+    });
+
     // Narrowing the list only hides names; it never unchecks a selected singer.
     singerSearchEl.addEventListener('input', () => {
       const q = singerSearchEl.value.trim().normalize('NFKC').toLowerCase();
@@ -518,7 +545,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const jacket = song.jacketUrl
         ? `<img class="hd-jacket" src="${escapeHtml(song.jacketUrl)}?w=112&h=112&fm=webp" alt="" loading="lazy" />`
         : `<div class="hd-jacket" aria-hidden="true">${escapeHtml([...song.titleJp][0] ?? '?')}</div>`;
-      const sub = [song.titleEn && song.titleEn !== song.titleJp ? song.titleEn : null, song.artistEn ?? song.artistJp].filter(Boolean) as string[];
+      // Credit first; songs with no credit (e.g. not on the official site) show their added members.
+      const credit = song.artistEn ?? song.artistJp ?? (song.members.length ? song.members.join(', ') : null);
+      const sub = [song.titleEn && song.titleEn !== song.titleJp ? song.titleEn : null, credit].filter(Boolean) as string[];
       return `<div class="hd-song">
         ${jacket}
         <div><div class="hd-title-main">${escapeHtml(song.titleJp)}</div>${sub.length ? `<div class="row-subtitle">${sub.map(escapeHtml).join(' · ')}</div>` : ''}</div>

@@ -193,6 +193,15 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         padding-bottom: 0.5rem;
         margin-bottom: 0.25rem;
       }
+      .reset-filters-btn {
+        width: 100%;
+        margin: 0.35rem 0 0.25rem;
+        padding: 0.35rem 0.5rem;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        border-color: var(--border);
+      }
+      @media (hover: hover) { .reset-filters-btn:hover { color: var(--text); border-color: var(--accent); } }
       .view-toggle {
         display: flex;
         gap: 0.5rem;

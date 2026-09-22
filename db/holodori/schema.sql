@@ -34,7 +34,11 @@ create table songs (
   official_order integer,
   -- Jackets are linked on the official CDN, not self-hosted.
   jacket_asset_id text,
-  jacket_url text
+  jacket_url text,
+  -- Individual members related to the song, separate from the credit above
+  -- (e.g. a FUWAMOCO song lists Fuwawa and Mococo). Powers the Member filter
+  -- alongside individual names in the credit; set from /settings/holodori-song.
+  members text[]
 );
 
 create table charts (
