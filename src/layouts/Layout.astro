@@ -245,7 +245,16 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         padding-bottom: 0.75rem;
         max-height: 220px;
         overflow-y: auto;
+        /* Thin, subtle scrollbar in its own reserved gutter so it never sits
+           on top of the list's text (e.g. right-aligned counts). */
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+        padding-right: 0.35rem;
       }
+      .filter-group-content::-webkit-scrollbar { width: 6px; }
+      .filter-group-content::-webkit-scrollbar-track { background: transparent; }
+      .filter-group-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
       .filter-group.open .filter-group-content {
         display: flex;
       }
