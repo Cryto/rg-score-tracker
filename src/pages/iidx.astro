@@ -9,6 +9,7 @@ import Layout from '../layouts/Layout.astro';
 
   <div class="layout">
     <aside class="filters-sidebar" id="filters-sidebar">
+      <button type="button" id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Close filters">✕</button>
       <div class="filters-heading">View</div>
       <div class="view-toggle">
         <button type="button" class="view-btn active" data-view="list">
@@ -108,25 +109,26 @@ import Layout from '../layouts/Layout.astro';
       <div class="table-scroll">
         <table id="chart-table" style="display:none;">
           <colgroup>
-            <col />
-            <col style="width:90px" />
-            <col style="width:90px" />
-            <col style="width:70px" />
-            <col style="width:140px" />
-            <col style="width:60px" />
+            <col class="col-title" />
+            <col class="col-chart" />
+            <col class="col-ex" />
+            <col class="col-grade hide-mobile" />
+            <col class="col-lamp" />
+            <col class="col-bp hide-mobile" />
           </colgroup>
           <thead>
             <tr>
               <th>Title</th>
               <th>Chart</th>
-              <th>EX Score</th>
-              <th>Grade</th>
+              <th>EX<span class="hide-mobile"> Score</span></th>
+              <th class="hide-mobile">Grade</th>
               <th>Lamp</th>
-              <th>BP</th>
+              <th class="hide-mobile">BP</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
+        <div id="table-sentinel"></div>
       </div>
 
       <div id="stats-container" style="display:none;"></div>
@@ -149,6 +151,9 @@ import Layout from '../layouts/Layout.astro';
     const LAMP_ROW_LABELS: Record<string, string> = { ...LAMP_LABELS, NONE: 'No score yet' };
 
     let viewMode: 'list' | 'stats' = 'list';
+    const ROW_BATCH = 200;
+    let listRows: Row[] = [];
+    let renderedCount = 0;
 
     type Row = {
       chartId: number;
@@ -184,15 +189,15 @@ import Layout from '../layouts/Layout.astro';
     const filtersToggleBtn = document.getElementById('filters-toggle-btn')!;
     const sidebarBackdropEl = document.getElementById('sidebar-backdrop')!;
 
-    function closeSidebar() {
-      filtersSidebarEl.classList.remove('open');
-      sidebarBackdropEl.classList.remove('open');
+    // body.sidebar-open locks page scroll behind the mobile overlay.
+    function setSidebarOpen(open: boolean) {
+      filtersSidebarEl.classList.toggle('open', open);
+      sidebarBackdropEl.classList.toggle('open', open);
+      document.body.classList.toggle('sidebar-open', open);
     }
-    filtersToggleBtn.addEventListener('click', () => {
-      filtersSidebarEl.classList.toggle('open');
-      sidebarBackdropEl.classList.toggle('open');
-    });
-    sidebarBackdropEl.addEventListener('click', closeSidebar);
+    filtersToggleBtn.addEventListener('click', () => setSidebarOpen(!filtersSidebarEl.classList.contains('open')));
+    sidebarBackdropEl.addEventListener('click', () => setSidebarOpen(false));
+    document.getElementById('sidebar-close-btn')!.addEventListener('click', () => setSidebarOpen(false));
 
     function formatTimestamp(iso: string | null): string {
       if (!iso) return '—';
@@ -347,7 +352,7 @@ import Layout from '../layouts/Layout.astro';
       const headerCols = Array.from({ length: 12 }, (_, i) => `<th>${i + 1}</th>`).join('');
       const totalRow = `<tr><th>Total</th>${colTotals.map((c) => `<td><strong>${c || ''}</strong></td>`).join('')}<td><strong>${grandTotal}</strong></td></tr>`;
       return `<h2 style="font-size:1rem; margin: 1.5rem 0 0.5rem;">${escapeHtml(title)}</h2>
-        <table><thead><tr><th></th>${headerCols}<th>Total</th></tr></thead><tbody>${bodyRows}${totalRow}</tbody></table>`;
+        <div class="stats-scroll"><table class="pivot-table"><thead><tr><th></th>${headerCols}<th>Total</th></tr></thead><tbody>${bodyRows}${totalRow}</tbody></table></div>`;
     }
 
     function renderStats(filtered: Row[]) {
@@ -398,43 +403,70 @@ import Layout from '../layouts/Layout.astro';
         return;
       }
 
-      tbody.innerHTML = filtered
-        .map((r, i) => {
-          const grade = computeGrade(r.exScore, r.noteCount);
-          const lampLabel = r.lamp ? LAMP_LABELS[r.lamp as keyof typeof LAMP_LABELS] : '—';
-          const chartCode = `${r.style}${r.difficulty} ${r.level}`;
-          const bpm = r.bpmMin == null
-            ? '—'
-            : r.bpmMax != null && r.bpmMax !== r.bpmMin
-              ? `${r.bpmMin}–${r.bpmMax}`
-              : `${r.bpmMin}`;
-          const diffLabel = DIFF_LABELS[r.difficulty] ?? r.difficulty;
-          const diffWithChartLabel = r.chartLabel ? `${diffLabel} (${escapeHtml(r.chartLabel)})` : diffLabel;
-          return `<tr class="song-row" data-expand="expand-${i}">
-            <td class="title-cell"><span class="expand-arrow">▸</span>${escapeHtml(r.title)}
-              <div class="row-subtitle">${escapeHtml(r.artist)}</div>${
-            r.titleEnglish && r.titleEnglish !== r.title
-              ? `<div class="row-subtitle">${escapeHtml(r.titleEnglish)}</div>`
-              : ''
-          }</td>
-            <td class="chart-code">${chartCode}</td>
-            <td>${r.exScore ?? '—'}</td>
-            <td>${grade}</td>
-            <td>${lampLabel}</td>
-            <td>${r.missCount ?? '—'}</td>
-          </tr>
-          <tr class="expand-row" id="expand-${i}" style="display:none;">
-            <td colspan="6">
-              <span><strong>Version:</strong> ${escapeHtml(r.version)}</span>
-              <span><strong>Style:</strong> ${STYLE_LABELS[r.style] ?? r.style}</span>
-              <span><strong>Difficulty:</strong> ${diffWithChartLabel}</span>
-              <span><strong>Level:</strong> ${r.level}</span>
-              <span><strong>BPM:</strong> ${bpm}</span>
-              <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
-            </td>
-          </tr>`;
-        })
-        .join('');
+      listRows = filtered;
+      renderedCount = Math.min(ROW_BATCH, listRows.length);
+      tbody.innerHTML = listRows.slice(0, renderedCount).map(rowHtml).join('');
+      fillViewport();
+    }
+
+    // Rendering all ~12k rows at once makes a 12k-row DOM that's slow on
+    // phones, so the list renders in batches as the sentinel below the table
+    // scrolls into view.
+    function appendMoreRows() {
+      if (viewMode !== 'list' || renderedCount >= listRows.length) return;
+      const next = Math.min(renderedCount + ROW_BATCH, listRows.length);
+      tbody.insertAdjacentHTML('beforeend', listRows.slice(renderedCount, next).map((r, j) => rowHtml(r, renderedCount + j)).join(''));
+      renderedCount = next;
+      fillViewport();
+    }
+    // The observer only fires when the sentinel enters/leaves view, so keep
+    // appending while it's still within range (tall screens, short batches).
+    const tableSentinelEl = document.getElementById('table-sentinel')!;
+    function fillViewport() {
+      requestAnimationFrame(() => {
+        if (tableSentinelEl.getBoundingClientRect().top < window.innerHeight + 1200) appendMoreRows();
+      });
+    }
+    new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) appendMoreRows();
+    }, { rootMargin: '1200px 0px' }).observe(tableSentinelEl);
+
+    function rowHtml(r: Row, i: number): string {
+      const grade = computeGrade(r.exScore, r.noteCount);
+      const lampLabel = r.lamp ? LAMP_LABELS[r.lamp as keyof typeof LAMP_LABELS] : '—';
+      const chartCode = `${r.style}${r.difficulty} ${r.level}`;
+      const bpm = r.bpmMin == null
+        ? '—'
+        : r.bpmMax != null && r.bpmMax !== r.bpmMin
+          ? `${r.bpmMin}–${r.bpmMax}`
+          : `${r.bpmMin}`;
+      const diffLabel = DIFF_LABELS[r.difficulty] ?? r.difficulty;
+      const diffWithChartLabel = r.chartLabel ? `${diffLabel} (${escapeHtml(r.chartLabel)})` : diffLabel;
+      return `<tr class="song-row" data-expand="expand-${i}">
+        <td class="title-cell"><span class="expand-arrow">▸</span>${escapeHtml(r.title)}
+          <div class="row-subtitle">${escapeHtml(r.artist)}</div>${
+        r.titleEnglish && r.titleEnglish !== r.title
+          ? `<div class="row-subtitle">${escapeHtml(r.titleEnglish)}</div>`
+          : ''
+      }</td>
+        <td class="chart-code">${chartCode}</td>
+        <td>${r.exScore ?? '—'}</td>
+        <td class="hide-mobile">${grade}</td>
+        <td>${lampLabel}</td>
+        <td class="hide-mobile">${r.missCount ?? '—'}</td>
+      </tr>
+      <tr class="expand-row" id="expand-${i}" style="display:none;">
+        <td colspan="6">
+          <span><strong>Version:</strong> ${escapeHtml(r.version)}</span>
+          <span><strong>Style:</strong> ${STYLE_LABELS[r.style] ?? r.style}</span>
+          <span><strong>Difficulty:</strong> ${diffWithChartLabel}</span>
+          <span><strong>Level:</strong> ${r.level}</span>
+          <span><strong>BPM:</strong> ${bpm}</span>
+          <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
+          <span class="show-mobile"><strong>Grade:</strong> ${grade}</span>
+          <span class="show-mobile"><strong>BP:</strong> ${r.missCount ?? '—'}</span>
+        </td>
+      </tr>`;
     }
 
     function escapeHtml(s: string) {

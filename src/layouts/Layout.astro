@@ -71,7 +71,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         font-size: 0.85rem;
         margin-bottom: 1rem;
       }
-      .back-link:hover { color: var(--text); }
+      @media (hover: hover) { .back-link:hover { color: var(--text); } }
       main {
         padding: 1.5rem;
         max-width: 1400px;
@@ -229,7 +229,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         font-size: 0.85rem;
         text-align: left;
       }
-      .filter-group-header:hover { color: var(--accent); }
+      @media (hover: hover) { .filter-group-header:hover { color: var(--accent); } }
       .filter-group-header .arrow {
         color: var(--text-dim);
         transition: transform 0.15s;
@@ -270,10 +270,19 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       .table-scroll {
         overflow-x: auto;
       }
+      .col-chart { width: 90px; }
+      .col-ex { width: 90px; }
+      .col-grade { width: 70px; }
+      .col-lamp { width: 140px; }
+      .col-bp { width: 60px; }
+      .show-mobile, .expand-row .show-mobile { display: none; }
+      .stats-scroll { overflow-x: auto; }
+      .pivot-table { table-layout: auto; }
+      .sidebar-close-btn { display: none; }
       .song-row {
         cursor: pointer;
       }
-      .song-row:hover { background: var(--surface); }
+      @media (hover: hover) { .song-row:hover { background: var(--surface); } }
       .song-row .expand-arrow {
         display: inline-block;
         color: var(--text-dim);
@@ -317,7 +326,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         cursor: pointer;
         border-color: var(--accent);
       }
-      button:hover { background: #1f2430; }
+      @media (hover: hover) { button:hover { background: #1f2430; } }
       .scores-fab {
         position: fixed;
         left: 1.25rem;
@@ -334,9 +343,11 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         z-index: 100;
       }
-      .scores-fab:hover {
-        color: var(--text);
-        border-color: var(--accent);
+      @media (hover: hover) {
+        .scores-fab:hover {
+          color: var(--text);
+          border-color: var(--accent);
+        }
       }
       .scores-fab svg { width: 1.4rem; height: 1.4rem; }
       .settings-grid {
@@ -356,7 +367,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         color: var(--text);
         text-decoration: none;
       }
-      .settings-card:hover { border-color: var(--accent); }
+      @media (hover: hover) { .settings-card:hover { border-color: var(--accent); } }
       .settings-card strong { font-size: 0.95rem; }
       .settings-card span { color: var(--text-dim); font-size: 0.85rem; }
       .game-grid {
@@ -377,7 +388,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         color: var(--text);
         text-decoration: none;
       }
-      .game-card:hover { border-color: var(--accent); }
+      @media (hover: hover) { .game-card:hover { border-color: var(--accent); } }
       .game-card-picture {
         aspect-ratio: 16 / 9;
         border-radius: 6px;
@@ -391,6 +402,50 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       .home-fab {
         left: auto;
         right: 1.25rem;
+      }
+      code { overflow-wrap: anywhere; }
+
+      @media (max-width: 768px) {
+        main {
+          padding: 1rem 1rem 5.5rem; /* bottom room so the FABs don't cover the last content */
+        }
+        h1 { font-size: 1.5rem; }
+        .page-header { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
+        .last-updated { text-align: left; }
+        /* Only the game nav stays frozen on small screens; the cryto.dev bar
+           scrolls away so the fixed header doesn't eat a fifth of the screen. */
+        .cryto-nav { position: static; }
+        .app-nav {
+          top: 0;
+          gap: 1.25rem;
+          padding: 0.75rem 1rem;
+          overflow-x: auto;
+          white-space: nowrap;
+          font-size: 0.9rem;
+          scrollbar-width: none;
+        }
+        /* iOS Safari zooms the page into any focused field under 16px. */
+        select, input, textarea { font-size: 16px; }
+        .hide-mobile { display: none; }
+        .expand-row .show-mobile { display: inline-block; }
+        table { font-size: 0.85rem; }
+        .col-chart { width: 64px; }
+        .col-ex { width: 56px; }
+        .col-lamp { width: 100px; }
+        th, td { padding: 0.4rem 0.35rem; }
+        .filters-sidebar { height: 100dvh; overscroll-behavior: contain; }
+        .sidebar-close-btn {
+          display: block;
+          align-self: flex-end;
+          border: none;
+          background: none;
+          color: var(--text-dim);
+          font-size: 1.1rem;
+          padding: 0.25rem 0.5rem;
+          margin-bottom: 0.25rem;
+        }
+        body.sidebar-open { overflow: hidden; }
+        .filter-group-header { padding: 0.8rem 0; }
       }
     </style>
   </head>
@@ -452,13 +507,18 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       function updateHeaderHeights() {
         const crytoNav = document.querySelector('.cryto-nav') as HTMLElement | null;
         const appNav = document.querySelector('.app-nav') as HTMLElement | null;
-        const crytoNavHeight = crytoNav ? crytoNav.getBoundingClientRect().height : 0;
-        const appNavHeight = appNav ? appNav.getBoundingClientRect().height : 0;
+        // Only sticky bars count -- on small screens the cryto.dev bar scrolls away.
+        const stickyHeight = (el: HTMLElement | null) =>
+          el && getComputedStyle(el).position === 'sticky' ? el.getBoundingClientRect().height : 0;
+        const crytoNavHeight = stickyHeight(crytoNav);
+        const appNavHeight = stickyHeight(appNav);
         document.documentElement.style.setProperty('--cryto-nav-height', `${crytoNavHeight}px`);
         document.documentElement.style.setProperty('--header-sticky-height', `${crytoNavHeight + appNavHeight}px`);
       }
       updateHeaderHeights();
       window.addEventListener('resize', updateHeaderHeights);
+      // Which bars are sticky flips at the mobile breakpoint.
+      window.matchMedia('(max-width: 768px)').addEventListener('change', updateHeaderHeights);
     </script>
   </body>
 </html>

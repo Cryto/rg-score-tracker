@@ -63,12 +63,61 @@ create table scores (
   updated_at timestamptz not null default now()
 );
 
+-- Every score submission as submitted (before ratcheting), as an audit trail
+-- for a future score-over-time graph. Never read by the main table: `scores`
+-- stays the field-by-field ratcheted best.
+create table score_attempts (
+  id bigserial primary key,
+  chart_id integer not null references charts(id) on delete cascade,
+  ex_score integer,
+  clear_lamp clear_lamp,
+  miss_count integer,
+  submitted_at timestamptz not null default now()
+);
+create index score_attempts_chart_idx on score_attempts(chart_id, submitted_at desc);
+
+-- score_attempts has no insert policy: the only way in is the `scores`
+-- triggers below (security definer), and writes to `scores` are already
+-- owner-gated. The helper lives in a `private` schema so Supabase doesn't
+-- expose it as a callable /rpc. Skips empty submissions and exact repeats
+-- of the chart's latest attempt (e.g. re-importing the same JSON export).
+create schema private;
+revoke all on schema private from public, anon, authenticated;
+
+create or replace function private.log_score_attempt(
+  p_chart_id integer, p_ex_score integer, p_clear_lamp clear_lamp, p_miss_count integer
+) returns void as $$
+declare
+  last public.score_attempts%rowtype;
+begin
+  if p_ex_score is null and p_clear_lamp is null and p_miss_count is null then
+    return;
+  end if;
+  select * into last from public.score_attempts
+    where chart_id = p_chart_id order by submitted_at desc, id desc limit 1;
+  if found
+    and last.ex_score is not distinct from p_ex_score
+    and last.clear_lamp is not distinct from p_clear_lamp
+    and last.miss_count is not distinct from p_miss_count then
+    return;
+  end if;
+  insert into public.score_attempts (chart_id, ex_score, clear_lamp, miss_count)
+    values (p_chart_id, p_ex_score, p_clear_lamp, p_miss_count);
+end;
+$$ language plpgsql set search_path = public;
+revoke all on function private.log_score_attempt from public, anon, authenticated;
+
 -- Each field only ever improves: uploading a new play never regresses your
 -- EX score PB, lamp PB, or miss-count PB, even if the other fields are worse
 -- on that particular play.
+-- Attempts are logged in two places so an upsert is logged exactly once:
+-- UPDATEs (incl. upsert conflicts) here, before NEW is ratcheted; INSERTs in
+-- an AFTER trigger below, which only fires if the row was actually inserted
+-- (BEFORE INSERT also fires on upserts that end up conflicting).
 create or replace function ratchet_score() returns trigger as $$
 begin
   if TG_OP = 'UPDATE' then
+    perform private.log_score_attempt(new.chart_id, new.ex_score, new.clear_lamp, new.miss_count);
     new.ex_score := case
       when old.ex_score is null then new.ex_score
       when new.ex_score is null then old.ex_score
@@ -88,11 +137,22 @@ begin
   new.updated_at := now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer set search_path = public;
 
 create trigger scores_ratchet
 before insert or update on scores
 for each row execute function ratchet_score();
+
+create or replace function log_inserted_score() returns trigger as $$
+begin
+  perform private.log_score_attempt(new.chart_id, new.ex_score, new.clear_lamp, new.miss_count);
+  return null;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+create trigger scores_log_insert
+after insert on scores
+for each row execute function log_inserted_score();
 
 -- Records when the song/chart catalog was last synced (written by the
 -- import scripts), so the site can show a "DB last updated" timestamp
@@ -118,6 +178,7 @@ alter table charts enable row level security;
 alter table scores enable row level security;
 alter table catalog_syncs enable row level security;
 alter table chart_availability enable row level security;
+alter table score_attempts enable row level security;
 
 create policy "public read versions" on versions for select using (true);
 create policy "public read songs" on songs for select using (true);
@@ -125,6 +186,7 @@ create policy "public read charts" on charts for select using (true);
 create policy "public read scores" on scores for select using (true);
 create policy "public read catalog_syncs" on catalog_syncs for select using (true);
 create policy "public read chart_availability" on chart_availability for select using (true);
+create policy "public read score_attempts" on score_attempts for select using (true);
 
 create policy "owner write scores" on scores
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
