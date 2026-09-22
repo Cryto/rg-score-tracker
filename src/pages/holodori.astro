@@ -71,6 +71,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         </div>
       </div>
 
+      <div class="filter-group" data-group="singer">
+        <button type="button" class="filter-group-header">Singer<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <input id="f-singer-search" type="text" placeholder="Find a singer (EN / JP)..." aria-label="Find a singer" autocomplete="off" />
+          <div id="f-singer-list" class="hd-singer-list"></div>
+        </div>
+      </div>
+
       <div class="filter-group" data-group="category">
         <button type="button" class="filter-group-header">Song Type<span class="arrow">▸</span></button>
         <div class="filter-group-content">
@@ -247,6 +255,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     .hd-list-count { color: var(--text-dim); font-size: 0.8rem; }
     .hd-level-range { display: flex; align-items: center; gap: 0.4rem; }
     .hd-level-range input { width: 4.5rem; }
+    #f-singer-search { width: 100%; margin-bottom: 0.25rem; }
+    .hd-singer-list { display: flex; flex-direction: column; gap: 0.35rem; }
+    .hd-singer-count { margin-left: auto; color: var(--text-dim); font-size: 0.75rem; }
     /* Below ~1100px four 150px cells no longer fit beside the title, so they
        wrap underneath it: all 4 across when the row has room, otherwise 2x2
        (never 3+1). */
@@ -294,7 +305,12 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       id: number; titleJp: string; titleEn: string | null; artistJp: string | null; artistEn: string | null;
       category: 'original' | 'cover' | null; officialOrder: number | null; jacketUrl: string | null;
       charts: Chart[]; lastUpdated: string | null; searchText: string;
+      singers: string[];
     };
+
+    // Duets/groups are stored as "A, B" or "A & B" (same order in EN and JP),
+    // so split them to let one singer's filter find their collabs too.
+    const splitSingers = (s: string | null) => (s ? s.split(/\s*(?:,|、|&)\s*/).map((x) => x.trim()).filter(Boolean) : []);
 
     const supabase = getSupabase('holodori');
     const statusEl = document.getElementById('status')!;
@@ -393,6 +409,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
           id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artistJp: s.artist_jp, artistEn: s.artist_en,
           category: s.category, officialOrder: s.official_order, jacketUrl: s.jacket_url, charts, lastUpdated,
           searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+          singers: splitSingers(s.artist_en ?? s.artist_jp),
         };
       });
 
@@ -406,10 +423,44 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         return a.titleJp.localeCompare(b.titleJp, 'ja');
       });
 
+      populateSingers();
       statusEl.style.display = 'none';
       listWrapEl.style.display = '';
       render();
     }
+
+    // Singer checkboxes (EN name, with song count), plus a box to narrow the
+    // list by EN or JP name. Songs not on the official site have no singer.
+    const singerListEl = document.getElementById('f-singer-list')!;
+    const singerSearchEl = document.getElementById('f-singer-search') as HTMLInputElement;
+    function populateSingers() {
+      const counts = new Map<string, number>();
+      const jpName = new Map<string, string>();
+      for (const song of songs) {
+        const jp = splitSingers(song.artistJp);
+        song.singers.forEach((name, i) => {
+          counts.set(name, (counts.get(name) ?? 0) + 1);
+          if (jp.length === song.singers.length && jp[i] !== name) jpName.set(name, jp[i]);
+        });
+      }
+      singerListEl.innerHTML = [...counts]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([name, n]) => {
+          const search = `${name} ${jpName.get(name) ?? ''}`.normalize('NFKC').toLowerCase();
+          const jp = jpName.get(name);
+          return `<label class="checkbox-row" data-search="${escapeHtml(search)}"${jp ? ` title="${escapeHtml(jp)}"` : ''}>
+            <input type="checkbox" value="${escapeHtml(name)}" /> ${escapeHtml(name)} <span class="hd-singer-count">${n}</span></label>`;
+        })
+        .join('');
+      singerListEl.querySelectorAll('input').forEach((cb) => cb.addEventListener('input', render));
+    }
+    // Narrowing the list only hides names; it never unchecks a selected singer.
+    singerSearchEl.addEventListener('input', () => {
+      const q = singerSearchEl.value.trim().normalize('NFKC').toLowerCase();
+      singerListEl.querySelectorAll<HTMLElement>('label').forEach((label) => {
+        label.style.display = !q || label.dataset.search!.includes(q) ? '' : 'none';
+      });
+    });
 
     function checked(group: string): Set<string> {
       return new Set([...document.querySelectorAll(`.filter-group[data-group="${group}"] input[type="checkbox"]:checked`)].map((cb) => (cb as HTMLInputElement).value));
@@ -420,7 +471,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const max = levelMaxEl.value ? Number(levelMaxEl.value) : null;
       return {
         search: searchEl.value.trim().normalize('NFKC').toLowerCase(),
-        difficulties: checked('difficulty'), lamps: checked('lamp'), grades: checked('grade'), categories: checked('category'),
+        difficulties: checked('difficulty'), lamps: checked('lamp'), grades: checked('grade'), categories: checked('category'), singers: checked('singer'),
         min, max,
       };
     }
@@ -441,6 +492,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       for (const song of songs) {
         if (f.search && !song.searchText.includes(f.search)) continue;
         if (f.categories.size && !f.categories.has(song.category ?? 'unlisted')) continue;
+        if (f.singers.size && !song.singers.some((name) => f.singers.has(name))) continue;
         const matches = song.charts.map((c) => chartMatches(c, f));
         if (chartFilterActive && !matches.some(Boolean)) continue;
         rows.push({ song, matches: chartFilterActive ? matches : matches.map(() => true) });
@@ -515,7 +567,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     });
     document.querySelectorAll('.filter-group').forEach((group) => {
       group.querySelector('.filter-group-header')!.addEventListener('click', () => group.classList.toggle('open'));
-      group.querySelectorAll('input').forEach((input) => input.addEventListener('input', render));
+      // Inputs present at load; singer checkboxes are wired up in populateSingers()
+      // and the singer search box only narrows that list.
+      group.querySelectorAll('input[type="checkbox"], input[type="number"]').forEach((input) => input.addEventListener('input', render));
     });
     searchEl.addEventListener('input', render);
 
