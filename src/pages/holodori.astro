@@ -254,6 +254,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       box-shadow: 0 0 7px rgba(140, 200, 255, 0.6);
     }
     .hd-list-count { color: var(--text-dim); font-size: 0.8rem; }
+    .hd-and-up { margin-left: 0.15rem; color: var(--text-dim); font-size: 0.8rem; font-weight: 700; }
     .hd-level-range { display: flex; align-items: center; gap: 0.4rem; }
     .hd-level-range input { width: 4.5rem; }
     #f-singer-search { width: 100%; margin-bottom: 0.25rem; }
@@ -576,7 +577,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const gradeKeys = ['S+2↑', 'S+', 'S', 'A', 'B', 'C', 'D', 'NONE'];
       const lampKeys = [...[...CLEAR_LAMPS].reverse(), 'NONE'];
       statsEl.innerHTML =
-        pivot('Grade × Level', gradeKeys, (k) => (k === 'NONE' ? 'No grade' : k === 'S+2↑' ? 'S+2 and above' : gradeBadge(k)), (c) => gradeBucket(c.grade), charts) +
+        // The S+2 row also counts S+3 and up: badge plus a small arrow.
+        pivot('Grade × Level', gradeKeys, (k) => (k === 'NONE' ? 'No grade' : k === 'S+2↑' ? `<span title="S+2 and above">${gradeBadge('S+2')}<span class="hd-and-up" aria-hidden="true">↑</span></span>` : gradeBadge(k)), (c) => gradeBucket(c.grade), charts) +
         pivot('Clear × Level', lampKeys, (k) => (k === 'NONE' ? 'Not cleared' : `<span class="hd-dot hd-dot-${k}"></span> ${CLEAR_LAMP_LABELS[k as ClearLamp]}`), (c) => c.lamp ?? 'NONE', charts);
     }
 
