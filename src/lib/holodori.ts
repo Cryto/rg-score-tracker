@@ -14,6 +14,28 @@ export const DIFFICULTY_COLORS: Record<Difficulty, string> = {
   EASY: '#4FDB95', NORMAL: '#FFBB54', HARD: '#FD93B6', EXPERT: '#9A93FF',
 };
 
+// Credited groups/units (not individual members), left out of the Member
+// filter. Names can't be told apart from people by pattern (e.g.
+// "subachocolunatan", "SorAZ"), so add new ones here as songs are added.
+export const GROUP_NAMES = new Set([
+  'AyaFubuMi',
+  'Blue Journey',
+  'FUWAMOCO',
+  'hololive 1st Generation',
+  'hololive English -Advent-',
+  'hololive English -Myth-',
+  'hololive English -Promise-',
+  'hololive IDOL PROJECT',
+  'hololive Indonesia 1st Generation',
+  'hololive Indonesia 2nd Generation',
+  'hololive Indonesia 3rd Generation',
+  'ReGLOSS',
+  'Secret Society holoX',
+  'Shiranui Construction',
+  'SorAZ',
+  'subachocolunatan',
+]);
+
 // Low to high, matching the database enum order.
 export const CLEAR_LAMPS = ['CLEAR', 'FULL_COMBO', 'ALL_PERFECT'] as const;
 export type ClearLamp = (typeof CLEAR_LAMPS)[number];

@@ -72,9 +72,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       </div>
 
       <div class="filter-group" data-group="singer">
-        <button type="button" class="filter-group-header">Singer<span class="arrow">▸</span></button>
+        <button type="button" class="filter-group-header">Member<span class="arrow">▸</span></button>
         <div class="filter-group-content">
-          <input id="f-singer-search" type="text" placeholder="Find a singer (EN / JP)..." aria-label="Find a singer" autocomplete="off" />
+          <input id="f-singer-search" type="text" placeholder="Find a member (EN / JP)..." aria-label="Find a member" autocomplete="off" />
           <div id="f-singer-list" class="hd-singer-list"></div>
         </div>
       </div>
@@ -297,7 +297,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     import { getSupabase } from '../lib/supabase';
     import {
       DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS,
-      computeGrade, gradeFill, type Difficulty, type ClearLamp,
+      computeGrade, gradeFill, GROUP_NAMES, type Difficulty, type ClearLamp,
     } from '../lib/holodori';
 
     type Chart = { id: number; difficulty: Difficulty; level: number | null; score: number | null; lamp: ClearLamp | null; updatedAt: string | null; grade: string | null };
@@ -429,7 +429,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       render();
     }
 
-    // Singer checkboxes (EN name, with song count), plus a box to narrow the
+    // Member checkboxes (individual singers only -- groups/units are skipped;
+    // EN name, with song count), plus a box to narrow the
     // list by EN or JP name. Songs not on the official site have no singer.
     const singerListEl = document.getElementById('f-singer-list')!;
     const singerSearchEl = document.getElementById('f-singer-search') as HTMLInputElement;
@@ -439,6 +440,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       for (const song of songs) {
         const jp = splitSingers(song.artistJp);
         song.singers.forEach((name, i) => {
+          if (GROUP_NAMES.has(name)) return;
           counts.set(name, (counts.get(name) ?? 0) + 1);
           if (jp.length === song.singers.length && jp[i] !== name) jpName.set(name, jp[i]);
         });
