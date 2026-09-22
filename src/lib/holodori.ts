@@ -22,13 +22,6 @@ export const CLEAR_LAMP_LABELS: Record<ClearLamp, string> = {
   CLEAR: 'Clear', FULL_COMBO: 'Full Combo', ALL_PERFECT: 'All Perfect',
 };
 
-// CSS backgrounds for the in-game clear circles (All Perfect is a rainbow).
-export const CLEAR_LAMP_BACKGROUNDS: Record<ClearLamp, string> = {
-  CLEAR: '#F9FF55',
-  FULL_COMBO: '#FF3BC8',
-  ALL_PERFECT: 'linear-gradient(135deg, #A25CFF, #5B62FF, #4CBFFF, #63E8E3, #A5FF99, #E7F3B4)',
-};
-
 // The game doesn't publish grade cutoffs; these are the owner's approximations
 // (same for every chart). Scores have no maximum, so S+N continues upward in
 // the same +250,000 steps observed from S to S+2. Edit here to correct them --
@@ -52,9 +45,18 @@ export function computeGrade(score: number | null | undefined): string | null {
   return GRADE_CUTOFFS.find(([min]) => score >= min)?.[1] ?? null;
 }
 
-// Grade badge colors sampled from the in-game "High-score" badges. S and every
-// S+N share one pastel gradient.
-export const GRADE_COLORS: Record<string, string> = {
-  D: '#57ABFF', C: '#91DB1D', B: '#F9BD00', A: '#F978C5',
+// Letter fills for the grade badges, sampled from the in-game "High-score"
+// badges: each letter has a lighter band over its top half, and S / every S+N
+// share one diagonal pastel gradient (yellow -> pink -> violet -> blue/cyan).
+const GRADE_FILLS: Record<string, string> = {
+  D: 'linear-gradient(180deg, #8AD2FF 0 46%, #57ABFF 54%)',
+  C: 'linear-gradient(180deg, #C4EA5E 0 46%, #91DB1D 54%)',
+  B: 'linear-gradient(180deg, #FFD65E 0 46%, #F9BD00 54%)',
+  A: 'linear-gradient(180deg, #FFA3DC 0 46%, #F978C5 54%)',
 };
-export const S_GRADE_BACKGROUND = 'linear-gradient(135deg, #FFE46B, #FAABCD, #A878FE, #988EF9)';
+const S_FILL = 'linear-gradient(155deg, #FFE46B 8%, #FFC7A0 30%, #FAABCD 48%, #C58CFF 68%, #8FA6FF 84%, #70E0F0 100%)';
+
+/** CSS background for a grade's letter fill (used with background-clip: text). */
+export function gradeFill(grade: string): string {
+  return grade.startsWith('S') ? S_FILL : GRADE_FILLS[grade] ?? '#fff';
+}

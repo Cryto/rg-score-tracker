@@ -3,6 +3,12 @@ import Layout from '../layouts/Layout.astro';
 import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../lib/holodori';
 ---
 <Layout title="Hololive Dreams Score Tracker">
+  <Fragment slot="head">
+    <!-- Rounded display font for the grade letters, subset to just the glyphs they use. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@900&text=SABCDEF%2B0123456789&display=swap" />
+  </Fragment>
   <div class="page-header">
     <h1>Hololive Dreams Score Tracker</h1>
     <div id="last-updated" class="last-updated"></div>
@@ -181,31 +187,60 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       text-overflow: ellipsis;
     }
     .hd-score.empty { color: var(--text-dim); }
-    .hd-grade-slot { grid-area: grade; min-height: 1.1rem; }
+    .hd-grade-slot { grid-area: grade; min-height: 1.6rem; }
+    /* In-game "High-score" badge style: chunky rounded letter filled with its
+       color (lighter band on top; pastel gradient for S), a thick white
+       outline, and a soft drop shadow. Two copies share one grid cell: the
+       white outline + shadow underneath, the clipped color fill on top. */
     .hd-grade {
-      display: inline-block;
-      padding: 0 0.4rem;
-      border-radius: 4px;
-      font-size: 0.72rem;
-      font-weight: 800;
-      line-height: 1.1rem;
-      color: #0f1115;
+      display: inline-grid;
+      padding: 0 0.2rem;
+      font-family: 'M PLUS Rounded 1c', 'Arial Rounded MT Bold', system-ui, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1.15;
+      white-space: nowrap;
     }
+    .hd-grade > span { grid-area: 1 / 1; }
+    .hd-grade-outline {
+      color: #fff;
+      -webkit-text-stroke: 6px #fff;
+      filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.5));
+    }
+    .hd-grade-fill {
+      /* The outline's filter gives it its own stacking context, which paints
+         above plain in-flow content -- so lift the fill explicitly. */
+      position: relative;
+      z-index: 1;
+      background: var(--fill);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    .hd-grade sup {
+      font-size: 0.6em;
+      vertical-align: 0.55em;
+      margin-left: 0.05em;
+    }
+    .hd-grade-outline sup { -webkit-text-stroke-width: 4px; }
     .hd-dot {
       grid-area: dot;
       display: inline-block;
-      width: 12px;
-      height: 12px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       border: 1.5px solid #5a5f6b;
       flex-shrink: 0;
       vertical-align: middle;
     }
-    .hd-dot-CLEAR { background: #F9FF55; border-color: #F9FF55; }
-    .hd-dot-FULL_COMBO { background: #FF3BC8; border-color: #FF3BC8; }
+    /* Lit clear circles get the in-game white ring and a soft glow. */
+    .hd-dot-CLEAR, .hd-dot-FULL_COMBO, .hd-dot-ALL_PERFECT { border: 1.5px solid #fff; }
+    .hd-dot-CLEAR { background: #F9FF55; box-shadow: 0 0 6px rgba(249, 255, 85, 0.55); }
+    .hd-dot-FULL_COMBO { background: #FF4FD0; box-shadow: 0 0 6px rgba(255, 79, 208, 0.55); }
     .hd-dot-ALL_PERFECT {
-      background: linear-gradient(135deg, #A25CFF, #5B62FF, #4CBFFF, #63E8E3, #A5FF99, #E7F3B4);
-      border-color: transparent;
+      background: linear-gradient(135deg, #C08BFF 0%, #8C9BFF 22%, #6FD3FF 45%, #7FF5E3 65%, #C4FFA8 82%, #FFF6A8 100%);
+      box-shadow: 0 0 7px rgba(140, 200, 255, 0.6);
     }
     .hd-list-count { color: var(--text-dim); font-size: 0.8rem; }
     .hd-level-range { display: flex; align-items: center; gap: 0.4rem; }
@@ -249,7 +284,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     import { getSupabase } from '../lib/supabase';
     import {
       DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS,
-      computeGrade, GRADE_COLORS, S_GRADE_BACKGROUND, type Difficulty, type ClearLamp,
+      computeGrade, gradeFill, type Difficulty, type ClearLamp,
     } from '../lib/holodori';
 
     type Chart = { id: number; difficulty: Difficulty; level: number | null; score: number | null; lamp: ClearLamp | null; updatedAt: string | null; grade: string | null };
@@ -300,8 +335,11 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
     function gradeBadge(grade: string | null): string {
       if (!grade) return '';
-      const bg = grade.startsWith('S') ? S_GRADE_BACKGROUND : GRADE_COLORS[grade];
-      return `<span class="hd-grade" style="background:${bg}">${escapeHtml(grade)}</span>`;
+      // "S+2" renders as the letter with a small raised "+2", like the in-game badge.
+      // Two stacked copies: a white-outlined one underneath and the color-filled
+      // one on top (Chrome can't combine a text outline with a clipped fill).
+      const text = `${escapeHtml(grade[0])}${grade.length > 1 ? `<sup>${escapeHtml(grade.slice(1))}</sup>` : ''}`;
+      return `<span class="hd-grade" style="--fill:${gradeFill(grade)}" role="img" aria-label="${escapeHtml(grade)}"><span class="hd-grade-outline" aria-hidden="true">${text}</span><span class="hd-grade-fill" aria-hidden="true">${text}</span></span>`;
     }
 
     // Grade filter buckets: everything from S+2 up is one bucket.

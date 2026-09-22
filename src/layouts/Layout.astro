@@ -449,6 +449,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         .filter-group-header { padding: 0.8rem 0; }
       }
     </style>
+    <slot name="head" />
   </head>
   <body>
     {showCrytoNav && <CrytoNav />}
