@@ -10,10 +10,15 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
   </p>
 
   <form id="score-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
-    <label>Song
-      <input id="song-search" type="text" placeholder="Title or singer (EN / JP)..." autocomplete="off" />
-      <select id="song-select" size="6" style="display:none;"></select>
-    </label>
+    <div class="hd-song-field">
+      <label for="song-search">Song</label>
+      <div class="hd-song-row">
+        <input id="song-search" type="text" placeholder="Title or singer (EN / JP)..." autocomplete="off" />
+        <button type="button" id="clear-song" class="hd-icon-btn" aria-label="Clear song" title="Clear song">✕</button>
+        <button type="button" id="clear-all">Clear all</button>
+      </div>
+      <select id="song-select" size="6" style="display:none;" aria-label="Matching songs"></select>
+    </div>
     <fieldset class="hd-diff-picker">
       <legend>Difficulty</legend>
       {DIFFICULTIES.map((d) => (
@@ -23,7 +28,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         </label>
       ))}
     </fieldset>
-    <label>Score <input id="score" type="number" min="0" inputmode="numeric" /></label>
+    <!-- type="text" (not number) so the field can show thousands separators. -->
+    <label>Score <input id="score" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 1,234,567" /></label>
     <label>Clear
       <select id="clear-lamp">
         <option value="">— not cleared —</option>
@@ -70,6 +76,11 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     }
     .hd-diff-picker input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .hd-song-field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hd-song-row { display: flex; gap: 0.4rem; }
+    .hd-song-row input { flex: 1; min-width: 0; }
+    .hd-song-row button { flex-shrink: 0; white-space: nowrap; }
+    .hd-icon-btn { width: 2.2rem; padding: 0; border-color: var(--border); color: var(--text-dim); }
   </style>
 
   <script>
@@ -132,6 +143,53 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       songSelect.style.display = matches.length ? '' : 'none';
     });
 
+    const scoreInput = document.getElementById('score') as HTMLInputElement;
+    const clearLampSelect = document.getElementById('clear-lamp') as HTMLSelectElement;
+
+    function clearSong() {
+      searchInput.value = '';
+      selected = null;
+      songSelect.style.display = 'none';
+      songSelect.innerHTML = '';
+      showLevels(null);
+    }
+    document.getElementById('clear-song')!.addEventListener('click', () => {
+      clearSong();
+      searchInput.focus();
+    });
+    document.getElementById('clear-all')!.addEventListener('click', () => {
+      clearSong();
+      form.querySelectorAll<HTMLInputElement>('input[name="difficulty"]').forEach((r) => (r.checked = false));
+      scoreInput.value = '';
+      clearLampSelect.value = '';
+      status.textContent = '';
+      searchInput.focus();
+    });
+
+    // Backspace/Delete next to a comma would only delete the comma (which the
+    // formatter immediately re-adds), so step over it to remove the digit.
+    scoreInput.addEventListener('keydown', (e) => {
+      const pos = scoreInput.selectionStart;
+      if (pos == null || pos !== scoreInput.selectionEnd) return;
+      if (e.key === 'Backspace' && scoreInput.value[pos - 1] === ',') scoreInput.setSelectionRange(pos - 1, pos - 1);
+      if (e.key === 'Delete' && scoreInput.value[pos] === ',') scoreInput.setSelectionRange(pos + 1, pos + 1);
+    });
+
+    // Show thousands separators while typing (5286383 -> 5,286,383), keeping
+    // the caret after the same digit it was after before reformatting.
+    scoreInput.addEventListener('input', () => {
+      const caret = scoreInput.selectionStart ?? scoreInput.value.length;
+      const digitsBeforeCaret = scoreInput.value.slice(0, caret).replace(/\D/g, '').length;
+      const digits = scoreInput.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+      const formatted = digits ? Number(digits).toLocaleString('en-US') : '';
+      scoreInput.value = formatted;
+      let pos = 0;
+      for (let seen = 0; pos < formatted.length && seen < digitsBeforeCaret; pos++) {
+        if (/\d/.test(formatted[pos])) seen++;
+      }
+      scoreInput.setSelectionRange(pos, pos);
+    });
+
     songSelect.addEventListener('change', () => {
       selected = songs.find((s) => s.id === Number(songSelect.value)) ?? null;
       searchInput.value = selected?.label ?? '';
@@ -152,8 +210,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         status.textContent = 'Pick a difficulty.';
         return;
       }
-      const scoreVal = (document.getElementById('score') as HTMLInputElement).value;
-      const clearLamp = (document.getElementById('clear-lamp') as HTMLSelectElement).value || null;
+      const scoreVal = scoreInput.value.replace(/\D/g, '');
+      const clearLamp = clearLampSelect.value || null;
       if (!scoreVal && !clearLamp) {
         status.textContent = 'Enter a score, a clear, or both.';
         return;
