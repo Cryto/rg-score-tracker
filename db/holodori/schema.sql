@@ -143,9 +143,10 @@ create trigger scores_log_insert
 after insert on scores
 for each row execute function log_inserted_score();
 
--- Row Level Security: anyone can read, only the owner account can write
--- scores. The catalog (songs/charts) is written only by the import script
--- with the service-role key, so it has no write policies at all.
+-- Row Level Security: anyone can read, only the owner account can write.
+-- The import script writes the catalog with the service-role key (bypassing
+-- RLS); the owner policies on songs/charts let the owner also add songs and
+-- edit levels from the browser (/settings/holodori-song).
 alter table songs enable row level security;
 alter table charts enable row level security;
 alter table scores enable row level security;
@@ -162,3 +163,16 @@ create policy "owner write scores" on scores
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
 create policy "owner update scores" on scores
   for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+
+create policy "owner write songs" on songs
+  for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner update songs" on songs
+  for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+
+create policy "owner write charts" on charts
+  for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner update charts" on charts
+  for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+
+create policy "owner write catalog_syncs" on catalog_syncs
+  for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);

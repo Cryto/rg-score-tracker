@@ -1,0 +1,184 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/holodori';
+---
+<Layout title="Add / Edit Hololive Dreams Song" showLogout={true} showHome={true} settingsMode={true}>
+  <a href="/settings" class="back-link">← Back to Settings</a>
+  <h1>Add / Edit Song — Hololive Dreams</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in to Hololive Dreams — <a href="/login">log in</a> to add or edit songs.
+  </p>
+
+  <form id="song-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
+    <label>Title (as shown in-game)
+      <input id="title" type="text" required autocomplete="off" list="song-titles" />
+      <datalist id="song-titles"></datalist>
+    </label>
+    <p id="match-note" class="hd-match-note"></p>
+    <label>English title <span class="hd-optional">(optional)</span>
+      <input id="title-en" type="text" autocomplete="off" />
+    </label>
+    <label>Singer <span class="hd-optional">(optional)</span>
+      <input id="artist" type="text" autocomplete="off" />
+    </label>
+    <fieldset class="hd-level-inputs">
+      <legend>Difficulty levels</legend>
+      {DIFFICULTIES.map((d) => (
+        <label style={`--diff:${DIFFICULTY_COLORS[d]}`}>
+          <span>{DIFFICULTY_LABELS[d]}</span>
+          <input type="number" min="1" max="99" inputmode="numeric" data-difficulty={d} />
+        </label>
+      ))}
+    </fieldset>
+    <button type="submit" id="submit-btn">Add Song</button>
+    <p id="status" style="color: var(--text-dim);"></p>
+    <p style="color: var(--text-dim); font-size: 0.85rem;">
+      Blank fields are left as they are when editing an existing song. Note: re-running the
+      catalog import script resets levels for songs listed in <code>db/holodori/levels.csv</code>
+      to that file's values.
+    </p>
+  </form>
+
+  <style>
+    .hd-optional { color: var(--text-dim); font-size: 0.85em; }
+    .hd-match-note { margin: -0.4rem 0 0; font-size: 0.85rem; color: var(--text-dim); min-height: 1.2em; }
+    .hd-level-inputs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+    .hd-level-inputs legend { padding: 0; margin-bottom: 0.35rem; }
+    .hd-level-inputs label { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hd-level-inputs span { color: var(--diff); font-weight: 700; font-size: 0.85rem; }
+    .hd-level-inputs input { width: 100%; border-color: var(--diff); text-align: center; font-weight: 700; }
+  </style>
+
+  <script>
+    import { getSupabase } from '../../lib/supabase';
+    import { DIFFICULTIES } from '../../lib/holodori';
+
+    const supabase = getSupabase('holodori');
+    const authWarning = document.getElementById('auth-warning')!;
+    const form = document.getElementById('song-form') as HTMLFormElement;
+    const titleEl = document.getElementById('title') as HTMLInputElement;
+    const titleEnEl = document.getElementById('title-en') as HTMLInputElement;
+    const artistEl = document.getElementById('artist') as HTMLInputElement;
+    const datalist = document.getElementById('song-titles')!;
+    const matchNote = document.getElementById('match-note')!;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const status = document.getElementById('status')!;
+    const levelInputs = [...document.querySelectorAll<HTMLInputElement>('[data-difficulty]')];
+
+    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; levels: Record<string, number | null> };
+    let existing = new Map<string, ExistingSong>();
+    let match: ExistingSong | null = null;
+
+    // Same looseness as the level-sheet importer: ignore width, case, spacing, punctuation.
+    const norm = (s: string) => s.normalize('NFKC').toLowerCase().replace(/[\s・·.,!?~〜☆★♡♪'’"“”()[\]「」『』:\-‐―–—_/]/g, '');
+
+    async function load() {
+      if (!supabase) {
+        status.textContent = 'Hololive Dreams isn\'t configured on this deployment.';
+        submitBtn.disabled = true;
+        return;
+      }
+      supabase.auth.getSession().then(({ data }) => {
+        if (!data.session) authWarning.style.display = '';
+      });
+      const { data, error } = await supabase
+        .from('songs')
+        .select('id, title_jp, title_en, artist_jp, artist_en, charts ( difficulty, level )');
+      if (error) {
+        status.textContent = `Failed to load songs: ${error.message}`;
+        return;
+      }
+      // Keyed by both the JP and EN title, so typing either finds the song
+      // instead of creating a duplicate.
+      existing = new Map();
+      const songsList: ExistingSong[] = (data ?? []).map((s: any) => ({
+        id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artist: s.artist_en ?? s.artist_jp,
+        levels: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, c.level])),
+      }));
+      for (const s of songsList) {
+        existing.set(norm(s.titleJp), s);
+        if (s.titleEn) existing.set(norm(s.titleEn), s);
+      }
+      datalist.innerHTML = '';
+      for (const s of songsList) datalist.append(new Option(s.titleEn && s.titleEn !== s.titleJp ? s.titleEn : '', s.titleJp));
+    }
+
+    // Typing (or picking) an existing title switches to edit mode and shows its current values.
+    titleEl.addEventListener('input', () => {
+      const found = existing.get(norm(titleEl.value)) ?? null;
+      if (found === match) return;
+      match = found;
+      if (match) {
+        matchNote.textContent = `Already in the catalog as "${match.titleJp}" — saving updates it.`;
+        titleEnEl.placeholder = match.titleEn ?? '';
+        artistEl.placeholder = match.artist ?? '';
+        for (const input of levelInputs) input.value = match.levels[input.dataset.difficulty!]?.toString() ?? '';
+        submitBtn.textContent = 'Update Song';
+      } else {
+        matchNote.textContent = titleEl.value.trim() ? 'New song.' : '';
+        titleEnEl.placeholder = artistEl.placeholder = '';
+        for (const input of levelInputs) input.value = '';
+        submitBtn.textContent = 'Add Song';
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!supabase) return;
+      const titleJp = titleEl.value.trim();
+      if (!titleJp) return;
+      const levels = levelInputs.map((input) => ({ difficulty: input.dataset.difficulty!, level: input.value ? Number(input.value) : null }));
+      if (levels.some((l) => l.level != null && (!Number.isInteger(l.level) || l.level < 1 || l.level > 99))) {
+        status.textContent = 'Levels must be whole numbers from 1 to 99.';
+        return;
+      }
+      const filled = levels.map((l) => l.level).filter((n): n is number => n != null);
+      const warning = filled.some((n, i) => i && n < filled[i - 1]) ? ' (Heads up: levels don\'t go up from Easy to Expert.)' : '';
+      submitBtn.disabled = true;
+      status.textContent = 'Saving...';
+
+      // Existing song: only send fields that were filled in, so blanks keep current values.
+      const songFields: Record<string, string> = {};
+      if (titleEnEl.value.trim()) songFields.title_en = titleEnEl.value.trim();
+      if (artistEl.value.trim()) songFields.artist_en = artistEl.value.trim();
+
+      let songId: number;
+      if (match) {
+        songId = match.id;
+        if (Object.keys(songFields).length) {
+          const { error } = await supabase.from('songs').update(songFields).eq('id', songId);
+          if (error) { status.textContent = `Error: ${error.message}`; submitBtn.disabled = false; return; }
+        }
+      } else {
+        const { data, error } = await supabase.from('songs').insert({ title_jp: titleJp, ...songFields }).select('id').single();
+        if (error) { status.textContent = `Error: ${error.message}`; submitBtn.disabled = false; return; }
+        songId = data.id;
+      }
+
+      // New songs get all four charts (so scores can be entered even before a level is known);
+      // existing songs only get the levels that were filled in.
+      const chartRows = levels
+        .filter((l) => !match || l.level != null)
+        .map((l) => ({ song_id: songId, difficulty: l.difficulty, level: l.level }));
+      if (chartRows.length) {
+        const { error } = await supabase.from('charts').upsert(chartRows, { onConflict: 'song_id,difficulty' });
+        if (error) { status.textContent = `Song saved, but levels failed: ${error.message}`; submitBtn.disabled = false; return; }
+      }
+      await supabase.from('catalog_syncs').insert({});
+
+      status.textContent = `${match ? 'Updated' : 'Added'} "${match?.titleJp ?? titleJp}".${warning}`;
+      submitBtn.disabled = false;
+      await load();
+      titleEl.dispatchEvent(new Event('input'));
+    });
+
+    load();
+  </script>
+</Layout>
