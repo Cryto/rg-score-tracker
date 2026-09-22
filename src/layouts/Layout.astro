@@ -497,9 +497,9 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
     )}
     {showLogout && (
       <script>
-        import { supabase } from '../lib/supabase';
+        import { configuredClients } from '../lib/supabase';
         document.getElementById('logout-fab')!.addEventListener('click', async () => {
-          await supabase.auth.signOut();
+          await Promise.all(configuredClients().map(([, client]) => client.auth.signOut()));
           window.location.href = '/';
         });
       </script>

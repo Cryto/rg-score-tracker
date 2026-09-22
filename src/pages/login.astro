@@ -12,8 +12,9 @@ import Layout from '../layouts/Layout.astro';
   </form>
 
   <script>
-    import { supabase } from '../lib/supabase';
+    import { supabase, configuredClients } from '../lib/supabase';
 
+    const GAME_NAMES: Record<string, string> = { iidx: 'beatmania IIDX', holodori: 'Hololive Dreams' };
     const form = document.getElementById('login-form') as HTMLFormElement;
     const status = document.getElementById('status')!;
 
@@ -23,13 +24,29 @@ import Layout from '../layouts/Layout.astro';
       if (data.session) window.location.href = '/settings';
     });
 
+    // Each game is a separate Supabase project with its own auth, so sign in
+    // to all of them with the same credentials (the owner account must exist
+    // in each project). IIDX is required; other games just report failures.
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = (document.getElementById('email') as HTMLInputElement).value;
       const password = (document.getElementById('password') as HTMLInputElement).value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      status.textContent = error ? `Error: ${error.message}` : 'Logged in.';
-      if (!error) setTimeout(() => (window.location.href = '/settings'), 500);
+      const results = await Promise.all(
+        configuredClients().map(async ([game, client]) => {
+          const { error } = await client.auth.signInWithPassword({ email, password });
+          return { game, error };
+        })
+      );
+      const iidxError = results.find((r) => r.game === 'iidx')?.error;
+      const otherErrors = results.filter((r) => r.game !== 'iidx' && r.error);
+      if (iidxError) {
+        status.textContent = `Error: ${iidxError.message}`;
+        return;
+      }
+      status.textContent = otherErrors.length
+        ? `Logged in, but not to ${otherErrors.map((r) => `${GAME_NAMES[r.game] ?? r.game} (${r.error!.message})`).join(', ')}.`
+        : 'Logged in.';
+      setTimeout(() => (window.location.href = '/settings'), otherErrors.length ? 2500 : 500);
     });
   </script>
 </Layout>

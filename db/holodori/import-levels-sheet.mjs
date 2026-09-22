@@ -12,38 +12,18 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { parseCsv, csvField } from './csv.mjs';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const DIFFS = ['easy', 'normal', 'hard', 'expert'];
+// Byte-order mark (U+FEFF): stripped from input, prepended to output so Excel
+// opens the Japanese titles correctly.
+const BOM = String.fromCharCode(0xfeff);
+const BOM_RE = new RegExp(`^${BOM}`);
 
 // Sheet spelling -> official JP title, for names normalization can't bridge.
 const ALIASES = {
   '地獄であおうぜ！スバちょこるなたん': '地獄で会おうぜ！ スバちょこるなたん',
-};
-
-function parseCsv(text) {
-  const rows = [];
-  let row = [], field = '', quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (quoted) {
-      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
-      else if (c === '"') quoted = false;
-      else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') { row.push(field); field = ''; }
-    else if (c === '\n' || c === '\r') {
-      if (c === '\r' && text[i + 1] === '\n') i++;
-      row.push(field); rows.push(row); row = []; field = '';
-    } else field += c;
-  }
-  if (field || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
-
-const csvField = (v) => {
-  v = v == null ? '' : String(v);
-  return /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
 };
 
 const norm = (s) => (s ?? '').normalize('NFKC').toLowerCase()
@@ -56,7 +36,7 @@ const songs = JSON.parse(fs.readFileSync(path.join(DIR, 'songs.json'), 'utf8'));
 const byTitle = new Map();
 for (const s of songs) for (const t of [s.title_jp, s.title_en]) if (t) byTitle.set(norm(t), s);
 
-const [header, ...body] = parseCsv(fs.readFileSync(sheetPath, 'utf8').replace(/^﻿/, ''));
+const [header, ...body] = parseCsv(fs.readFileSync(sheetPath, 'utf8').replace(BOM_RE, ''));
 if (!/song/i.test(header[0] ?? '')) throw new Error(`Unexpected header: ${header.join(',')}`);
 
 const levelsByOrder = new Map();
@@ -81,8 +61,7 @@ for (const r of body) {
 const lines = [['order', 'title_en', 'title_jp', ...DIFFS].join(',')];
 for (const s of songs) lines.push([s.order, s.title_en, s.title_jp, ...(levelsByOrder.get(s.order) ?? ['', '', '', ''])].map(csvField).join(','));
 for (const s of sheetOnly) lines.push(['', '', s.name, ...s.levels].map(csvField).join(','));
-// BOM so Excel opens the Japanese titles correctly.
-fs.writeFileSync(path.join(DIR, 'levels.csv'), '﻿' + lines.join('\r\n') + '\r\n');
+fs.writeFileSync(path.join(DIR, 'levels.csv'), BOM + lines.join('\r\n') + '\r\n');
 
 const missing = songs.filter((s) => !levelsByOrder.has(s.order));
 console.log(`Official songs with levels: ${levelsByOrder.size}/${songs.length}`);
