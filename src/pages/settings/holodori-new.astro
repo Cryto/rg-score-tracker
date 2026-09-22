@@ -10,9 +10,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
   </p>
 
   <form id="score-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
-    <div class="hd-song-field">
+    <div class="hd-field">
       <label for="song-search">Song</label>
-      <div class="hd-song-row">
+      <div class="hd-field-row">
         <input id="song-search" type="text" placeholder="Title or singer (EN / JP)..." autocomplete="off" />
         <button type="button" id="clear-song" class="hd-icon-btn" aria-label="Clear song" title="Clear song">✕</button>
         <button type="button" id="clear-all">Clear all</button>
@@ -29,7 +29,13 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       ))}
     </fieldset>
     <!-- type="text" (not number) so the field can show thousands separators. -->
-    <label>Score <input id="score" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 1,234,567" /></label>
+    <div class="hd-field">
+      <label for="score">Score</label>
+      <div class="hd-field-row">
+        <input id="score" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 1,234,567" />
+        <button type="button" id="clear-score" class="hd-icon-btn" aria-label="Clear score" title="Clear score">✕</button>
+      </div>
+    </div>
     <label>Clear
       <select id="clear-lamp">
         <option value="">— not cleared —</option>
@@ -76,10 +82,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     }
     .hd-diff-picker input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .hd-song-field { display: flex; flex-direction: column; gap: 0.25rem; }
-    .hd-song-row { display: flex; gap: 0.4rem; }
-    .hd-song-row input { flex: 1; min-width: 0; }
-    .hd-song-row button { flex-shrink: 0; white-space: nowrap; }
+    .hd-field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hd-field-row { display: flex; gap: 0.4rem; }
+    .hd-field-row input { flex: 1; min-width: 0; }
+    .hd-field-row button { flex-shrink: 0; white-space: nowrap; }
     .hd-icon-btn { width: 2.2rem; padding: 0; border-color: var(--border); color: var(--text-dim); }
   </style>
 
@@ -145,6 +151,11 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
     const scoreInput = document.getElementById('score') as HTMLInputElement;
     const clearLampSelect = document.getElementById('clear-lamp') as HTMLSelectElement;
+
+    document.getElementById('clear-score')!.addEventListener('click', () => {
+      scoreInput.value = '';
+      scoreInput.focus();
+    });
 
     function clearSong() {
       searchInput.value = '';
