@@ -111,8 +111,8 @@ import Layout from '../layouts/Layout.astro';
           <colgroup>
             <col class="col-title" />
             <col class="col-chart" />
-            <col class="col-ex" />
-            <col class="col-grade hide-mobile" />
+            <col class="col-ex hide-mobile" />
+            <col class="col-grade" />
             <col class="col-lamp" />
             <col class="col-bp hide-mobile" />
           </colgroup>
@@ -120,8 +120,8 @@ import Layout from '../layouts/Layout.astro';
             <tr>
               <th>Title</th>
               <th>Chart</th>
-              <th>EX<span class="hide-mobile"> Score</span></th>
-              <th class="hide-mobile">Grade</th>
+              <th class="hide-mobile">EX Score</th>
+              <th>Grade</th>
               <th>Lamp</th>
               <th class="hide-mobile">BP</th>
             </tr>
@@ -475,8 +475,8 @@ import Layout from '../layouts/Layout.astro';
           : ''
       }</td>
         <td class="chart-code">${chartCode}</td>
-        <td>${r.exScore ?? '—'}</td>
-        <td class="hide-mobile">${grade}</td>
+        <td class="hide-mobile">${r.exScore ?? '—'}</td>
+        <td>${grade}</td>
         <td>${lampLabel}</td>
         <td class="hide-mobile">${r.missCount ?? '—'}</td>
       </tr>
@@ -488,7 +488,7 @@ import Layout from '../layouts/Layout.astro';
           <span><strong>Level:</strong> ${r.level}</span>
           <span><strong>BPM:</strong> ${bpm}</span>
           <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
-          <span class="show-mobile"><strong>Grade:</strong> ${grade}</span>
+          <span class="show-mobile"><strong>EX Score:</strong> ${r.exScore ?? '—'}</span>
           <span class="show-mobile"><strong>BP:</strong> ${r.missCount ?? '—'}</span>
         </td>
       </tr>`;
