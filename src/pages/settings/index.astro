@@ -3,6 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 ---
 <Layout title="Settings" showLogout={true} showHome={true} settingsMode={true}>
   <h1>Settings</h1>
+
+  <h2 class="settings-game-heading">beatmania IIDX</h2>
   <div class="settings-grid">
     <a class="settings-card" href="/settings/new">
       <strong>Add / Update a Score</strong>
@@ -21,4 +23,20 @@ import Layout from '../../layouts/Layout.astro';
       <span>Add or update songs and charts themselves — titles, levels, BPM, and more.</span>
     </a>
   </div>
+
+  <h2 class="settings-game-heading">Hololive Dreams</h2>
+  <div class="settings-grid">
+    <a class="settings-card" href="/settings/holodori-new">
+      <strong>Add / Update a Score</strong>
+      <span>Search a song, pick a difficulty, enter score and clear.</span>
+    </a>
+  </div>
+
+  <style>
+    .settings-game-heading {
+      font-size: 1rem;
+      color: var(--text-dim);
+      margin: 1.75rem 0 0.75rem;
+    }
+  </style>
 </Layout>

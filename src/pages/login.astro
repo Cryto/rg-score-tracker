@@ -12,16 +12,17 @@ import Layout from '../layouts/Layout.astro';
   </form>
 
   <script>
-    import { supabase, configuredClients } from '../lib/supabase';
+    import { configuredClients } from '../lib/supabase';
 
     const GAME_NAMES: Record<string, string> = { iidx: 'beatmania IIDX', holodori: 'Hololive Dreams' };
     const form = document.getElementById('login-form') as HTMLFormElement;
     const status = document.getElementById('status')!;
 
-    supabase.auth.getSession().then(({ data }) => {
-      // Already logged in (e.g. via the settings button) -- skip straight to
-      // /settings instead of showing the form again.
-      if (data.session) window.location.href = '/settings';
+    // Already logged in to every configured game (e.g. via the settings
+    // button) -- skip straight to /settings. If any game is missing a
+    // session (say a newly added one), show the form so it can be signed in.
+    Promise.all(configuredClients().map(([, client]) => client.auth.getSession())).then((results) => {
+      if (results.every(({ data }) => data.session)) window.location.href = '/settings';
     });
 
     // Each game is a separate Supabase project with its own auth, so sign in

@@ -1,7 +1,485 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../lib/holodori';
 ---
 <Layout title="Hololive Dreams Score Tracker">
-  <h1>Hololive Dreams Score Tracker</h1>
-  <p style="color: var(--text-dim);">Coming soon — catalog and score data for this game haven't been added yet.</p>
+  <div class="page-header">
+    <h1>Hololive Dreams Score Tracker</h1>
+    <div id="last-updated" class="last-updated"></div>
+  </div>
+
+  <div class="layout">
+    <aside class="filters-sidebar" id="filters-sidebar">
+      <button type="button" id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Close filters">✕</button>
+      <div class="filters-heading">View</div>
+      <div class="view-toggle">
+        <button type="button" class="view-btn active" data-view="list">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          List
+        </button>
+        <button type="button" class="view-btn" data-view="stats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Statistics
+        </button>
+      </div>
+
+      <div class="filters-heading">Filters</div>
+
+      <div class="filter-group" data-group="difficulty">
+        <button type="button" class="filter-group-header">Difficulty<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          {DIFFICULTIES.map((d) => (
+            <label class="checkbox-row"><input type="checkbox" value={d} /> <span style={`color:${DIFFICULTY_COLORS[d]}`}>{DIFFICULTY_LABELS[d]}</span></label>
+          ))}
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="level">
+        <button type="button" class="filter-group-header">Level<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <div class="hd-level-range">
+            <input id="f-level-min" type="number" min="1" max="99" placeholder="Min" aria-label="Minimum level" />
+            <span>–</span>
+            <input id="f-level-max" type="number" min="1" max="99" placeholder="Max" aria-label="Maximum level" />
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="lamp">
+        <button type="button" class="filter-group-header">Clear<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          {[...CLEAR_LAMPS].reverse().map((l) => (
+            <label class="checkbox-row"><input type="checkbox" value={l} /> <span class={`hd-dot hd-dot-${l}`}></span> {CLEAR_LAMP_LABELS[l]}</label>
+          ))}
+          <label class="checkbox-row"><input type="checkbox" value="NONE" /> <span class="hd-dot"></span> Not cleared</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="grade">
+        <button type="button" class="filter-group-header">Grade<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          {['S+2↑', 'S+', 'S', 'A', 'B', 'C', 'D'].map((g) => (
+            <label class="checkbox-row"><input type="checkbox" value={g} /> {g === 'S+2↑' ? 'S+2 and above' : g}</label>
+          ))}
+          <label class="checkbox-row"><input type="checkbox" value="NONE" /> No grade</label>
+        </div>
+      </div>
+
+      <div class="filter-group" data-group="category">
+        <button type="button" class="filter-group-header">Song Type<span class="arrow">▸</span></button>
+        <div class="filter-group-content">
+          <label class="checkbox-row"><input type="checkbox" value="original" /> Original</label>
+          <label class="checkbox-row"><input type="checkbox" value="cover" /> Cover</label>
+          <label class="checkbox-row"><input type="checkbox" value="unlisted" /> Not on official site</label>
+        </div>
+      </div>
+    </aside>
+
+    <div class="table-container">
+      <div class="table-toolbar">
+        <button type="button" id="filters-toggle-btn" class="filters-toggle-btn" aria-label="Toggle filters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+          Filters
+        </button>
+        <label class="search-row">Search
+          <input id="f-search" type="text" placeholder="Title or singer (EN / JP)..." />
+        </label>
+      </div>
+
+      <p id="status" style="color: var(--text-dim);">Loading...</p>
+
+      <div id="song-list-wrap" style="display:none;">
+        <div class="hd-list-header" aria-hidden="true">
+          <span></span><span>Song</span>
+          {DIFFICULTIES.map((d) => <span style={`color:${DIFFICULTY_COLORS[d]}`}>{DIFFICULTY_LABELS[d]}</span>)}
+        </div>
+        <div id="song-list"></div>
+        <p id="list-count" class="hd-list-count"></p>
+      </div>
+
+      <div id="stats-container" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+  <style is:global>
+    /* Holodori song list. Classes are hd- prefixed because rows are rendered
+       from JS (innerHTML), which Astro's scoped styles can't reach. */
+    .hd-list-header,
+    .hd-song {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) repeat(4, 150px);
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .hd-list-header {
+      position: sticky;
+      top: calc(var(--header-sticky-height, 0px) + var(--toolbar-height, 0px));
+      z-index: 10;
+      background: var(--bg);
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .hd-song {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .hd-jacket {
+      width: 56px;
+      height: 56px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: linear-gradient(135deg, var(--border), var(--surface));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .hd-title-main {
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .hd-charts { display: contents; }
+    .hd-chart {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: "level score dot" "level grade dot";
+      column-gap: 0.45rem;
+      align-items: center;
+      padding: 0.35rem 0.45rem;
+      border-radius: 6px;
+      background: var(--surface);
+      border-left: 3px solid var(--diff);
+      min-height: 46px;
+      min-width: 0;
+    }
+    .hd-chart.dim { opacity: 0.3; }
+    /* In-game style: white chip with the level in the difficulty color. */
+    .hd-level {
+      grid-area: level;
+      min-width: 2rem;
+      padding: 0.15rem 0.35rem;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--diff);
+      font-weight: 800;
+      text-align: center;
+    }
+    .hd-diff-name { display: none; }
+    .hd-score {
+      grid-area: score;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hd-score.empty { color: var(--text-dim); }
+    .hd-grade-slot { grid-area: grade; min-height: 1.1rem; }
+    .hd-grade {
+      display: inline-block;
+      padding: 0 0.4rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1.1rem;
+      color: #0f1115;
+    }
+    .hd-dot {
+      grid-area: dot;
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1.5px solid #5a5f6b;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+    .hd-dot-CLEAR { background: #F9FF55; border-color: #F9FF55; }
+    .hd-dot-FULL_COMBO { background: #FF3BC8; border-color: #FF3BC8; }
+    .hd-dot-ALL_PERFECT {
+      background: linear-gradient(135deg, #A25CFF, #5B62FF, #4CBFFF, #63E8E3, #A5FF99, #E7F3B4);
+      border-color: transparent;
+    }
+    .hd-list-count { color: var(--text-dim); font-size: 0.8rem; }
+    .hd-level-range { display: flex; align-items: center; gap: 0.4rem; }
+    .hd-level-range input { width: 4.5rem; }
+    /* Below ~1100px four 150px cells no longer fit beside the title, so they
+       wrap underneath it: all 4 across when the row has room, otherwise 2x2
+       (never 3+1). */
+    @media (max-width: 1100px) {
+      .hd-list-header { display: none; }
+      .hd-song {
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 0.5rem 0.65rem;
+        padding: 0.6rem 0.25rem;
+        container-type: inline-size;
+      }
+      .hd-jacket { width: 48px; height: 48px; }
+      .hd-charts {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.4rem;
+      }
+      @container (min-width: 640px) {
+        .hd-charts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      }
+      /* No column header on mobile, so each cell names its difficulty. */
+      .hd-diff-name {
+        display: block;
+        grid-area: name;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--diff);
+      }
+      .hd-chart { grid-template-areas: "name name name" "level score dot" "level grade dot"; }
+    }
+  </style>
+
+  <script>
+    import { getSupabase } from '../lib/supabase';
+    import {
+      DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS,
+      computeGrade, GRADE_COLORS, S_GRADE_BACKGROUND, type Difficulty, type ClearLamp,
+    } from '../lib/holodori';
+
+    type Chart = { id: number; difficulty: Difficulty; level: number | null; score: number | null; lamp: ClearLamp | null; updatedAt: string | null; grade: string | null };
+    type Song = {
+      id: number; titleJp: string; titleEn: string | null; artistJp: string | null; artistEn: string | null;
+      category: 'original' | 'cover' | null; officialOrder: number | null; jacketUrl: string | null;
+      charts: Chart[]; lastUpdated: string | null; searchText: string;
+    };
+
+    const supabase = getSupabase('holodori');
+    const statusEl = document.getElementById('status')!;
+    const listWrapEl = document.getElementById('song-list-wrap')!;
+    const listEl = document.getElementById('song-list')!;
+    const listCountEl = document.getElementById('list-count')!;
+    const statsEl = document.getElementById('stats-container')!;
+    const lastUpdatedEl = document.getElementById('last-updated')!;
+    const filtersSidebarEl = document.getElementById('filters-sidebar')!;
+    const sidebarBackdropEl = document.getElementById('sidebar-backdrop')!;
+    const searchEl = document.getElementById('f-search') as HTMLInputElement;
+    const levelMinEl = document.getElementById('f-level-min') as HTMLInputElement;
+    const levelMaxEl = document.getElementById('f-level-max') as HTMLInputElement;
+
+    let songs: Song[] = [];
+    let viewMode: 'list' | 'stats' = 'list';
+
+    // body.sidebar-open locks page scroll behind the mobile overlay.
+    function setSidebarOpen(open: boolean) {
+      filtersSidebarEl.classList.toggle('open', open);
+      sidebarBackdropEl.classList.toggle('open', open);
+      document.body.classList.toggle('sidebar-open', open);
+    }
+    document.getElementById('filters-toggle-btn')!.addEventListener('click', () => setSidebarOpen(!filtersSidebarEl.classList.contains('open')));
+    sidebarBackdropEl.addEventListener('click', () => setSidebarOpen(false));
+    document.getElementById('sidebar-close-btn')!.addEventListener('click', () => setSidebarOpen(false));
+
+    // Keep the column header stuck just under the sticky search toolbar.
+    const toolbarEl = document.querySelector('.table-toolbar') as HTMLElement;
+    new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-height', `${toolbarEl.offsetHeight}px`)).observe(toolbarEl);
+
+    function escapeHtml(s: string) {
+      return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    }
+
+    function formatTimestamp(iso: string | null): string {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    }
+
+    function gradeBadge(grade: string | null): string {
+      if (!grade) return '';
+      const bg = grade.startsWith('S') ? S_GRADE_BACKGROUND : GRADE_COLORS[grade];
+      return `<span class="hd-grade" style="background:${bg}">${escapeHtml(grade)}</span>`;
+    }
+
+    // Grade filter buckets: everything from S+2 up is one bucket.
+    function gradeBucket(grade: string | null): string {
+      if (!grade) return 'NONE';
+      return /^S\+\d+$/.test(grade) ? 'S+2↑' : grade;
+    }
+
+    async function loadLastUpdated() {
+      if (!supabase) return;
+      const [{ data: sync }, { data: score }] = await Promise.all([
+        supabase.from('catalog_syncs').select('synced_at').order('synced_at', { ascending: false }).limit(1).maybeSingle(),
+        supabase.from('scores').select('updated_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      lastUpdatedEl.innerHTML = `DB last updated: ${formatTimestamp(sync?.synced_at ?? null)}<br>Scores last updated: ${formatTimestamp(score?.updated_at ?? null)}`;
+    }
+
+    async function load() {
+      if (!supabase) {
+        statusEl.textContent = 'Hololive Dreams isn\'t configured on this deployment (missing PUBLIC_SUPABASE_URL_HOLODORI / PUBLIC_SUPABASE_ANON_KEY_HOLODORI).';
+        return;
+      }
+      // Supabase caps a single select at 1000 rows - page through until exhausted.
+      const pageSize = 1000;
+      let data: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data: page, error } = await supabase
+          .from('songs')
+          .select('id, title_jp, title_en, artist_jp, artist_en, category, official_order, jacket_url, charts ( id, difficulty, level, scores ( score, clear_lamp, updated_at ) )')
+          .range(from, from + pageSize - 1);
+        if (error) {
+          statusEl.textContent = `Failed to load: ${error.message}`;
+          return;
+        }
+        data = data.concat(page ?? []);
+        if (!page || page.length < pageSize) break;
+      }
+
+      songs = data.map((s: any) => {
+        const charts: Chart[] = DIFFICULTIES.map((d) => {
+          const c = (s.charts ?? []).find((c: any) => c.difficulty === d);
+          // scores is 1:1 with charts, but PostgREST may return it as an object or a one-element array.
+          const sc = Array.isArray(c?.scores) ? c.scores[0] : c?.scores;
+          const score = sc?.score ?? null;
+          return { id: c?.id, difficulty: d, level: c?.level ?? null, score, lamp: sc?.clear_lamp ?? null, updatedAt: sc?.updated_at ?? null, grade: computeGrade(score) };
+        });
+        const lastUpdated = charts.map((c) => c.updatedAt).filter(Boolean).sort().pop() ?? null;
+        return {
+          id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artistJp: s.artist_jp, artistEn: s.artist_en,
+          category: s.category, officialOrder: s.official_order, jacketUrl: s.jacket_url, charts, lastUpdated,
+          searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+        };
+      });
+
+      // Songs with a score first, most recently updated first; then the
+      // official site order; songs not on the official site last, by title.
+      songs.sort((a, b) => {
+        if (!!a.lastUpdated !== !!b.lastUpdated) return a.lastUpdated ? -1 : 1;
+        if (a.lastUpdated && b.lastUpdated && a.lastUpdated !== b.lastUpdated) return a.lastUpdated > b.lastUpdated ? -1 : 1;
+        if ((a.officialOrder == null) !== (b.officialOrder == null)) return a.officialOrder == null ? 1 : -1;
+        if (a.officialOrder != null && b.officialOrder != null) return a.officialOrder - b.officialOrder;
+        return a.titleJp.localeCompare(b.titleJp, 'ja');
+      });
+
+      statusEl.style.display = 'none';
+      listWrapEl.style.display = '';
+      render();
+    }
+
+    function checked(group: string): Set<string> {
+      return new Set([...document.querySelectorAll(`.filter-group[data-group="${group}"] input[type="checkbox"]:checked`)].map((cb) => (cb as HTMLInputElement).value));
+    }
+
+    function currentFilters() {
+      const min = levelMinEl.value ? Number(levelMinEl.value) : null;
+      const max = levelMaxEl.value ? Number(levelMaxEl.value) : null;
+      return {
+        search: searchEl.value.trim().normalize('NFKC').toLowerCase(),
+        difficulties: checked('difficulty'), lamps: checked('lamp'), grades: checked('grade'), categories: checked('category'),
+        min, max,
+      };
+    }
+
+    function chartMatches(c: Chart, f: ReturnType<typeof currentFilters>): boolean {
+      if (f.difficulties.size && !f.difficulties.has(c.difficulty)) return false;
+      if (f.min != null && (c.level == null || c.level < f.min)) return false;
+      if (f.max != null && (c.level == null || c.level > f.max)) return false;
+      if (f.lamps.size && !f.lamps.has(c.lamp ?? 'NONE')) return false;
+      if (f.grades.size && !f.grades.has(gradeBucket(c.grade))) return false;
+      return true;
+    }
+
+    function filtered() {
+      const f = currentFilters();
+      const chartFilterActive = f.difficulties.size || f.lamps.size || f.grades.size || f.min != null || f.max != null;
+      const rows: { song: Song; matches: boolean[] }[] = [];
+      for (const song of songs) {
+        if (f.search && !song.searchText.includes(f.search)) continue;
+        if (f.categories.size && !f.categories.has(song.category ?? 'unlisted')) continue;
+        const matches = song.charts.map((c) => chartMatches(c, f));
+        if (chartFilterActive && !matches.some(Boolean)) continue;
+        rows.push({ song, matches: chartFilterActive ? matches : matches.map(() => true) });
+      }
+      return rows;
+    }
+
+    function chartHtml(c: Chart, match: boolean): string {
+      const score = c.score != null ? c.score.toLocaleString('en-US') : '—';
+      const lampTitle = c.lamp ? CLEAR_LAMP_LABELS[c.lamp] : 'Not cleared';
+      return `<div class="hd-chart${match ? '' : ' dim'}" style="--diff:${DIFFICULTY_COLORS[c.difficulty]}">
+        <span class="hd-diff-name">${DIFFICULTY_LABELS[c.difficulty]}</span>
+        <span class="hd-level" title="${DIFFICULTY_LABELS[c.difficulty]} level">${c.level ?? '?'}</span>
+        <span class="hd-score${c.score == null ? ' empty' : ''}">${score}</span>
+        <span class="hd-grade-slot">${gradeBadge(c.grade)}</span>
+        <span class="hd-dot${c.lamp ? ` hd-dot-${c.lamp}` : ''}" title="${lampTitle}" aria-label="${lampTitle}"></span>
+      </div>`;
+    }
+
+    function songHtml(song: Song, matches: boolean[]): string {
+      const jacket = song.jacketUrl
+        ? `<img class="hd-jacket" src="${escapeHtml(song.jacketUrl)}?w=112&h=112&fm=webp" alt="" loading="lazy" />`
+        : `<div class="hd-jacket" aria-hidden="true">${escapeHtml([...song.titleJp][0] ?? '?')}</div>`;
+      const sub = [song.titleEn && song.titleEn !== song.titleJp ? song.titleEn : null, song.artistEn ?? song.artistJp].filter(Boolean) as string[];
+      return `<div class="hd-song">
+        ${jacket}
+        <div><div class="hd-title-main">${escapeHtml(song.titleJp)}</div>${sub.length ? `<div class="row-subtitle">${sub.map(escapeHtml).join(' · ')}</div>` : ''}</div>
+        <div class="hd-charts">${song.charts.map((c, i) => chartHtml(c, matches[i])).join('')}</div>
+      </div>`;
+    }
+
+    // Pivot of matching charts: rows = grade or clear, columns = level.
+    function pivot(title: string, rowKeys: string[], rowLabel: (k: string) => string, keyOf: (c: Chart) => string, charts: Chart[]): string {
+      const levels = [...new Set(charts.map((c) => c.level).filter((l): l is number => l != null))].sort((a, b) => a - b);
+      const counts = new Map(rowKeys.map((k) => [k, new Map<number, number>()]));
+      for (const c of charts) if (c.level != null) { const m = counts.get(keyOf(c)); if (m) m.set(c.level, (m.get(c.level) ?? 0) + 1); }
+      const body = rowKeys.map((k) => {
+        const m = counts.get(k)!; const total = [...m.values()].reduce((a, b) => a + b, 0);
+        if (!total) return '';
+        return `<tr><th>${rowLabel(k)}</th>${levels.map((l) => `<td>${m.get(l) || ''}</td>`).join('')}<td><strong>${total}</strong></td></tr>`;
+      }).join('');
+      const colTotals = levels.map((l) => rowKeys.reduce((a, k) => a + (counts.get(k)!.get(l) ?? 0), 0));
+      return `<h2 style="font-size:1rem; margin: 1.5rem 0 0.5rem;">${title}</h2>
+        <div class="stats-scroll"><table class="pivot-table"><thead><tr><th>Lv</th>${levels.map((l) => `<th>${l}</th>`).join('')}<th>Total</th></tr></thead>
+        <tbody>${body}<tr><th>Total</th>${colTotals.map((t) => `<td><strong>${t || ''}</strong></td>`).join('')}<td><strong>${colTotals.reduce((a, b) => a + b, 0)}</strong></td></tr></tbody></table></div>`;
+    }
+
+    function renderStats(rows: ReturnType<typeof filtered>) {
+      const charts = rows.flatMap(({ song, matches }) => song.charts.filter((_, i) => matches[i]));
+      const gradeKeys = ['S+2↑', 'S+', 'S', 'A', 'B', 'C', 'D', 'NONE'];
+      const lampKeys = [...[...CLEAR_LAMPS].reverse(), 'NONE'];
+      statsEl.innerHTML =
+        pivot('Grade × Level', gradeKeys, (k) => (k === 'NONE' ? 'No grade' : k === 'S+2↑' ? 'S+2 and above' : gradeBadge(k)), (c) => gradeBucket(c.grade), charts) +
+        pivot('Clear × Level', lampKeys, (k) => (k === 'NONE' ? 'Not cleared' : `<span class="hd-dot hd-dot-${k}"></span> ${CLEAR_LAMP_LABELS[k as ClearLamp]}`), (c) => c.lamp ?? 'NONE', charts);
+    }
+
+    function render() {
+      const rows = filtered();
+      if (viewMode === 'stats') { renderStats(rows); return; }
+      listEl.innerHTML = rows.map(({ song, matches }) => songHtml(song, matches)).join('');
+      listCountEl.textContent = `${rows.length} of ${songs.length} songs`;
+    }
+
+    document.querySelectorAll('.view-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        viewMode = (btn as HTMLElement).dataset.view as 'list' | 'stats';
+        document.querySelectorAll('.view-btn').forEach((b) => b.classList.toggle('active', b === btn));
+        listWrapEl.style.display = viewMode === 'list' && songs.length ? '' : 'none';
+        statsEl.style.display = viewMode === 'stats' ? '' : 'none';
+        render();
+      });
+    });
+    document.querySelectorAll('.filter-group').forEach((group) => {
+      group.querySelector('.filter-group-header')!.addEventListener('click', () => group.classList.toggle('open'));
+      group.querySelectorAll('input').forEach((input) => input.addEventListener('input', render));
+    });
+    searchEl.addEventListener('input', render);
+
+    load();
+    loadLastUpdated();
+  </script>
 </Layout>

@@ -1,0 +1,165 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../../lib/holodori';
+---
+<Layout title="Add Hololive Dreams Score" showLogout={true} showHome={true} settingsMode={true}>
+  <a href="/settings" class="back-link">← Back to Settings</a>
+  <h1>Add / Update Score — Hololive Dreams</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in to Hololive Dreams — <a href="/login">log in</a> to submit scores.
+  </p>
+
+  <form id="score-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
+    <label>Song
+      <input id="song-search" type="text" placeholder="Title or singer (EN / JP)..." autocomplete="off" />
+      <select id="song-select" size="6" style="display:none;"></select>
+    </label>
+    <fieldset class="hd-diff-picker">
+      <legend>Difficulty</legend>
+      {DIFFICULTIES.map((d) => (
+        <label style={`--diff:${DIFFICULTY_COLORS[d]}`}>
+          <input type="radio" name="difficulty" value={d} required />
+          <span>{DIFFICULTY_LABELS[d]} <b data-level={d}></b></span>
+        </label>
+      ))}
+    </fieldset>
+    <label>Score <input id="score" type="number" min="0" inputmode="numeric" /></label>
+    <label>Clear
+      <select id="clear-lamp">
+        <option value="">— not cleared —</option>
+        {CLEAR_LAMPS.map((l) => <option value={l}>{CLEAR_LAMP_LABELS[l]}</option>)}
+      </select>
+    </label>
+    <button type="submit">Submit</button>
+    <p id="status" style="color: var(--text-dim);"></p>
+    <p style="color: var(--text-dim); font-size: 0.85rem;">
+      Score and clear each only ever improve — submitting a lower score or a lesser
+      clear than your current best won't overwrite it. Grades are worked out from the score.
+    </p>
+  </form>
+
+  <style>
+    .hd-diff-picker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+    .hd-diff-picker legend { padding: 0; margin-bottom: 0.35rem; }
+    .hd-diff-picker label { position: relative; }
+    .hd-diff-picker input { position: absolute; opacity: 0; inset: 0; }
+    .hd-diff-picker span {
+      display: block;
+      text-align: center;
+      padding: 0.45rem 0.25rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--diff);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .hd-diff-picker b { display: block; font-size: 1.1rem; }
+    /* Selected: in-game style white badge with the difficulty-colored text. */
+    .hd-diff-picker input:checked + span { background: #fff; border-color: #fff; }
+    .hd-diff-picker input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+
+  <script>
+    import { getSupabase } from '../../lib/supabase';
+    import { DIFFICULTIES } from '../../lib/holodori';
+
+    const supabase = getSupabase('holodori');
+    const authWarning = document.getElementById('auth-warning')!;
+    const form = document.getElementById('score-form') as HTMLFormElement;
+    const searchInput = document.getElementById('song-search') as HTMLInputElement;
+    const songSelect = document.getElementById('song-select') as HTMLSelectElement;
+    const status = document.getElementById('status')!;
+
+    type SongOption = { id: number; label: string; searchText: string; charts: Record<string, { id: number; level: number | null }> };
+    let songs: SongOption[] = [];
+    let selected: SongOption | null = null;
+
+    function showLevels(song: SongOption | null) {
+      for (const d of DIFFICULTIES) {
+        document.querySelector(`[data-level="${d}"]`)!.textContent = song?.charts[d]?.level?.toString() ?? '';
+      }
+    }
+
+    async function load() {
+      if (!supabase) {
+        status.textContent = 'Hololive Dreams isn\'t configured on this deployment.';
+        return;
+      }
+      supabase.auth.getSession().then(({ data }) => {
+        if (!data.session) authWarning.style.display = '';
+      });
+      const { data, error } = await supabase
+        .from('songs')
+        .select('id, title_jp, title_en, artist_jp, artist_en, charts ( id, difficulty, level )')
+        .order('title_jp');
+      if (error) {
+        status.textContent = `Failed to load songs: ${error.message}`;
+        return;
+      }
+      songs = (data ?? []).map((s: any) => ({
+        id: s.id,
+        label: s.title_en && s.title_en !== s.title_jp ? `${s.title_jp} (${s.title_en})` : s.title_jp,
+        searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+        charts: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, { id: c.id, level: c.level }])),
+      }));
+    }
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().normalize('NFKC').toLowerCase();
+      selected = null;
+      showLevels(null);
+      if (!q) {
+        songSelect.style.display = 'none';
+        songSelect.innerHTML = '';
+        return;
+      }
+      const matches = songs.filter((s) => s.searchText.includes(q)).slice(0, 50);
+      songSelect.innerHTML = '';
+      for (const s of matches) songSelect.add(new Option(s.label, String(s.id)));
+      songSelect.style.display = matches.length ? '' : 'none';
+    });
+
+    songSelect.addEventListener('change', () => {
+      selected = songs.find((s) => s.id === Number(songSelect.value)) ?? null;
+      searchInput.value = selected?.label ?? '';
+      songSelect.style.display = 'none';
+      showLevels(selected);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!supabase) return;
+      if (!selected) {
+        status.textContent = 'Pick a song from the list first.';
+        return;
+      }
+      const difficulty = (form.querySelector('input[name="difficulty"]:checked') as HTMLInputElement | null)?.value;
+      const chart = difficulty ? selected.charts[difficulty] : undefined;
+      if (!chart) {
+        status.textContent = 'Pick a difficulty.';
+        return;
+      }
+      const scoreVal = (document.getElementById('score') as HTMLInputElement).value;
+      const clearLamp = (document.getElementById('clear-lamp') as HTMLSelectElement).value || null;
+      if (!scoreVal && !clearLamp) {
+        status.textContent = 'Enter a score, a clear, or both.';
+        return;
+      }
+      const { error } = await supabase.from('scores').upsert(
+        { chart_id: chart.id, score: scoreVal ? Number(scoreVal) : null, clear_lamp: clearLamp },
+        { onConflict: 'chart_id' }
+      );
+      status.textContent = error ? `Error: ${error.message}` : 'Saved.';
+    });
+
+    load();
+  </script>
+</Layout>
