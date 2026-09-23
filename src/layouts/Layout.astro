@@ -454,7 +454,9 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         .last-updated { text-align: left; }
         /* Only the game nav stays frozen on small screens; the cryto.dev bar
            scrolls away so the fixed header doesn't eat a fifth of the screen. */
-        .cryto-nav { position: static; }
+        /* Not sticky on phones, but still positioned so its z-index keeps the
+           CrytoNav menu dropdown above the sticky game nav below it. */
+        .cryto-nav { position: relative; }
         .app-nav {
           top: 0;
           gap: 1.25rem;

@@ -18,7 +18,12 @@ const links = [
 <header class="cryto-nav">
   <nav>
     <a class="brand" href="https://cryto.dev/">CRYTO.DEV</a>
-    <ul>
+    <!-- Phones: the links collapse into a dropdown behind this button. -->
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="cryto-nav-links" aria-label="Menu">
+      <svg class="icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+      <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+    </button>
+    <ul id="cryto-nav-links">
       {links.map((link) => (
         <li><a href={link.href}>{link.label}</a></li>
       ))}
@@ -80,4 +85,81 @@ const links = [
   li a:hover {
     color: var(--cn-text);
   }
+
+  .menu-btn { display: none; }
+
+  /* Same breakpoint as the app's mobile layout. The bar scrolls away there
+     (Layout.astro makes it non-sticky), so the dropdown only has to work at
+     the top of the page; the layout keeps it above the sticky game nav. */
+  @media (max-width: 768px) {
+    nav {
+      position: relative;
+      flex-wrap: nowrap;
+      padding: 0.6rem 0.75rem 0.6rem 1rem;
+    }
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: var(--cn-muted);
+      cursor: pointer;
+    }
+    .menu-btn:focus-visible { outline: 2px solid var(--cn-muted); outline-offset: 1px; }
+    .menu-btn[aria-expanded="true"] { color: var(--cn-text); border-color: var(--cn-border); }
+    .menu-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+    .menu-btn .icon-close, .menu-btn[aria-expanded="true"] .icon-open { display: none; }
+    .menu-btn[aria-expanded="true"] .icon-close { display: block; }
+
+    ul {
+      display: none;
+      position: absolute;
+      top: calc(100% + 1px);
+      right: 0.75rem;
+      min-width: 11rem;
+      flex-direction: column;
+      gap: 0;
+      padding: 0.35rem 0;
+      background: var(--cn-surface);
+      border: 1px solid var(--cn-border);
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    nav.open ul { display: flex; }
+    li a {
+      display: block;
+      padding: 0.8rem 1.1rem;
+    }
+    li a:focus-visible { outline: 2px solid var(--cn-muted); outline-offset: -2px; }
+  }
 </style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.cryto-nav nav');
+  const btn = nav?.querySelector<HTMLButtonElement>('.menu-btn');
+  if (nav && btn) {
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    btn.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+    // Close on a tap outside the bar, on picking a link, and on Escape.
+    document.addEventListener('click', (e) => {
+      if (!nav.contains(e.target as Node)) setOpen(false);
+    });
+    nav.querySelectorAll('li a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        setOpen(false);
+        btn.focus();
+      }
+    });
+    // Leaving the phone layout (rotation, resize) resets the menu.
+    window.matchMedia('(max-width: 768px)').addEventListener('change', () => setOpen(false));
+  }
+</script>
