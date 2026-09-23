@@ -354,6 +354,32 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       }
       .history-empty, .history-error { color: var(--text-dim); margin: 0; }
       .expand-row .history .history-extra, .history-extra { color: var(--text-dim); }
+      /* Current score & history panel on the add/update score pages
+         (src/lib/score-manager.ts). */
+      .score-manager {
+        max-width: 560px;
+        margin-top: 1.5rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        font-size: 0.9rem;
+      }
+      .score-manager h2 { font-size: 1rem; margin: 0 0 0.2rem; }
+      .score-manager h3 { font-size: 0.9rem; margin: 0.9rem 0 0.35rem; }
+      .sm-chart { margin: 0 0 0.6rem; font-weight: 600; }
+      .sm-muted { color: var(--text-dim); font-weight: 400; margin: 0; }
+      .sm-current { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+      .sm-remove { border-color: #8a3a3a; color: #ff9a9a; }
+      .sm-attempts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+      .sm-attempts li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; }
+      .sm-when { color: var(--text-dim); min-width: 11rem; }
+      .sm-delete { margin-left: auto; width: 2rem; padding: 0.2rem 0; color: var(--text-dim); }
+      @media (hover: hover) {
+        .sm-remove:hover { background: #3a1f1f; }
+        .sm-delete:hover { color: #ff9a9a; border-color: #8a3a3a; }
+      }
+      .sm-note { margin: 0.6rem 0 0; color: var(--text-dim); min-height: 1.2em; }
       select, input, button {
         background: var(--surface);
         border: 1px solid var(--border);

@@ -167,6 +167,12 @@ create policy "owner write scores" on scores
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
 create policy "owner update scores" on scores
   for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+-- Removing a score or a single attempt (add/update score page). No delete
+-- trigger: removing a score leaves its attempts, and vice versa.
+create policy "owner delete scores" on scores
+  for delete using (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner delete score_attempts" on score_attempts
+  for delete using (auth.uid() = '<OWNER_UUID>'::uuid);
 
 create policy "owner write songs" on songs
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
