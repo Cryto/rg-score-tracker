@@ -50,6 +50,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     </p>
   </form>
 
+  <section id="score-manager" class="score-manager" hidden></section>
+
   <style>
     .hd-diff-picker {
       display: grid;
@@ -91,7 +93,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
   <script>
     import { getSupabase } from '../../lib/supabase';
-    import { DIFFICULTIES } from '../../lib/holodori';
+    import { DIFFICULTIES, DIFFICULTY_LABELS, CLEAR_LAMP_LABELS, computeGrade, type ClearLamp } from '../../lib/holodori';
+    import { scoreManager } from '../../lib/score-manager';
     import { searchKey } from '../../lib/search';
 
     const supabase = getSupabase('holodori');
@@ -137,8 +140,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
     searchInput.addEventListener('input', () => {
       const q = searchKey(searchInput.value.trim());
+      const hadSong = selected != null;
       selected = null;
       showLevels(null);
+      if (hadSong) refreshManager();
       if (!q) {
         songSelect.style.display = 'none';
         songSelect.innerHTML = '';
@@ -164,7 +169,27 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       songSelect.style.display = 'none';
       songSelect.innerHTML = '';
       showLevels(null);
+      refreshManager();
     }
+
+    const manager = supabase && scoreManager(document.getElementById('score-manager')!, {
+      client: supabase,
+      scoreColumns: 'score, clear_lamp',
+      attemptColumns: 'score, clear_lamp',
+      describe: (r) => [
+        r.score != null ? r.score.toLocaleString('en-US') : null,
+        computeGrade(r.score),
+        r.clear_lamp ? CLEAR_LAMP_LABELS[r.clear_lamp as ClearLamp] : null,
+      ].filter(Boolean).join(' · ') || '(empty)',
+      migration: 'db/holodori/migrations/0003_owner_score_deletes.sql',
+    });
+    // The panel follows the picked song + difficulty.
+    function refreshManager() {
+      const difficulty = (form.querySelector('input[name="difficulty"]:checked') as HTMLInputElement | null)?.value;
+      const chart = selected && difficulty ? selected.charts[difficulty] : undefined;
+      manager?.show(chart?.id ?? null, chart ? `${selected!.label} — ${DIFFICULTY_LABELS[difficulty as keyof typeof DIFFICULTY_LABELS]} ${chart.level ?? ''}` : '');
+    }
+    form.querySelectorAll('input[name="difficulty"]').forEach((r) => r.addEventListener('change', refreshManager));
     document.getElementById('clear-song')!.addEventListener('click', () => {
       clearSong();
       searchInput.focus();
@@ -172,6 +197,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     document.getElementById('clear-all')!.addEventListener('click', () => {
       clearSong();
       form.querySelectorAll<HTMLInputElement>('input[name="difficulty"]').forEach((r) => (r.checked = false));
+      refreshManager();
       scoreInput.value = '';
       clearLampSelect.value = '';
       status.textContent = '';
@@ -207,6 +233,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       searchInput.value = selected?.label ?? '';
       songSelect.style.display = 'none';
       showLevels(selected);
+      refreshManager();
     });
 
     form.addEventListener('submit', async (e) => {
@@ -233,6 +260,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         { onConflict: 'chart_id' }
       );
       status.textContent = error ? `Error: ${error.message}` : 'Saved.';
+      if (!error) refreshManager();
     });
 
     load();

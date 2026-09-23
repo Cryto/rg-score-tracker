@@ -35,9 +35,13 @@ import Layout from '../../layouts/Layout.astro';
     </p>
   </form>
 
+  <section id="score-manager" class="score-manager" hidden></section>
+
   <script>
     import { supabase } from '../../lib/supabase';
     import { searchKey } from '../../lib/search';
+    import { scoreManager } from '../../lib/score-manager';
+    import { LAMP_LABELS } from '../../lib/grade';
 
     const authWarning = document.getElementById('auth-warning')!;
     const form = document.getElementById('score-form') as HTMLFormElement;
@@ -47,6 +51,17 @@ import Layout from '../../layouts/Layout.astro';
 
     let charts: { id: number; label: string; searchText: string }[] = [];
     let selectedChartId: number | null = null;
+    const manager = scoreManager(document.getElementById('score-manager')!, {
+      client: supabase,
+      scoreColumns: 'ex_score, clear_lamp, miss_count',
+      attemptColumns: 'ex_score, clear_lamp, miss_count',
+      describe: (r) => [
+        r.ex_score != null ? `EX ${r.ex_score}` : null,
+        r.clear_lamp ? LAMP_LABELS[r.clear_lamp as keyof typeof LAMP_LABELS] : null,
+        r.miss_count != null ? `BP ${r.miss_count}` : null,
+      ].filter(Boolean).join(' · ') || '(empty)',
+      migration: 'db/migrations/0008_owner_score_deletes.sql',
+    });
 
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) authWarning.style.display = '';
@@ -77,6 +92,7 @@ import Layout from '../../layouts/Layout.astro';
 
     searchInput.addEventListener('input', () => {
       const q = searchKey(searchInput.value.trim());
+      if (selectedChartId != null) manager.show(null);
       selectedChartId = null;
       if (!q) {
         chartSelect.style.display = 'none';
@@ -94,6 +110,7 @@ import Layout from '../../layouts/Layout.astro';
       selectedChartId = Number(chartSelect.value);
       searchInput.value = chartSelect.selectedOptions[0]?.textContent ?? '';
       chartSelect.style.display = 'none';
+      manager.show(selectedChartId, searchInput.value);
     });
 
     form.addEventListener('submit', async (e) => {
@@ -117,6 +134,7 @@ import Layout from '../../layouts/Layout.astro';
       );
 
       status.textContent = error ? `Error: ${error.message}` : 'Saved.';
+      if (!error) manager.show(selectedChartId, searchInput.value);
     });
 
     loadCharts();
