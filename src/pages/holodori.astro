@@ -551,8 +551,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     }
 
     function songHtml(song: Song, matches: boolean[]): string {
-      const jacket = song.jacketUrl
-        ? `<img class="hd-jacket" src="${escapeHtml(song.jacketUrl)}?w=112&h=112&fm=webp" alt="" loading="lazy" />`
+      // The official site's image host resizes on request; other hosts get the URL as-is.
+      const jacketSrc = song.jacketUrl?.includes('microcms-assets.io') ? `${song.jacketUrl}?w=112&h=112&fm=webp` : song.jacketUrl;
+      const jacket = jacketSrc
+        ? `<img class="hd-jacket" src="${escapeHtml(jacketSrc)}" alt="" loading="lazy" />`
         : `<div class="hd-jacket" aria-hidden="true">${escapeHtml([...song.titleJp][0] ?? '?')}</div>`;
       // Credit first; songs with no credit (e.g. not on the official site) show their added members.
       const credit = song.artistEn ?? song.artistJp ?? (song.members.length ? song.members.join(', ') : null);
