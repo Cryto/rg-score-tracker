@@ -142,6 +142,7 @@ import Layout from '../layouts/Layout.astro';
     import { supabase } from '../lib/supabase';
     import { computeGrade, LAMP_LABELS } from '../lib/grade';
     import { searchKey } from '../lib/search';
+    import { loadAttempts, historyHtml } from '../lib/history';
 
     const DIFF_LABELS: Record<string, string> = {
       B: 'Beginner', N: 'Normal', H: 'Hyper', A: 'Another', L: 'Leggendaria',
@@ -499,6 +500,7 @@ import Layout from '../layouts/Layout.astro';
           <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
           <span class="show-mobile"><strong>EX Score:</strong> ${r.exScore ?? '—'}</span>
           <span class="show-mobile"><strong>BP:</strong> ${r.missCount ?? '—'}</span>
+          <div class="history" data-chart-id="${r.chartId}"></div>
         </td>
       </tr>`;
     }
@@ -515,7 +517,28 @@ import Layout from '../layouts/Layout.astro';
       const isOpen = expandRow.style.display !== 'none';
       expandRow.style.display = isOpen ? 'none' : '';
       row.classList.toggle('open', !isOpen);
+      if (!isOpen) showHistory(expandRow.querySelector<HTMLElement>('.history')!);
     });
+
+    // Filled the first time a row is expanded (and again after a re-render).
+    async function showHistory(el: HTMLElement) {
+      if (el.dataset.loaded) return;
+      el.dataset.loaded = '1';
+      el.innerHTML = '<div class="history-title">History</div><p class="history-empty">Loading…</p>';
+      try {
+        const attempts = await loadAttempts(supabase, 'iidx', Number(el.dataset.chartId), 'ex_score, clear_lamp, miss_count');
+        el.querySelector('.history-empty')!.outerHTML = historyHtml(attempts.map((a) => ({
+          at: a.submitted_at,
+          score: a.ex_score,
+          extraHtml: `<span class="history-extra">${[
+            a.clear_lamp ? LAMP_LABELS[a.clear_lamp as keyof typeof LAMP_LABELS] : null,
+            a.miss_count != null ? `BP ${a.miss_count}` : null,
+          ].filter(Boolean).join(' · ')}</span>`,
+        })), String);
+      } catch (err: any) {
+        el.querySelector('.history-empty')!.outerHTML = `<p class="history-error">Couldn't load history: ${escapeHtml(err.message ?? String(err))}</p>`;
+      }
+    }
 
     document.querySelectorAll('.view-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
