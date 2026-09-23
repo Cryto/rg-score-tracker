@@ -37,6 +37,7 @@ import Layout from '../../layouts/Layout.astro';
 
   <script>
     import { supabase } from '../../lib/supabase';
+    import { searchKey } from '../../lib/search';
 
     const authWarning = document.getElementById('auth-warning')!;
     const form = document.getElementById('score-form') as HTMLFormElement;
@@ -70,12 +71,12 @@ import Layout from '../../layouts/Layout.astro';
       charts = (data ?? []).map((c: any) => ({
         id: c.id,
         label: `${c.songs?.title ?? '?'} [${c.play_style} ${c.difficulty} Lv${c.level}]`,
-        searchText: `${c.songs?.title ?? ''} ${c.songs?.title_english ?? ''}`.toLowerCase(),
+        searchText: searchKey(`${c.songs?.title ?? ''} ${c.songs?.title_english ?? ''}`),
       }));
     }
 
     searchInput.addEventListener('input', () => {
-      const q = searchInput.value.trim().toLowerCase();
+      const q = searchKey(searchInput.value.trim());
       selectedChartId = null;
       if (!q) {
         chartSelect.style.display = 'none';

@@ -141,6 +141,7 @@ import Layout from '../layouts/Layout.astro';
   <script>
     import { supabase } from '../lib/supabase';
     import { computeGrade, LAMP_LABELS } from '../lib/grade';
+    import { searchKey } from '../lib/search';
 
     const DIFF_LABELS: Record<string, string> = {
       B: 'Beginner', N: 'Normal', H: 'Hyper', A: 'Another', L: 'Leggendaria',
@@ -175,6 +176,7 @@ import Layout from '../layouts/Layout.astro';
       missCount: number | null;
       scoreUpdatedAt: string | null;
       playableIn: string[];
+      searchText: string;
     };
 
     let rows: Row[] = [];
@@ -266,6 +268,7 @@ import Layout from '../layouts/Layout.astro';
         lamp: c.scores?.clear_lamp ?? null,
         missCount: c.scores?.miss_count ?? null,
         scoreUpdatedAt: c.scores?.updated_at ?? null,
+        searchText: searchKey(`${c.songs?.title ?? ''} ${c.songs?.title_english ?? ''}`),
       }));
 
       // Charts with a score sort by most-recently-updated first, surfacing
@@ -358,7 +361,7 @@ import Layout from '../layouts/Layout.astro';
 
     function currentFilters() {
       return {
-        search: (document.getElementById('f-search') as HTMLInputElement).value.trim().toLowerCase(),
+        search: searchKey((document.getElementById('f-search') as HTMLInputElement).value.trim()),
         versions: checkedValues('version'),
         playableIn: checkedValues('playable-in'),
         styles: checkedValues('style'),
@@ -415,12 +418,7 @@ import Layout from '../layouts/Layout.astro';
     function render() {
       const f = currentFilters();
       const filtered = rows.filter((r) => {
-        if (
-          f.search &&
-          !r.title.toLowerCase().includes(f.search) &&
-          !r.titleEnglish.toLowerCase().includes(f.search)
-        )
-          return false;
+        if (f.search && !r.searchText.includes(f.search)) return false;
         if (f.versions.size && !f.versions.has(r.version)) return false;
         if (f.playableIn.size && !r.playableIn.some((v) => f.playableIn.has(v))) return false;
         if (f.styles.size && !f.styles.has(r.style)) return false;

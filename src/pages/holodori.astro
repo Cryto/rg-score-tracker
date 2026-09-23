@@ -297,6 +297,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
   <script>
     import { getSupabase } from '../lib/supabase';
+    import { searchKey } from '../lib/search';
     import {
       DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS,
       computeGrade, gradeFill, GROUP_NAMES, type Difficulty, type ClearLamp,
@@ -429,7 +430,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         return {
           id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artistJp: s.artist_jp, artistEn: s.artist_en,
           category: s.category, officialOrder: s.official_order, jacketUrl: s.jacket_url, charts, lastUpdated,
-          searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...(s.members ?? [])].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+          searchText: searchKey([s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...(s.members ?? [])].filter(Boolean).join(' ')),
           credited: splitSingers(s.artist_en ?? s.artist_jp),
           members: s.members ?? [],
           singers: [...new Set([...splitSingers(s.artist_en ?? s.artist_jp), ...(s.members ?? [])])],
@@ -474,7 +475,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       singerListEl.innerHTML = [...counts]
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([name, n]) => {
-          const search = `${name} ${jpName.get(name) ?? ''}`.normalize('NFKC').toLowerCase();
+          const search = searchKey(`${name} ${jpName.get(name) ?? ''}`);
           const jp = jpName.get(name);
           return `<label class="checkbox-row" data-search="${escapeHtml(search)}"${jp ? ` title="${escapeHtml(jp)}"` : ''}>
             <input type="checkbox" value="${escapeHtml(name)}" /> ${escapeHtml(name)} <span class="hd-singer-count">${n}</span></label>`;
@@ -494,7 +495,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
     // Narrowing the list only hides names; it never unchecks a selected singer.
     singerSearchEl.addEventListener('input', () => {
-      const q = singerSearchEl.value.trim().normalize('NFKC').toLowerCase();
+      const q = searchKey(singerSearchEl.value.trim());
       singerListEl.querySelectorAll<HTMLElement>('label').forEach((label) => {
         label.style.display = !q || label.dataset.search!.includes(q) ? '' : 'none';
       });
@@ -508,7 +509,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const min = levelMinEl.value ? Number(levelMinEl.value) : null;
       const max = levelMaxEl.value ? Number(levelMaxEl.value) : null;
       return {
-        search: searchEl.value.trim().normalize('NFKC').toLowerCase(),
+        search: searchKey(searchEl.value.trim()),
         difficulties: checked('difficulty'), lamps: checked('lamp'), grades: checked('grade'), categories: checked('category'), singers: checked('singer'),
         min, max,
       };
