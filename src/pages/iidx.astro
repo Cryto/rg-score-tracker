@@ -315,6 +315,10 @@ import Layout from '../layouts/Layout.astro';
       playableInListEl.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
         cb.addEventListener('input', render);
       });
+      // chart_availability hasn't been populated yet; an always-empty filter just looks broken.
+      if (!rows.some((r) => r.playableIn.length)) {
+        playableInListEl.closest<HTMLElement>('.filter-group')!.hidden = true;
+      }
 
       statusEl.style.display = 'none';
       tableEl.style.display = '';
