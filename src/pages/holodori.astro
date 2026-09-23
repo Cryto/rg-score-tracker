@@ -66,7 +66,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         <button type="button" class="filter-group-header">Grade<span class="arrow">▸</span></button>
         <div class="filter-group-content">
           {['S+2↑', 'S+', 'S', 'A', 'B', 'C', 'D'].map((g) => (
-            <label class="checkbox-row"><input type="checkbox" value={g} /> {g === 'S+2↑' ? 'S+2 and above' : g}</label>
+            <label class="checkbox-row"><input type="checkbox" value={g} /> <span data-grade-label={g}>{g === 'S+2↑' ? 'S+2 and above' : g}</span></label>
           ))}
           <label class="checkbox-row"><input type="checkbox" value="NONE" /> No grade</label>
         </div>
@@ -364,6 +364,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       return `<span class="hd-grade" style="--fill:${gradeFill(grade)}" role="img" aria-label="${escapeHtml(grade)}"><span class="hd-grade-outline" aria-hidden="true">${text}</span><span class="hd-grade-fill" aria-hidden="true">${text}</span></span>`;
     }
 
+    // A grade bucket as a badge; the S+2 bucket also counts S+3 and up, so it gets a small arrow.
+    function gradeBucketLabel(bucket: string): string {
+      return bucket === 'S+2↑'
+        ? `<span title="S+2 and above">${gradeBadge('S+2')}<span class="hd-and-up" aria-hidden="true">↑</span></span>`
+        : gradeBadge(bucket);
+    }
+    for (const el of document.querySelectorAll<HTMLElement>('[data-grade-label]')) el.innerHTML = gradeBucketLabel(el.dataset.gradeLabel!);
+
     // Grade filter buckets: everything from S+2 up is one bucket.
     function gradeBucket(grade: string | null): string {
       if (!grade) return 'NONE';
@@ -577,8 +585,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const gradeKeys = ['S+2↑', 'S+', 'S', 'A', 'B', 'C', 'D', 'NONE'];
       const lampKeys = [...[...CLEAR_LAMPS].reverse(), 'NONE'];
       statsEl.innerHTML =
-        // The S+2 row also counts S+3 and up: badge plus a small arrow.
-        pivot('Grade × Level', gradeKeys, (k) => (k === 'NONE' ? 'No grade' : k === 'S+2↑' ? `<span title="S+2 and above">${gradeBadge('S+2')}<span class="hd-and-up" aria-hidden="true">↑</span></span>` : gradeBadge(k)), (c) => gradeBucket(c.grade), charts) +
+        pivot('Grade × Level', gradeKeys, (k) => (k === 'NONE' ? 'No grade' : gradeBucketLabel(k)), (c) => gradeBucket(c.grade), charts) +
         pivot('Clear × Level', lampKeys, (k) => (k === 'NONE' ? 'Not cleared' : `<span class="hd-dot hd-dot-${k}"></span> ${CLEAR_LAMP_LABELS[k as ClearLamp]}`), (c) => c.lamp ?? 'NONE', charts);
     }
 
