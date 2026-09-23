@@ -43,9 +43,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     <button type="submit" id="submit-btn">Add Song</button>
     <p id="status" style="color: var(--text-dim);"></p>
     <p style="color: var(--text-dim); font-size: 0.85rem;">
-      Blank fields are left as they are when editing an existing song. Note: re-running the
-      catalog import script resets levels for songs listed in <code>db/holodori/levels.csv</code>
-      to that file's values.
+      Blank fields are left as they are when editing an existing song. Edits made here survive
+      re-running the catalog import script, which only fills in missing titles, singers and levels
+      (unless run with <code>--force</code>).
     </p>
   </form>
 
