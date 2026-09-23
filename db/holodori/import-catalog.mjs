@@ -5,18 +5,19 @@
 // rows that actually differ are written. Songs no longer in the source files
 // are left alone, never deleted, and `members` is never touched.
 //
-// Fields also editable from /settings/holodori-song (title_en, artist_en,
-// chart levels) are only filled in where the DB has none, so browser fixes
+// Fields also edited outside these files (title_en, artist_en, jacket_url,
+// chart levels) are only filled in where the DB has none, so those edits
 // survive a re-import; where the DB and the files disagree, the DB value is
-// kept and listed. --force overwrites those with the files' values instead.
-// Official-site fields (credits, category, order, jacket) always follow the
-// files.
+// kept and counted. --force overwrites those with the files' values instead.
+// Other official-site fields (credits, category, order) always follow the
+// files. TITLE_RENAMES maps source titles to songs renamed in the DB, since
+// title_jp is the identity a re-import matches on.
 //
 // Requires in .env (never commit the service-role key):
 //   PUBLIC_SUPABASE_URL_HOLODORI, SUPABASE_SERVICE_ROLE_KEY_HOLODORI
-// Usage: node --env-file=.env db/holodori/import-catalog.mjs [--dry-run] [--force]
+// Usage: node --env-file=.env db/holodori/import-catalog.mjs [--dry-run] [--force] [--verbose]
 //   --dry-run with the env vars set reads the DB and prints the plan; without
-//   them it only counts the source files.
+//   them it only counts the source files. --verbose lists each kept value.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -24,6 +25,11 @@ import { parseCsv } from './csv.mjs';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const DIFFICULTIES = ['EASY', 'NORMAL', 'HARD', 'EXPERT'];
+// Source title -> the title_jp the song has in the DB.
+const TITLE_RENAMES = {
+  '地獄で会おうぜ！ スバちょこるなたん': '地獄であおうぜ！スバちょこるなたん',
+};
+const renamed = (title) => TITLE_RENAMES[title] ?? title;
 
 /** Song rows plus each song's charts, keyed by title_jp. */
 export function buildCatalog() {
@@ -31,10 +37,10 @@ export function buildCatalog() {
   const [header, ...rows] = parseCsv(fs.readFileSync(path.join(DIR, 'levels.csv'), 'utf8').trimStart() /* also strips the BOM */)
     .filter((r) => r.some((f) => f.trim()));
   const col = Object.fromEntries(header.map((h, i) => [h.trim(), i]));
-  const levelsByTitle = new Map(rows.map((r) => [r[col.title_jp], DIFFICULTIES.map((d) => r[col[d.toLowerCase()]]?.trim() || null)]));
+  const levelsByTitle = new Map(rows.map((r) => [renamed(r[col.title_jp]), DIFFICULTIES.map((d) => r[col[d.toLowerCase()]]?.trim() || null)]));
 
   const songs = official.map((s) => ({
-    title_jp: s.title_jp, title_en: s.title_en,
+    title_jp: renamed(s.title_jp), title_en: s.title_en,
     artist_jp: s.artist_jp, artist_en: s.artist_en,
     lyrics_jp: s.lyrics_jp, lyrics_en: s.lyrics_en,
     music_jp: s.music_jp, music_en: s.music_en,
@@ -55,8 +61,8 @@ export function buildCatalog() {
   return { songs, charts };
 }
 
-// Also editable in the browser: filled in where empty, never overwritten without --force.
-const EDITABLE_FIELDS = ['title_en', 'artist_en'];
+// Also edited outside the source files: filled in where empty, never overwritten without --force.
+const EDITABLE_FIELDS = ['title_en', 'artist_en', 'jacket_url'];
 
 /**
  * Works out the writes needed to bring the DB in line with the catalog.
@@ -149,7 +155,11 @@ async function main() {
   for (const { song_id, difficulty, level } of plan.chartUpdates) console.log(`  level song ${song_id} ${difficulty} -> ${level}`);
   if (plan.kept.length) {
     console.log(`Kept ${plan.kept.length} DB value(s) that differ from the files (--force to overwrite):`);
-    for (const k of plan.kept) console.log(`  ${k.title} ${k.field}: DB ${JSON.stringify(k.db)}, files ${JSON.stringify(k.file)}`);
+    const byField = Map.groupBy(plan.kept, (k) => k.field);
+    for (const [field, ks] of byField) console.log(`  ${field}: ${ks.length}`);
+    if (process.argv.includes('--verbose')) {
+      for (const k of plan.kept) console.log(`  ${k.title} ${k.field}: DB ${JSON.stringify(k.db)}, files ${JSON.stringify(k.file)}`);
+    }
   }
   if (dryRun) return;
 
