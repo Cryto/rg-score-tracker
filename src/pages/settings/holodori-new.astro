@@ -92,6 +92,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
   <script>
     import { getSupabase } from '../../lib/supabase';
     import { DIFFICULTIES } from '../../lib/holodori';
+    import { searchKey } from '../../lib/search';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;
@@ -129,13 +130,13 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       songs = (data ?? []).map((s: any) => ({
         id: s.id,
         label: s.title_en && s.title_en !== s.title_jp ? `${s.title_jp} (${s.title_en})` : s.title_jp,
-        searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+        searchText: searchKey([s.title_jp, s.title_en, s.artist_jp, s.artist_en].filter(Boolean).join(' ')),
         charts: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, { id: c.id, level: c.level }])),
       }));
     }
 
     searchInput.addEventListener('input', () => {
-      const q = searchInput.value.trim().normalize('NFKC').toLowerCase();
+      const q = searchKey(searchInput.value.trim());
       selected = null;
       showLevels(null);
       if (!q) {

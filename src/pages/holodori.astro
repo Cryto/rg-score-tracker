@@ -175,6 +175,17 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       min-width: 0;
     }
     .hd-chart.dim { opacity: 0.3; }
+    .hd-chart.has-history { cursor: pointer; }
+    .hd-chart.has-history:focus-visible, .hd-chart[aria-expanded="true"] { outline: 2px solid var(--diff); outline-offset: 1px; }
+    @media (hover: hover) { .hd-chart.has-history:hover { background: var(--border); } }
+    .hd-history {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background: var(--surface);
+      border-left: 3px solid var(--diff);
+    }
     /* Level chip filled with the difficulty color, white number. White on
        these pastels is low contrast, so a faint dark shadow keeps it legible. */
     .hd-level {
@@ -297,6 +308,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
   <script>
     import { getSupabase } from '../lib/supabase';
+    import { searchKey } from '../lib/search';
+    import { loadAttempts, historyHtml } from '../lib/history';
     import {
       DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS,
       computeGrade, gradeFill, GROUP_NAMES, type Difficulty, type ClearLamp,
@@ -429,7 +442,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         return {
           id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artistJp: s.artist_jp, artistEn: s.artist_en,
           category: s.category, officialOrder: s.official_order, jacketUrl: s.jacket_url, charts, lastUpdated,
-          searchText: [s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...(s.members ?? [])].filter(Boolean).join(' ').normalize('NFKC').toLowerCase(),
+          searchText: searchKey([s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...(s.members ?? [])].filter(Boolean).join(' ')),
           credited: splitSingers(s.artist_en ?? s.artist_jp),
           members: s.members ?? [],
           singers: [...new Set([...splitSingers(s.artist_en ?? s.artist_jp), ...(s.members ?? [])])],
@@ -474,7 +487,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       singerListEl.innerHTML = [...counts]
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([name, n]) => {
-          const search = `${name} ${jpName.get(name) ?? ''}`.normalize('NFKC').toLowerCase();
+          const search = searchKey(`${name} ${jpName.get(name) ?? ''}`);
           const jp = jpName.get(name);
           return `<label class="checkbox-row" data-search="${escapeHtml(search)}"${jp ? ` title="${escapeHtml(jp)}"` : ''}>
             <input type="checkbox" value="${escapeHtml(name)}" /> ${escapeHtml(name)} <span class="hd-singer-count">${n}</span></label>`;
@@ -494,7 +507,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
     // Narrowing the list only hides names; it never unchecks a selected singer.
     singerSearchEl.addEventListener('input', () => {
-      const q = singerSearchEl.value.trim().normalize('NFKC').toLowerCase();
+      const q = searchKey(singerSearchEl.value.trim());
       singerListEl.querySelectorAll<HTMLElement>('label').forEach((label) => {
         label.style.display = !q || label.dataset.search!.includes(q) ? '' : 'none';
       });
@@ -508,7 +521,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       const min = levelMinEl.value ? Number(levelMinEl.value) : null;
       const max = levelMaxEl.value ? Number(levelMaxEl.value) : null;
       return {
-        search: searchEl.value.trim().normalize('NFKC').toLowerCase(),
+        search: searchKey(searchEl.value.trim()),
         difficulties: checked('difficulty'), lamps: checked('lamp'), grades: checked('grade'), categories: checked('category'), singers: checked('singer'),
         min, max,
       };
@@ -541,7 +554,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     function chartHtml(c: Chart, match: boolean): string {
       const score = c.score != null ? c.score.toLocaleString('en-US') : '—';
       const lampTitle = c.lamp ? CLEAR_LAMP_LABELS[c.lamp] : 'Not cleared';
-      return `<div class="hd-chart${match ? '' : ' dim'}" style="--diff:${DIFFICULTY_COLORS[c.difficulty]}">
+      // Charts with a score open their attempt history below the song row.
+      const opener = c.score != null || c.lamp ? ` role="button" tabindex="0" aria-expanded="false" data-chart-id="${c.id}" title="Show ${DIFFICULTY_LABELS[c.difficulty]} history"` : '';
+      return `<div class="hd-chart${match ? '' : ' dim'}${opener ? ' has-history' : ''}" style="--diff:${DIFFICULTY_COLORS[c.difficulty]}"${opener}>
         <span class="hd-diff-name">${DIFFICULTY_LABELS[c.difficulty]}</span>
         <span class="hd-level" title="${DIFFICULTY_LABELS[c.difficulty]} level">${c.level ?? '?'}</span>
         <span class="hd-score${c.score == null ? ' empty' : ''}">${score}</span>
@@ -597,6 +612,48 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       listEl.innerHTML = rows.map(({ song, matches }) => songHtml(song, matches)).join('');
       listCountEl.textContent = `${rows.length} of ${songs.length} songs`;
     }
+
+    // One history panel per song row: opening a difficulty replaces any open
+    // panel in that row; opening the same one again closes it.
+    async function toggleHistory(cell: HTMLElement) {
+      const row = cell.closest<HTMLElement>('.hd-song')!;
+      const chartId = Number(cell.dataset.chartId);
+      const open = row.querySelector<HTMLElement>('.hd-history');
+      row.querySelectorAll('.hd-chart[aria-expanded="true"]').forEach((el) => el.setAttribute('aria-expanded', 'false'));
+      open?.remove();
+      if (open && Number(open.dataset.chartId) === chartId) return;
+
+      const chart = songs.flatMap((s) => s.charts).find((c) => c.id === chartId)!;
+      const panel = document.createElement('div');
+      panel.className = 'hd-history history';
+      panel.dataset.chartId = String(chartId);
+      panel.style.setProperty('--diff', DIFFICULTY_COLORS[chart.difficulty]);
+      panel.innerHTML = `<div class="history-title">${DIFFICULTY_LABELS[chart.difficulty]} ${chart.level ?? ''} history</div><p class="history-empty">Loading…</p>`;
+      row.appendChild(panel);
+      cell.setAttribute('aria-expanded', 'true');
+      try {
+        const attempts = await loadAttempts(supabase!, 'holodori', chartId, 'score, clear_lamp');
+        const body = historyHtml(attempts.map((a) => ({
+          at: a.submitted_at,
+          score: a.score,
+          extraHtml: `<span class="history-extra">${[computeGrade(a.score), a.clear_lamp ? CLEAR_LAMP_LABELS[a.clear_lamp as ClearLamp] : null].filter(Boolean).join(' · ')}</span>`,
+        })));
+        panel.querySelector('.history-empty')!.outerHTML = body;
+      } catch (err: any) {
+        panel.querySelector('.history-empty')!.outerHTML = `<p class="history-error">Couldn't load history: ${escapeHtml(err.message ?? String(err))}</p>`;
+      }
+    }
+    listEl.addEventListener('click', (e) => {
+      const cell = (e.target as HTMLElement).closest<HTMLElement>('.hd-chart.has-history');
+      if (cell) toggleHistory(cell);
+    });
+    listEl.addEventListener('keydown', (e) => {
+      const cell = (e.target as HTMLElement).closest<HTMLElement>('.hd-chart.has-history');
+      if (cell && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        toggleHistory(cell);
+      }
+    });
 
     document.querySelectorAll('.view-btn').forEach((btn) => {
       btn.addEventListener('click', () => {

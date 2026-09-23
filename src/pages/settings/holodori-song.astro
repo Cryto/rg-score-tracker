@@ -97,6 +97,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
   <script>
     import { getSupabase } from '../../lib/supabase';
     import { DIFFICULTIES, GROUP_NAMES } from '../../lib/holodori';
+    import { searchKey } from '../../lib/search';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;
@@ -163,7 +164,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     });
 
     // Same looseness as the level-sheet importer: ignore width, case, spacing, punctuation.
-    const norm = (s: string) => s.normalize('NFKC').toLowerCase().replace(/[\s・·.,!?~〜☆★♡♪'’"“”()[\]「」『』:\-‐―–—_/]/g, '');
+    const norm = (s: string) => searchKey(s).replace(/[\s・·.,!?~〜☆★♡♪"“”()[\]「」『』:\-‐―–—_/]/g, '');
 
     async function load() {
       if (!supabase) {
