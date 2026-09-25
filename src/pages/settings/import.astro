@@ -19,9 +19,10 @@ import Layout from '../../layouts/Layout.astro';
   <textarea id="csv-input" rows="10" style="width:100%; max-width:800px; font-family: monospace;"
     placeholder="title,play_style,difficulty,ex_score,clear_lamp,miss_count
 SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
-  <div style="margin-top: 0.75rem; display:flex; gap:0.75rem;">
+  <div style="margin-top: 0.75rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem;">
     <button id="preview-btn">Preview</button>
     <button id="submit-btn" style="display:none;">Import Matched Rows</button>
+    <span id="submit-status" class="submit-status" role="status"></span>
   </div>
 
   <div id="results" style="margin-top:1.5rem;"></div>
@@ -33,6 +34,7 @@ SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
     const csvInput = document.getElementById('csv-input') as HTMLTextAreaElement;
     const previewBtn = document.getElementById('preview-btn')!;
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const submitStatus = document.getElementById('submit-status')!;
     const results = document.getElementById('results')!;
 
     const VALID_STYLES = new Set(['SP', 'DP']);
@@ -132,18 +134,17 @@ SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
         ${unmatched.length ? `<p style="color:#ffb066;">${unmatched.length} row(s) had no matching chart (check title/style/difficulty):</p><pre>${unmatched.join('\n')}</pre>` : ''}
         ${invalid.length ? `<p style="color:#ff8080;">${invalid.length} row(s) had invalid style/difficulty/lamp values:</p><pre>${invalid.join('\n')}</pre>` : ''}
       `;
+      submitStatus.innerHTML = '';
       submitBtn.style.display = matched.length ? '' : 'none';
     });
 
     submitBtn.addEventListener('click', async () => {
       submitBtn.disabled = true;
+      submitStatus.innerHTML = 'Importing…';
       const { error } = await supabase.from('scores').upsert(matched, { onConflict: 'chart_id' });
-      results.insertAdjacentHTML(
-        'beforeend',
-        error
-          ? `<p style="color:#ff8080;">Import failed: ${error.message}</p>`
-          : `<p style="color:#8fd18f;">Imported ${matched.length} row(s).</p>`
-      );
+      submitStatus.innerHTML = error
+        ? `<span style="color:#ff8080;">Import failed: ${error.message}</span>`
+        : `<span style="color:#8fd18f;">Imported ${matched.length} row(s).</span>`;
       submitBtn.disabled = false;
     });
 

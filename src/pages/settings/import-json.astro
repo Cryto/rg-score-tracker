@@ -15,9 +15,10 @@ import Layout from '../../layouts/Layout.astro';
   </p>
 
   <input id="json-file" type="file" accept="application/json,.json" />
-  <div style="margin-top: 0.75rem; display:flex; gap:0.75rem;">
+  <div style="margin-top: 0.75rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem;">
     <button id="preview-btn" disabled>Preview</button>
     <button id="submit-btn" style="display:none;">Import Matched Scores</button>
+    <span id="submit-status" class="submit-status" role="status"></span>
   </div>
 
   <div id="results" style="margin-top:1.5rem;"></div>
@@ -30,6 +31,7 @@ import Layout from '../../layouts/Layout.astro';
     const fileInput = document.getElementById('json-file') as HTMLInputElement;
     const previewBtn = document.getElementById('preview-btn') as HTMLButtonElement;
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const submitStatus = document.getElementById('submit-status')!;
     const results = document.getElementById('results')!;
 
     type ParsedScore = {
@@ -74,6 +76,7 @@ import Layout from '../../layouts/Layout.astro';
       const file = fileInput.files?.[0];
       previewBtn.disabled = !file;
       submitBtn.style.display = 'none';
+      submitStatus.innerHTML = '';
       results.innerHTML = '';
       fileContent = null;
       if (!file) return;
@@ -127,18 +130,17 @@ import Layout from '../../layouts/Layout.astro';
         <p style="color: var(--text-dim);">${noPlayCount} chart(s) with no play (clear_type 0) skipped.</p>
         ${unmatched.length ? `<p style="color:#ffb066;">${unmatched.length} chart(s) had no matching song/chart in the catalog (external_id not found):</p><pre>${unmatched.slice(0, 100).join('\n')}${unmatched.length > 100 ? `\n… and ${unmatched.length - 100} more` : ''}</pre>` : ''}
       `;
+      submitStatus.innerHTML = '';
       submitBtn.style.display = matched.length ? '' : 'none';
     });
 
     submitBtn.addEventListener('click', async () => {
       submitBtn.disabled = true;
+      submitStatus.innerHTML = 'Importing…';
       const { error } = await supabase.from('scores').upsert(matched, { onConflict: 'chart_id' });
-      results.insertAdjacentHTML(
-        'beforeend',
-        error
-          ? `<p style="color:#ff8080;">Import failed: ${error.message}</p>`
-          : `<p style="color:#8fd18f;">Imported ${matched.length} score(s).</p>`
-      );
+      submitStatus.innerHTML = error
+        ? `<span style="color:#ff8080;">Import failed: ${error.message}</span>`
+        : `<span style="color:#8fd18f;">Imported ${matched.length} score(s).</span>`;
       submitBtn.disabled = false;
     });
 
