@@ -27,9 +27,10 @@ import Layout from '../../layouts/Layout.astro';
   <textarea id="csv-input" rows="10" style="width:100%; max-width:900px; font-family: monospace;"
     placeholder="title,artist,debut_version,spn_level,spa_level
 SAMPLE SONG,Some Artist,22 PENDUAL,5,10"></textarea>
-  <div style="margin-top: 0.75rem; display:flex; gap:0.75rem;">
+  <div style="margin-top: 0.75rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem;">
     <button id="preview-btn">Preview</button>
     <button id="submit-btn" style="display:none;">Apply Changes</button>
+    <span id="submit-status" class="submit-status" role="status"></span>
   </div>
 
   <div id="results" style="margin-top:1.5rem;"></div>
@@ -45,6 +46,7 @@ SAMPLE SONG,Some Artist,22 PENDUAL,5,10"></textarea>
     const csvInput = document.getElementById('csv-input') as HTMLTextAreaElement;
     const previewBtn = document.getElementById('preview-btn')!;
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const submitStatus = document.getElementById('submit-status')!;
     const results = document.getElementById('results')!;
 
     type SongUpdate = { existingId: number | null; title: string; patch: Record<string, any> };
@@ -153,11 +155,13 @@ SAMPLE SONG,Some Artist,22 PENDUAL,5,10"></textarea>
         <p>${planned.reduce((n, p) => n + p.charts.length, 0)} chart row(s) will be upserted.</p>
         ${unmappedVersions.size ? `<p style="color:#ffb066;">${unmappedVersions.size} debut_version value(s) didn't match any version name (skipped, not guessed):</p><pre>${[...unmappedVersions].join('\n')}</pre>` : ''}
       `;
+      submitStatus.innerHTML = '';
       submitBtn.style.display = planned.length ? '' : 'none';
     });
 
     submitBtn.addEventListener('click', async () => {
       submitBtn.disabled = true;
+      submitStatus.innerHTML = 'Applying…';
       let songErrors = 0, chartErrors = 0, songsWritten = 0, chartsWritten = 0;
 
       for (const { song, charts } of planned) {
@@ -183,13 +187,11 @@ SAMPLE SONG,Some Artist,22 PENDUAL,5,10"></textarea>
 
       const { error: syncError } = await supabase.from('catalog_syncs').insert({});
 
-      results.insertAdjacentHTML(
-        'beforeend',
-        `<p style="color:#8fd18f;">Done. ${songsWritten} song(s) written, ${chartsWritten} chart(s) upserted.</p>
-         ${songErrors ? `<p style="color:#ff8080;">${songErrors} song write error(s).</p>` : ''}
-         ${chartErrors ? `<p style="color:#ff8080;">${chartErrors} chart write error(s).</p>` : ''}
-         ${syncError ? `<p style="color:#ffb066;">Note: failed to record catalog sync timestamp: ${syncError.message}</p>` : ''}`
-      );
+      submitStatus.innerHTML =
+        `<span style="color:#8fd18f;">Done. ${songsWritten} song(s) written, ${chartsWritten} chart(s) upserted.</span>
+         ${songErrors ? `<span style="color:#ff8080;">${songErrors} song write error(s).</span>` : ''}
+         ${chartErrors ? `<span style="color:#ff8080;">${chartErrors} chart write error(s).</span>` : ''}
+         ${syncError ? `<span style="color:#ffb066;">Note: failed to record catalog sync timestamp: ${syncError.message}</span>` : ''}`;
       submitBtn.disabled = false;
     });
 

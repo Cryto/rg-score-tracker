@@ -1,10 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
+// Card pictures are linked from each game's official site or store page, never
+// committed (same rule as the Holodori jackets). Holodori's share image is
+// 1.5 MB, so it goes through that site's own resizer (only w=430 is allowed
+// there), falling back to the original if the resizer stops accepting it.
 const games = [
-  { href: '/iidx', title: 'beatmania IIDX', subtitle: 'Konami · Rhythm', available: true },
-  { href: '/holodori', title: 'Hololive Dreams', subtitle: 'hololive · Rhythm', available: true },
-  { href: '/djmax', title: 'DJMAX Respect V', subtitle: 'Coming soon', available: false },
+  {
+    href: '/iidx', title: 'beatmania IIDX', subtitle: 'Konami · Rhythm', available: true,
+    picture: 'https://p.eagate.573.jp/game/infinitas/2/img/infinitas.jpg',
+  },
+  {
+    href: '/holodori', title: 'Hololive Dreams', subtitle: 'hololive · Rhythm', available: true,
+    picture: 'https://www.hololive-dreams.com/_vercel/image?url=%2Fogp.jpg&w=430&q=100',
+    fallback: 'https://www.hololive-dreams.com/ogp.jpg',
+  },
+  {
+    href: '/djmax', title: 'DJMAX Respect V', subtitle: 'Coming soon', available: false,
+    picture: 'https://cdn.cloudflare.steamstatic.com/steam/apps/960170/capsule_616x353.jpg',
+  },
 ];
 ---
 <Layout title="Rhythm Game Score Tracker">
@@ -13,7 +27,16 @@ const games = [
   <div class="game-grid">
     {games.map((game) => (
       <a class="game-card" href={game.href}>
-        <div class="game-card-picture" aria-hidden="true"></div>
+        <div class="game-card-picture" aria-hidden="true">
+          <img
+            src={game.picture}
+            alt=""
+            decoding="async"
+            referrerpolicy="no-referrer"
+            data-fallback={game.fallback}
+            onerror="if (this.dataset.fallback && this.src !== this.dataset.fallback) { this.src = this.dataset.fallback; } else { this.remove(); }"
+          />
+        </div>
         <strong>{game.title}</strong>
         <span>{game.subtitle}</span>
       </a>
