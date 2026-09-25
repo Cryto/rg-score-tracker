@@ -120,7 +120,8 @@ import Layout from '../../layouts/Layout.astro';
             chart_id: chartId,
             ex_score: score.ex_score ?? null,
             clear_lamp: score.clear_type ? CLEAR_LAMPS[score.clear_type - 1] : null,
-            miss_count: score.miss_count ?? null,
+            // -1 means no miss count was recorded (e.g. a failed play).
+            miss_count: score.miss_count >= 0 ? score.miss_count : null,
           });
         }
       }

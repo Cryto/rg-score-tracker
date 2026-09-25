@@ -1,10 +1,11 @@
 // "Current score & history" panel for the add/update score pages: shows the
 // selected chart's best score and its logged attempts, and lets the owner
 // remove the score or delete single attempts (e.g. a mistyped score, which
-// ratcheting would otherwise keep forever). The two are independent: removing
-// the score leaves the attempts, and deleting an attempt never changes the
-// score. Shared by IIDX and Holodori; each page supplies its columns and how
-// to describe a row.
+// ratcheting would otherwise keep forever). The best is built from the
+// attempts: deleting one makes the database recompute each field from the
+// attempts left (db/migrations/0009, db/holodori/migrations/0004), and
+// removing the score deletes all of its attempts. Shared by IIDX and
+// Holodori; each page supplies its columns and how to describe a row.
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Options = {
@@ -71,16 +72,20 @@ export function scoreManager(el: HTMLElement, opts: Options) {
     note = '';
 
     el.querySelector('.sm-remove')?.addEventListener('click', async () => {
-      if (!confirm(`Remove the score for ${title}?\n\nBest: ${opts.describe(score)}\n\nThe attempt history is kept; delete attempts separately if needed.`)) return;
-      const { data, error } = await opts.client.from('scores').delete().eq('chart_id', id).select('chart_id');
-      note = error ? `Error: ${error.message}` : data?.length ? 'Score removed.' : blocked;
+      const history = attempts.length ? `\n\nIts ${attempts.length} logged attempt(s) are deleted too.` : '';
+      if (!confirm(`Remove the score for ${title}?\n\nBest: ${opts.describe(score)}${history}`)) return;
+      // Deleting the attempts removes the score through the database trigger;
+      // the direct delete covers scores with no attempts.
+      const gone = await opts.client.from('score_attempts').delete().eq('chart_id', id).select('id');
+      const res = gone.error ? gone : await opts.client.from('scores').delete().eq('chart_id', id).select('chart_id');
+      note = res.error ? `Error: ${res.error.message}` : gone.data?.length || res.data?.length ? 'Score removed.' : blocked;
       render();
     });
     el.querySelectorAll<HTMLButtonElement>('.sm-delete').forEach((btn) => btn.addEventListener('click', async () => {
       const attempt = attempts.find((a) => a.id === Number(btn.dataset.id));
-      if (!confirm(`Delete this attempt?\n\n${when(attempt.submitted_at)}: ${opts.describe(attempt)}\n\nThe current best score isn't changed.`)) return;
+      if (!confirm(`Delete this attempt?\n\n${when(attempt.submitted_at)}: ${opts.describe(attempt)}\n\n${attempts.length > 1 ? 'The best score is recalculated from the remaining attempts.' : 'This is the only attempt, so the score is removed too.'}`)) return;
       const { data, error } = await opts.client.from('score_attempts').delete().eq('id', attempt.id).select('id');
-      note = error ? `Error: ${error.message}` : data?.length ? 'Attempt deleted.' : blocked;
+      note = error ? `Error: ${error.message}` : data?.length ? 'Attempt deleted; best score updated.' : blocked;
       render();
     }));
   }
