@@ -162,6 +162,17 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         width: 200px;
         flex-shrink: 0;
       }
+      /* Desktop: the sidebar rides along under the sticky nav while the list
+         scrolls, scrolling on its own if it's taller than the viewport. */
+      @media (min-width: 769px) {
+        .filters-sidebar {
+          position: sticky;
+          top: var(--header-sticky-height, 0px);
+          max-height: calc(100vh - var(--header-sticky-height, 0px));
+          overflow-y: auto;
+          overscroll-behavior: contain;
+        }
+      }
       @media (max-width: 768px) {
         .filters-toggle-btn { display: inline-flex; }
         .filters-sidebar {
