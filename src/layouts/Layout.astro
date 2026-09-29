@@ -1,5 +1,6 @@
 ---
 import CrytoNav from '../components/CrytoNav.astro';
+import { listedGames } from '../games';
 
 interface Props {
   title: string;
@@ -551,9 +552,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       </nav>
     ) : (
       <nav class="app-nav">
-        <a href="/iidx">beatmania IIDX</a>
-        <a href="/holodori">Hololive Dreams</a>
-        <a href="/djmax">DJMAX Respect V</a>
+        {listedGames.map((game) => <a href={game.route}>{game.name}</a>)}
       </nav>
     )}
     <main>

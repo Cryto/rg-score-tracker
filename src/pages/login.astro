@@ -13,8 +13,9 @@ import Layout from '../layouts/Layout.astro';
 
   <script>
     import { configuredClients } from '../lib/supabase';
+    import { configuredGames } from '../games';
 
-    const GAME_NAMES: Record<string, string> = { iidx: 'beatmania IIDX', holodori: 'Hololive Dreams' };
+    const gameName = (id: string) => configuredGames.find((g) => g.id === id)?.name ?? id;
     const form = document.getElementById('login-form') as HTMLFormElement;
     const status = document.getElementById('status')!;
 
@@ -22,12 +23,13 @@ import Layout from '../layouts/Layout.astro';
     // button) -- skip straight to /settings. If any game is missing a
     // session (say a newly added one), show the form so it can be signed in.
     Promise.all(configuredClients().map(([, client]) => client.auth.getSession())).then((results) => {
-      if (results.every(({ data }) => data.session)) window.location.href = '/settings';
+      if (results.length && results.every(({ data }) => data.session)) window.location.href = '/settings';
     });
 
     // Each game is a separate Supabase project with its own auth, so sign in
     // to all of them with the same credentials (the owner account must exist
-    // in each project). IIDX is required; other games just report failures.
+    // in each project). Succeeding on at least one counts as logged in; the
+    // rest just report their failures.
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = (document.getElementById('email') as HTMLInputElement).value;
@@ -38,16 +40,19 @@ import Layout from '../layouts/Layout.astro';
           return { game, error };
         })
       );
-      const iidxError = results.find((r) => r.game === 'iidx')?.error;
-      const otherErrors = results.filter((r) => r.game !== 'iidx' && r.error);
-      if (iidxError) {
-        status.textContent = `Error: ${iidxError.message}`;
+      if (results.length === 0) {
+        status.textContent = 'No games are set up yet. See .env.example.';
         return;
       }
-      status.textContent = otherErrors.length
-        ? `Logged in, but not to ${otherErrors.map((r) => `${GAME_NAMES[r.game] ?? r.game} (${r.error!.message})`).join(', ')}.`
+      const failed = results.filter((r) => r.error);
+      if (failed.length === results.length) {
+        status.textContent = `Error: ${failed[0].error!.message}`;
+        return;
+      }
+      status.textContent = failed.length
+        ? `Logged in, but not to ${failed.map((r) => `${gameName(r.game)} (${r.error!.message})`).join(', ')}.`
         : 'Logged in.';
-      setTimeout(() => (window.location.href = '/settings'), otherErrors.length ? 2500 : 500);
+      setTimeout(() => (window.location.href = '/settings'), failed.length ? 2500 : 500);
     });
   </script>
 </Layout>

@@ -1,40 +1,23 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { configuredGames } from '../../games';
 ---
 <Layout title="Settings" showLogout={true} showHome={true} settingsMode={true}>
   <h1>Settings</h1>
 
-  <h2 class="settings-game-heading">beatmania IIDX</h2>
-  <div class="settings-grid">
-    <a class="settings-card" href="/settings/new">
-      <strong>Add / Update a Score</strong>
-      <span>Search a song/chart, enter EX score, lamp, and miss count manually.</span>
-    </a>
-    <a class="settings-card" href="/settings/import">
-      <strong>Bulk Import (CSV)</strong>
-      <span>Paste a CSV of scores, matched by song title, and import in bulk.</span>
-    </a>
-    <a class="settings-card" href="/settings/import-json">
-      <strong>Import from JSON Export</strong>
-      <span>Upload a native score-export file, matched exactly by song ID.</span>
-    </a>
-    <a class="settings-card" href="/settings/catalog-import">
-      <strong>Catalog Import / Update (CSV)</strong>
-      <span>Add or update songs and charts themselves — titles, levels, BPM, and more.</span>
-    </a>
-  </div>
-
-  <h2 class="settings-game-heading">Hololive Dreams</h2>
-  <div class="settings-grid">
-    <a class="settings-card" href="/settings/holodori-new">
-      <strong>Add / Update a Score</strong>
-      <span>Search a song, pick a difficulty, enter score and clear.</span>
-    </a>
-    <a class="settings-card" href="/settings/holodori-song">
-      <strong>Add / Edit a Song</strong>
-      <span>Add a new song with its difficulty levels, or fix levels on an existing one.</span>
-    </a>
-  </div>
+  {configuredGames.filter((game) => game.settingsLinks?.length).map((game) => (
+    <>
+      <h2 class="settings-game-heading">{game.name}</h2>
+      <div class="settings-grid">
+        {game.settingsLinks!.map((link) => (
+          <a class="settings-card" href={link.href}>
+            <strong>{link.title}</strong>
+            <span>{link.description}</span>
+          </a>
+        ))}
+      </div>
+    </>
+  ))}
 
   <style>
     .settings-game-heading {
