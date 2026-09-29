@@ -5,7 +5,7 @@
 // Usage:
 //   1. Download the TSV (git-lfs tracked, so use the media host, not raw.githubusercontent.com):
 //        curl -L -o songs.tsv https://media.githubusercontent.com/media/vanHavel/iidx-db/master/raw_data/songs.tsv
-//   2. node --env-file=.env db/import/import-iidx-db.mjs songs.tsv
+//   2. node --env-file=.env db/iidx/import/import-iidx-db.mjs songs.tsv
 //
 // Requires SUPABASE_SERVICE_ROLE_KEY and PUBLIC_SUPABASE_URL in .env (never commit that key).
 
@@ -14,7 +14,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const [, , tsvPath] = process.argv;
 if (!tsvPath) {
-  console.error('Usage: node --env-file=.env db/import/import-iidx-db.mjs <path-to-songs.tsv>');
+  console.error('Usage: node --env-file=.env db/iidx/import/import-iidx-db.mjs <path-to-songs.tsv>');
   process.exit(1);
 }
 
@@ -42,7 +42,7 @@ function parseBpm(raw) {
 // iidx-db's "folder" column: 0 = 1st style, 1 = substream (given number 0 in
 // our versions table), 2-33 = matches the official version number directly.
 // Anything outside that range (e.g. 80, an Infinitas-exclusive bucket) has no
-// known mapping. See db/migrations/0002_seed_versions.sql for how this was verified.
+// known mapping. See db/iidx/migrations/0002_seed_versions.sql for how this was verified.
 function folderToVersionNumber(folder) {
   if (folder === 0) return 1;
   if (folder === 1) return 0;
@@ -57,7 +57,7 @@ if (versionsError) {
 }
 const versionIdByNumber = new Map(versionRows.map((v) => [v.number, v.id]));
 if (versionIdByNumber.size === 0) {
-  console.error('No rows in versions table. Run db/migrations/0002_seed_versions.sql first.');
+  console.error('No rows in versions table. Run db/iidx/migrations/0002_seed_versions.sql first.');
   process.exit(1);
 }
 

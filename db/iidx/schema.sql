@@ -248,7 +248,7 @@ create policy "owner delete score_attempts" on score_attempts
   for delete using (auth.uid() = '<OWNER_UUID>'::uuid);
 
 -- Lets the owner insert/update catalog data from the browser (the
--- /settings/catalog-import page), the same way scores works above. This
+-- /settings/iidx/catalog-import page), the same way scores works above. This
 -- widens the owner session's blast radius from "can edit scores" to "can
 -- edit the whole catalog" -- see Key Decisions in the wiki.
 create policy "owner write songs" on songs

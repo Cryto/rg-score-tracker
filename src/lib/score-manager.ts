@@ -3,7 +3,7 @@
 // remove the score or delete single attempts (e.g. a mistyped score, which
 // ratcheting would otherwise keep forever). The best is built from the
 // attempts: deleting one makes the database recompute each field from the
-// attempts left (db/migrations/0009, db/holodori/migrations/0004), and
+// attempts left (db/iidx/migrations/0009, db/holodori/migrations/0004), and
 // removing the score deletes all of its attempts. Shared by IIDX and
 // Holodori; each page supplies its columns and how to describe a row.
 import type { SupabaseClient } from '@supabase/supabase-js';

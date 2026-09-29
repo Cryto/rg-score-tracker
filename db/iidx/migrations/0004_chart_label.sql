@@ -1,5 +1,5 @@
 -- Run in the Supabase SQL Editor if your database predates this migration.
--- New forks running the current db/schema.sql from scratch don't need this.
+-- New forks running the current db/iidx/schema.sql from scratch don't need this.
 --
 -- Optional free-text label for a chart, e.g. "Black Another" for the charts
 -- that are Black Another rather than plain Leggendaria. Difficulty stays 'L'

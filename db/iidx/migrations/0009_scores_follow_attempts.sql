@@ -1,5 +1,5 @@
 -- Run in the Supabase SQL Editor if your database predates this migration.
--- New forks running the current db/schema.sql from scratch don't need this.
+-- New forks running the current db/iidx/schema.sql from scratch don't need this.
 --
 -- Deleting an attempt now recomputes the chart's best from the attempts
 -- that remain, each field separately: highest EX score, best clear lamp,

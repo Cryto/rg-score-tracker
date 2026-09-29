@@ -1,5 +1,5 @@
 -- Run in the Supabase SQL Editor if your database predates this migration.
--- New forks running the current db/schema.sql from scratch don't need this.
+-- New forks running the current db/iidx/schema.sql from scratch don't need this.
 --
 -- Logs every score submission as submitted (before ratcheting), as an audit
 -- trail for a future score-over-time graph. Never read by the site's main

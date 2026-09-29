@@ -1,6 +1,6 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../lib/holodori';
+import Layout from '@/layouts/Layout.astro';
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../holodori';
 ---
 <Layout title="Hololive Dreams Score Tracker">
   <Fragment slot="head">
@@ -307,13 +307,13 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
   </style>
 
   <script>
-    import { getSupabase } from '../lib/supabase';
-    import { searchKey } from '../lib/search';
-    import { loadAttempts, historyHtml } from '../lib/history';
+    import { getSupabase } from '@/lib/supabase';
+    import { searchKey } from '@/lib/search';
+    import { loadAttempts, historyHtml } from '@/lib/history';
     import {
       DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS,
       computeGrade, gradeFill, GROUP_NAMES, type Difficulty, type ClearLamp,
-    } from '../lib/holodori';
+    } from '../holodori';
 
     type Chart = { id: number; difficulty: Difficulty; level: number | null; score: number | null; lamp: ClearLamp | null; updatedAt: string | null; grade: string | null };
     type Song = {
@@ -321,7 +321,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       category: 'original' | 'cover' | null; officialOrder: number | null; jacketUrl: string | null;
       charts: Chart[]; lastUpdated: string | null; searchText: string;
       // credited: individual names split from the credit (may include groups);
-      // members: extra members added on /settings/holodori-song; singers: both.
+      // members: extra members added on /settings/holodori/song; singers: both.
       credited: string[]; members: string[]; singers: string[];
     };
 

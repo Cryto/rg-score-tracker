@@ -1,6 +1,6 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../../lib/holodori';
+import Layout from '@/layouts/Layout.astro';
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_LAMP_LABELS } from '../../../holodori';
 ---
 <Layout title="Add Hololive Dreams Score" showLogout={true} showHome={true} settingsMode={true}>
   <a href="/settings" class="back-link">← Back to Settings</a>
@@ -92,10 +92,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
   </style>
 
   <script>
-    import { getSupabase } from '../../lib/supabase';
-    import { DIFFICULTIES, DIFFICULTY_LABELS, CLEAR_LAMP_LABELS, computeGrade, type ClearLamp } from '../../lib/holodori';
-    import { scoreManager } from '../../lib/score-manager';
-    import { searchKey } from '../../lib/search';
+    import { getSupabase } from '@/lib/supabase';
+    import { DIFFICULTIES, DIFFICULTY_LABELS, CLEAR_LAMP_LABELS, computeGrade, type ClearLamp } from '../../../holodori';
+    import { scoreManager } from '@/lib/score-manager';
+    import { searchKey } from '@/lib/search';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;

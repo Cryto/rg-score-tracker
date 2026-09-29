@@ -1,5 +1,5 @@
 -- Run in the Supabase SQL Editor if your database predates this migration.
--- New forks running the current db/schema.sql from scratch don't need this.
+-- New forks running the current db/iidx/schema.sql from scratch don't need this.
 --
 -- Tracks when the song/chart catalog was last synced, so the site can show
 -- a "DB last updated" timestamp alongside the existing "scores last updated"

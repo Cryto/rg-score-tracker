@@ -1,5 +1,10 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "compilerOptions": {
+    // Lets game folders (src/games/<id>/) import shared code as '@/lib/...'
+    // instead of long relative paths.
+    "paths": { "@/*": ["./src/*"] }
+  }
 }

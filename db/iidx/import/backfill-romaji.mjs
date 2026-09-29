@@ -3,7 +3,7 @@
 // catalog -- titles the source data never covered). Uses kuroshiro to
 // convert kanji/kana titles to romaji automatically.
 //
-// Usage: node --env-file=.env db/import/backfill-romaji.mjs
+// Usage: node --env-file=.env db/iidx/import/backfill-romaji.mjs
 //
 // Automated romanization of stylized song titles is often rough (kuroshiro
 // doesn't know IIDX naming conventions), so treat this as a starting point,

@@ -11,22 +11,22 @@ const game: GameDefinition = {
   supabase: { url: import.meta.env.PUBLIC_SUPABASE_URL, key: import.meta.env.PUBLIC_SUPABASE_ANON_KEY },
   settingsLinks: [
     {
-      href: '/settings/new',
+      href: '/settings/iidx/new',
       title: 'Add / Update a Score',
       description: 'Search a song/chart, enter EX score, lamp, and miss count manually.',
     },
     {
-      href: '/settings/import',
+      href: '/settings/iidx/import',
       title: 'Bulk Import (CSV)',
       description: 'Paste a CSV of scores, matched by song title, and import in bulk.',
     },
     {
-      href: '/settings/import-json',
+      href: '/settings/iidx/import-json',
       title: 'Import from JSON Export',
       description: 'Upload a native score-export file, matched exactly by song ID.',
     },
     {
-      href: '/settings/catalog-import',
+      href: '/settings/iidx/catalog-import',
       title: 'Catalog Import / Update (CSV)',
       description: 'Add or update songs and charts themselves — titles, levels, BPM, and more.',
     },

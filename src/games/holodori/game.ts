@@ -17,12 +17,12 @@ const game: GameDefinition = {
   },
   settingsLinks: [
     {
-      href: '/settings/holodori-new',
+      href: '/settings/holodori/new',
       title: 'Add / Update a Score',
       description: 'Search a song, pick a difficulty, enter score and clear.',
     },
     {
-      href: '/settings/holodori-song',
+      href: '/settings/holodori/song',
       title: 'Add / Edit a Song',
       description: 'Add a new song with its difficulty levels, or fix levels on an existing one.',
     },
