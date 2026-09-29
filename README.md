@@ -28,6 +28,20 @@ song data.
 6. Populate the song catalog — see "Song data" below.
 7. `npm run dev`
 
+## Games
+
+Each game lives in its own folder, `src/games/<id>/game.ts`, which sets its
+name, page, home-page card, settings links, and which env vars hold its
+Supabase project. The nav, home page, login, and settings list whatever game
+folders exist, and only games whose env vars are set (plus "coming soon"
+placeholders) are shown. Any game can be left unconfigured, so a fork can run
+just one game.
+
+- **Add a game:** copy `src/games/djmax/game.ts` as a starting point, then add
+  its page under `src/pages/`.
+- **Remove a game:** leave its env vars unset, or delete its folder under
+  `src/games/` along with its pages.
+
 ## Song data
 
 The `songs`/`charts` tables are populated separately from the app itself, since

@@ -1,43 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { configuredGames, listedGames } from '../games';
 
 // Card pictures are linked from each game's official site or store page, never
-// committed (same rule as the Holodori jackets). Holodori's share image is
-// 1.5 MB, so it goes through that site's own resizer (only w=430 is allowed
-// there), falling back to the original if the resizer stops accepting it.
-const games = [
-  {
-    href: '/iidx', title: 'beatmania IIDX', subtitle: 'Konami · Rhythm', available: true,
-    picture: 'https://p.eagate.573.jp/game/infinitas/2/img/infinitas.jpg',
-  },
-  {
-    href: '/holodori', title: 'Hololive Dreams', subtitle: 'hololive · Rhythm', available: true,
-    picture: 'https://www.hololive-dreams.com/_vercel/image?url=%2Fogp.jpg&w=430&q=100',
-    fallback: 'https://www.hololive-dreams.com/ogp.jpg',
-  },
-  {
-    href: '/djmax', title: 'DJMAX Respect V', subtitle: 'Coming soon', available: false,
-    picture: 'https://cdn.cloudflare.steamstatic.com/steam/apps/960170/capsule_616x353.jpg',
-  },
-];
+// committed (same rule as the Holodori jackets). Each game's own folder sets
+// them (src/games/<id>/game.ts).
+const games = listedGames;
 ---
 <Layout title="Rhythm Game Score Tracker">
   <h1>Rhythm Game Score Tracker</h1>
   <p style="color: var(--text-dim);">Pick a game to view its song list and your scores.</p>
+  {configuredGames.length === 0 && (
+    <p>No games are set up yet. Copy <code>.env.example</code> to <code>.env</code> and fill in at least one game's Supabase values.</p>
+  )}
   <div class="game-grid">
     {games.map((game) => (
-      <a class="game-card" href={game.href}>
+      <a class="game-card" href={game.route}>
         <div class="game-card-picture" aria-hidden="true">
           <img
             src={game.picture}
             alt=""
             decoding="async"
             referrerpolicy="no-referrer"
-            data-fallback={game.fallback}
+            data-fallback={game.pictureFallback}
             onerror="if (this.dataset.fallback && this.src !== this.dataset.fallback) { this.src = this.dataset.fallback; } else { this.remove(); }"
           />
         </div>
-        <strong>{game.title}</strong>
+        <strong>{game.name}</strong>
         <span>{game.subtitle}</span>
       </a>
     ))}

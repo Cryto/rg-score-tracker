@@ -38,10 +38,12 @@ import Layout from '../../layouts/Layout.astro';
   <section id="score-manager" class="score-manager" hidden></section>
 
   <script>
-    import { supabase } from '../../lib/supabase';
+    import { requireSupabase } from '../../lib/supabase';
     import { searchKey } from '../../lib/search';
     import { scoreManager } from '../../lib/score-manager';
     import { LAMP_LABELS } from '../../lib/grade';
+
+    const supabase = requireSupabase('iidx');
 
     const authWarning = document.getElementById('auth-warning')!;
     const form = document.getElementById('score-form') as HTMLFormElement;

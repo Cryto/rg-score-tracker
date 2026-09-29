@@ -139,10 +139,12 @@ import Layout from '../layouts/Layout.astro';
   <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
 
   <script>
-    import { supabase } from '../lib/supabase';
+    import { requireSupabase } from '../lib/supabase';
     import { computeGrade, LAMP_LABELS } from '../lib/grade';
     import { searchKey } from '../lib/search';
     import { loadAttempts, historyHtml } from '../lib/history';
+
+    const supabase = requireSupabase('iidx');
 
     const DIFF_LABELS: Record<string, string> = {
       B: 'Beginner', N: 'Normal', H: 'Hyper', A: 'Another', L: 'Leggendaria',
