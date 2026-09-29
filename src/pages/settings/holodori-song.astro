@@ -11,7 +11,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
 
   <form id="song-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
     <label>Title (as shown in-game)
-      <input id="title" type="text" required autocomplete="off" list="song-titles" />
+      <span class="hd-title-wrap">
+        <input id="title" type="text" required autocomplete="off" list="song-titles" />
+        <button type="button" id="clear-form" class="hd-clear" aria-label="Clear form" title="Clear form">✕</button>
+      </span>
       <datalist id="song-titles"></datalist>
     </label>
     <p id="match-note" class="hd-match-note"></p>
@@ -42,6 +45,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     </fieldset>
     <button type="submit" id="submit-btn">Add Song</button>
     <p id="status" style="color: var(--text-dim);"></p>
+    <button type="button" id="undo-btn" style="display:none; align-self:flex-start;">Undo</button>
     <p style="color: var(--text-dim); font-size: 0.85rem;">
       Blank fields are left as they are when editing an existing song. Edits made here survive
       re-running the catalog import script, which only fills in missing titles, singers and levels
@@ -50,6 +54,12 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
   </form>
 
   <style>
+    .hd-title-wrap { position: relative; display: block; }
+    .hd-title-wrap input { width: 100%; padding-right: 2rem; box-sizing: border-box; }
+    .hd-clear {
+      position: absolute; right: 0.3rem; top: 50%; transform: translateY(-50%);
+      border: none; background: none; padding: 0.2rem 0.4rem; color: var(--text-dim); line-height: 1;
+    }
     .hd-optional { color: var(--text-dim); font-size: 0.85em; }
     .hd-match-note { margin: -0.4rem 0 0; font-size: 0.85rem; color: var(--text-dim); min-height: 1.2em; }
     .hd-level-inputs {
@@ -111,7 +121,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
     const status = document.getElementById('status')!;
     const levelInputs = [...document.querySelectorAll<HTMLInputElement>('[data-difficulty]')];
 
-    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; members: string[]; levels: Record<string, number | null> };
+    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; artistEn: string | null; members: string[]; levels: Record<string, number | null> };
     let existing = new Map<string, ExistingSong>();
     let match: ExistingSong | null = null;
 
@@ -163,6 +173,29 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       }
     });
 
+    const undoBtn = document.getElementById('undo-btn') as HTMLButtonElement;
+    let undoAction: (() => Promise<void>) | null = null;
+    function setUndo(fn: (() => Promise<void>) | null) {
+      undoAction = fn;
+      undoBtn.style.display = fn ? '' : 'none';
+    }
+
+    function clearForm() {
+      titleEl.value = titleEnEl.value = artistEl.value = memberInput.value = '';
+      for (const input of levelInputs) input.value = '';
+      members = [];
+      match = null;
+      matchNote.textContent = '';
+      membersNote.textContent = '';
+      titleEnEl.placeholder = artistEl.placeholder = '';
+      submitBtn.textContent = 'Add Song';
+      renderChips();
+      status.textContent = '';
+      setUndo(null);
+      titleEl.focus();
+    }
+    document.getElementById('clear-form')!.addEventListener('click', clearForm);
+
     // Same looseness as the level-sheet importer: ignore width, case, spacing, punctuation.
     const norm = (s: string) => searchKey(s).replace(/[\s・·.,!?~〜☆★♡♪"“”()[\]「」『』:\-‐―–—_/]/g, '');
 
@@ -194,7 +227,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       // instead of creating a duplicate.
       existing = new Map();
       const songsList: ExistingSong[] = (data ?? []).map((s: any) => ({
-        id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artist: s.artist_en ?? s.artist_jp,
+        id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artist: s.artist_en ?? s.artist_jp, artistEn: s.artist_en,
         members: s.members ?? [],
         levels: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, c.level])),
       }));
@@ -269,6 +302,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
         songFields.members = members.length ? members : null;
       }
 
+      // Snapshot for undo: an added song is deleted again; an updated one gets its old values back.
+      const prev = match;
       let songId: number;
       if (match) {
         songId = match.id;
@@ -293,11 +328,40 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
       }
       await supabase.from('catalog_syncs').insert({});
 
-      status.textContent = `${match ? 'Updated' : 'Added'} "${match?.titleJp ?? titleJp}".${warning}`;
+      const savedName = prev?.titleJp ?? titleJp;
+      status.textContent = `${prev ? 'Updated' : 'Added'} "${savedName}".${warning}`;
+      const changedDiffs = levels.filter((l) => !prev || l.level != null).map((l) => l.difficulty);
+      setUndo(async () => {
+        undoBtn.disabled = true;
+        status.textContent = 'Undoing...';
+        let err: string | undefined;
+        if (!prev) {
+          err = (await supabase.from('charts').delete().eq('song_id', songId)).error?.message
+            ?? (await supabase.from('songs').delete().eq('id', songId)).error?.message;
+        } else {
+          const restore: Record<string, unknown> = {};
+          if ('title_en' in songFields) restore.title_en = prev.titleEn;
+          if ('artist_en' in songFields) restore.artist_en = prev.artistEn;
+          if ('members' in songFields) restore.members = prev.members.length ? prev.members : null;
+          if (Object.keys(restore).length) err = (await supabase.from('songs').update(restore).eq('id', songId)).error?.message;
+          const back = changedDiffs.filter((d) => d in prev.levels).map((d) => ({ song_id: songId, difficulty: d, level: prev.levels[d] }));
+          const gone = changedDiffs.filter((d) => !(d in prev.levels));
+          if (!err && back.length) err = (await supabase.from('charts').upsert(back, { onConflict: 'song_id,difficulty' })).error?.message;
+          if (!err && gone.length) err = (await supabase.from('charts').delete().eq('song_id', songId).in('difficulty', gone)).error?.message;
+        }
+        undoBtn.disabled = false;
+        if (err) { status.textContent = `Undo failed: ${err}`; return; }
+        await supabase.from('catalog_syncs').insert({});
+        await load();
+        clearForm();
+        status.textContent = `${prev ? 'Reverted' : 'Removed'} "${savedName}".`;
+      });
       submitBtn.disabled = false;
       await load();
       titleEl.dispatchEvent(new Event('input'));
     });
+
+    undoBtn.addEventListener('click', () => undoAction?.());
 
     load();
   </script>
