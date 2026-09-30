@@ -171,6 +171,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
           top: var(--header-sticky-height, 0px);
           max-height: calc(100vh - var(--header-sticky-height, 0px));
           overflow-y: auto;
+          overflow-x: hidden;
           overscroll-behavior: contain;
         }
       }
@@ -185,6 +186,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
           max-width: 300px;
           height: 100vh;
           overflow-y: auto;
+          overflow-x: hidden;
           background: var(--bg);
           border-right: 1px solid var(--border);
           z-index: 200;
@@ -252,7 +254,16 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         text-align: left;
       }
       @media (hover: hover) { .filter-group-header:hover { color: var(--accent); } }
+      /* Square box so the open-state rotation stays inside the header instead
+         of poking past the sidebar's edge and forcing a sideways scrollbar. */
       .filter-group-header .arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1em;
+        height: 1em;
+        line-height: 1;
+        flex-shrink: 0;
         color: var(--text-dim);
         transition: transform 0.15s;
       }
@@ -286,6 +297,8 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         font-size: 0.85rem;
         color: var(--text);
         cursor: pointer;
+        /* Long names wrap rather than widening the list sideways. */
+        overflow-wrap: anywhere;
       }
       .checkbox-row input[type="checkbox"] {
         width: auto;
