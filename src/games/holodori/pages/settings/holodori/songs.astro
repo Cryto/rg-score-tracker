@@ -1,0 +1,244 @@
+---
+import Layout from '@/layouts/Layout.astro';
+---
+<Layout title="Edit Hololive Dreams Song Database" showLogout={true} showHome={true} settingsMode={true}>
+  <a href="/settings" class="back-link">← Back to Settings</a>
+  <h1>Edit Song Database — Hololive Dreams</h1>
+  <p id="auth-warning" style="display:none; color: #ff8080;">
+    You're not logged in to Hololive Dreams — <a href="/login">log in</a> to remove songs.
+  </p>
+
+  <div class="hd-db-controls">
+    <input id="search" type="search" placeholder="Title, singer or member (EN / JP)..." autocomplete="off" aria-label="Search songs" />
+    <fieldset class="choice-picker" id="views">
+      <legend>Show</legend>
+      <label><input type="checkbox" name="view" value="all" checked /><span>All <b data-count="all"></b></span></label>
+      <label><input type="checkbox" name="view" value="untyped" /><span>No song type <b data-count="untyped"></b></span></label>
+      <label><input type="checkbox" name="view" value="nomember" /><span>No member <b data-count="nomember"></b></span></label>
+    </fieldset>
+    <p id="view-note" class="hd-db-note"></p>
+  </div>
+  <p id="status" style="color: var(--text-dim);"></p>
+  <ul id="song-list" class="hd-db-list"></ul>
+  <p id="empty" style="color: var(--text-dim);" hidden></p>
+
+  <style>
+    .hd-db-controls { display: flex; flex-direction: column; gap: 0.6rem; max-width: 560px; margin-bottom: 0.75rem; }
+    .hd-db-controls input[type="search"] { width: 100%; box-sizing: border-box; }
+    .hd-db-controls b { font-weight: 400; opacity: 0.75; }
+    .hd-db-note { margin: 0; font-size: 0.85rem; color: var(--text-dim); min-height: 1.2em; }
+  </style>
+
+  <!-- Global: rows are created from JS, which Astro's scoped styles can't reach. -->
+  <style is:global>
+    .hd-db-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; max-width: 900px; }
+    .hd-db-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.75rem;
+      padding: 0.55rem 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .hd-db-song { flex: 1 1 16rem; min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; overflow-wrap: anywhere; }
+    .hd-db-song small { color: var(--text-dim); font-size: 0.8rem; }
+    .hd-db-missing { color: #ffb86b; }
+    .hd-db-actions { display: flex; gap: 0.4rem; margin-left: auto; }
+    .hd-db-actions a {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .hd-db-remove { border-color: #8a3a3a; color: #ff9a9a; }
+    @media (hover: hover) {
+      .hd-db-actions a:hover { background: #1f2430; }
+      .hd-db-remove:hover { background: #3a1f1f; }
+    }
+  </style>
+
+  <script>
+    import { getSupabase } from '@/lib/supabase';
+    import { GROUP_NAMES } from '../../../holodori';
+    import { searchKey } from '@/lib/search';
+    import { singleChoice } from '@/lib/choice';
+
+    type Song = {
+      id: number; titleJp: string; titleEn: string | null; credit: string | null;
+      category: string | null; members: string[]; individuals: string[];
+      scores: number; attempts: number; search: string;
+    };
+    type View = 'all' | 'untyped' | 'nomember';
+
+    const supabase = getSupabase('holodori');
+    const authWarning = document.getElementById('auth-warning')!;
+    const searchEl = document.getElementById('search') as HTMLInputElement;
+    const viewInputs = [...document.querySelectorAll<HTMLInputElement>('input[name="view"]')];
+    const viewEl = singleChoice(viewInputs);
+    const viewNote = document.getElementById('view-note')!;
+    const status = document.getElementById('status')!;
+    const listEl = document.getElementById('song-list')!;
+    const emptyEl = document.getElementById('empty')!;
+
+    const VIEW_NOTES: Record<View, string> = {
+      all: '',
+      untyped: 'Songs with neither Original nor Cover set.',
+      nomember: 'Songs with no members added and no individual singer in the credit (only a group, or no credit). Some songs have none; edit the ones that should.',
+    };
+    const splitCredit = (s: string | null) => (s ? s.split(/\s*(?:,|、|&)\s*/).map((x) => x.trim()).filter(Boolean) : []);
+    const VIEWS: Record<View, (s: Song) => boolean> = {
+      all: () => true,
+      untyped: (s) => !s.category,
+      nomember: (s) => !s.members.length && !s.individuals.length,
+    };
+
+    let songs: Song[] = [];
+    let membersSupported = true;
+
+    function currentView(): View {
+      return (viewEl.value || 'all') as View;
+    }
+
+    async function load() {
+      if (!supabase) {
+        status.textContent = 'Hololive Dreams isn\'t configured on this deployment.';
+        return;
+      }
+      supabase.auth.getSession().then(({ data }) => {
+        if (!data.session) authWarning.style.display = '';
+      });
+      status.textContent = 'Loading...';
+      const cols = 'id, title_jp, title_en, artist_jp, artist_en, category, charts ( scores ( chart_id ), score_attempts ( id ) )';
+      let { data, error }: { data: any[] | null; error: { message: string } | null } =
+        await supabase.from('songs').select(`${cols}, members`).order('title_jp');
+      // Database without migration 0002: work without members.
+      if (error && /members/.test(error.message)) {
+        membersSupported = false;
+        ({ data, error } = await supabase.from('songs').select(cols).order('title_jp'));
+      }
+      if (error) {
+        status.textContent = `Failed to load songs: ${error.message}`;
+        return;
+      }
+      songs = (data ?? []).map((s: any) => {
+        const credit = s.artist_en ?? s.artist_jp;
+        const members: string[] = s.members ?? [];
+        return {
+          id: s.id, titleJp: s.title_jp, titleEn: s.title_en, credit, category: s.category, members,
+          individuals: splitCredit(credit).filter((n) => !GROUP_NAMES.has(n)),
+          scores: (s.charts ?? []).reduce((n: number, c: any) => n + (c.scores?.length ?? 0), 0),
+          attempts: (s.charts ?? []).reduce((n: number, c: any) => n + (c.score_attempts?.length ?? 0), 0),
+          search: searchKey([s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...members].filter(Boolean).join(' ')),
+        };
+      });
+      status.textContent = '';
+      render();
+    }
+
+    function row(song: Song) {
+      const li = document.createElement('li');
+      li.className = 'hd-db-row';
+      const info = document.createElement('div');
+      info.className = 'hd-db-song';
+      const title = document.createElement('strong');
+      title.textContent = song.titleJp;
+      info.append(title);
+      if (song.titleEn && song.titleEn !== song.titleJp) {
+        const en = document.createElement('small');
+        en.textContent = song.titleEn;
+        info.append(en);
+      }
+      const details = document.createElement('small');
+      const type = document.createElement('span');
+      type.textContent = song.category === 'original' ? 'Original' : song.category === 'cover' ? 'Cover' : 'No song type';
+      if (!song.category) type.className = 'hd-db-missing';
+      const people = document.createElement('span');
+      const who = [song.credit, song.members.length ? `members: ${song.members.join(', ')}` : ''].filter(Boolean).join(' · ');
+      people.textContent = who || 'No singer or members';
+      if (membersSupported && VIEWS.nomember(song)) people.className = 'hd-db-missing';
+      const scores = song.scores ? ` · ${song.scores} score${song.scores === 1 ? '' : 's'}` : '';
+      details.append(type, ' · ', people, scores);
+      info.append(details);
+
+      const actions = document.createElement('div');
+      actions.className = 'hd-db-actions';
+      const edit = document.createElement('a');
+      edit.href = `/settings/holodori/song?song=${encodeURIComponent(song.titleJp)}`;
+      edit.textContent = 'Edit';
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'hd-db-remove';
+      remove.textContent = 'Remove';
+      remove.addEventListener('click', () => removeSong(song, remove));
+      actions.append(edit, remove);
+      li.append(info, actions);
+      return li;
+    }
+
+    function render() {
+      const view = currentView();
+      for (const v of Object.keys(VIEWS) as View[]) {
+        document.querySelector(`[data-count="${v}"]`)!.textContent = `(${songs.filter(VIEWS[v]).length})`;
+      }
+      viewNote.textContent = VIEW_NOTES[view];
+      if (view === 'nomember' && !membersSupported) {
+        viewNote.textContent += ' (Members aren\'t set up on this database yet: run migration 0002.)';
+      }
+      const q = searchKey(searchEl.value.trim());
+      const shown = songs.filter((s) => VIEWS[view](s) && (!q || s.search.includes(q)));
+      listEl.replaceChildren(...shown.map(row));
+      emptyEl.hidden = !songs.length || !!shown.length;
+      emptyEl.textContent = view === 'all' || q ? 'No songs match.' : 'Nothing to clean up here.';
+    }
+
+    async function removeSong(song: Song, button: HTMLButtonElement) {
+      if (!supabase) return;
+      const lost = song.scores
+        ? `This also deletes its ${song.scores} score${song.scores === 1 ? '' : 's'} and ${song.attempts} attempt${song.attempts === 1 ? '' : 's'} in the history. This can't be undone.`
+        : 'It has no scores. This can\'t be undone.';
+      if (!confirm(`Remove "${song.titleJp}" from the song database?\n\n${lost}`)) return;
+      button.disabled = true;
+      status.textContent = `Removing "${song.titleJp}"...`;
+      // Charts, scores and attempts go with the song (on delete cascade). RLS
+      // turns a delete the account may not make into a silent no-op, so ask
+      // for the removed row back and treat none as a failure.
+      const { data, error } = await supabase.from('songs').delete().eq('id', song.id).select('id');
+      if (error || !data?.length) {
+        button.disabled = false;
+        status.textContent = `Remove failed: ${error?.message ?? 'nothing was deleted (log in, and run db/holodori/migrations/0005_owner_song_deletes.sql)'}`;
+        return;
+      }
+      await supabase.from('catalog_syncs').insert({});
+      songs = songs.filter((s) => s.id !== song.id);
+      status.textContent = `Removed "${song.titleJp}".`;
+      render();
+    }
+
+    function syncUrl() {
+      const url = new URL(location.href);
+      const view = currentView();
+      if (view === 'all') url.searchParams.delete('view');
+      else url.searchParams.set('view', view);
+      history.replaceState(null, '', url);
+    }
+
+    for (const input of viewInputs) {
+      input.addEventListener('change', () => {
+        // Clicking the selected view again goes back to All rather than none.
+        if (!viewEl.value) viewEl.value = 'all';
+        status.textContent = '';
+        syncUrl();
+        render();
+      });
+    }
+    searchEl.addEventListener('input', render);
+
+    const initial = new URLSearchParams(location.search).get('view');
+    if (initial && initial in VIEWS) viewEl.value = initial;
+    load();
+  </script>
+</Layout>

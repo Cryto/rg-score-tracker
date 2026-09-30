@@ -222,11 +222,17 @@ create policy "owner write songs" on songs
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
 create policy "owner update songs" on songs
   for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+-- Undo on /settings/holodori/song and Remove on /settings/holodori/songs.
+-- Deleting a song cascades to its charts, scores and score attempts.
+create policy "owner delete songs" on songs
+  for delete using (auth.uid() = '<OWNER_UUID>'::uuid);
 
 create policy "owner write charts" on charts
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
 create policy "owner update charts" on charts
   for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner delete charts" on charts
+  for delete using (auth.uid() = '<OWNER_UUID>'::uuid);
 
 create policy "owner write catalog_syncs" on catalog_syncs
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
