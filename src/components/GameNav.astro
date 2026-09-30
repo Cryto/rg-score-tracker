@@ -1,0 +1,172 @@
+---
+import { listedGames } from '../games';
+
+// One button per listed game. On a mouse/trackpad the button's frame grows on
+// hover to show the game's picture (the same hotlinked picture as its home
+// card, from src/games/<id>/game.ts). Touch screens get plain compact pills in
+// a sideways-scrolling row, with no preview.
+---
+<nav class="app-nav game-nav">
+  {listedGames.map((game) => (
+    <a class="game-tab" href={game.route}>
+      <span class="game-tab-frame" aria-hidden="true">
+        <span class="game-tab-preview">
+          <span class="game-tab-picture">
+            {game.picture && (
+              <img
+                data-src={game.picture}
+                data-fallback={game.pictureFallback}
+                alt=""
+                decoding="async"
+                referrerpolicy="no-referrer"
+              />
+            )}
+          </span>
+          <span class="game-tab-subtitle">{game.subtitle}</span>
+        </span>
+      </span>
+      <span class="game-tab-label">{game.name}</span>
+    </a>
+  ))}
+</nav>
+
+<style>
+  .game-nav {
+    gap: 0.6rem;
+    padding: 0.75rem 1.5rem;
+  }
+  .game-tab {
+    --tab-pad-y: 0.45rem;
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .game-tab-label {
+    position: relative;
+    z-index: 2;
+    padding: var(--tab-pad-y) 0.95rem;
+    pointer-events: none;
+  }
+  /* The button's visible border and fill. It sits behind the label and is the
+     part that grows into the preview card. */
+  .game-tab-frame {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    display: grid;
+    grid-template-rows: 0fr;
+    padding-top: calc(2 * var(--tab-pad-y) + 1.2em);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    transition:
+      width 0.22s ease,
+      grid-template-rows 0.22s ease,
+      border-radius 0.22s ease,
+      border-color 0.15s,
+      box-shadow 0.22s;
+  }
+  .game-tab[aria-current='page'] .game-tab-frame {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  }
+  .game-tab:focus-visible { outline: none; }
+  .game-tab:focus-visible .game-tab-frame {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .game-tab-preview {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0 0.5rem;
+    opacity: 0;
+    transition: opacity 0.15s, padding 0.22s ease;
+  }
+  .game-tab-picture {
+    display: block;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+    /* Shows through when a game has no picture or it fails to load. */
+    background: linear-gradient(135deg, var(--border), var(--bg));
+  }
+  .game-tab-picture img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .game-tab-subtitle {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .game-tab:hover .game-tab-frame { border-color: var(--accent); }
+    .game-tab:hover,
+    .game-tab:focus-visible { z-index: 3; }
+    .game-tab:hover .game-tab-frame,
+    .game-tab:focus-visible .game-tab-frame {
+      width: max(100%, 15rem);
+      grid-template-rows: 1fr;
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+    }
+    .game-tab:hover .game-tab-preview,
+    .game-tab:focus-visible .game-tab-preview {
+      opacity: 1;
+      padding: 0 0.5rem 0.55rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .game-tab-frame, .game-tab-preview { transition: none; }
+  }
+
+  /* Phones: smaller pills in the existing sideways-scrolling row. The row is a
+     scroll container here, so a preview couldn't escape it anyway. */
+  @media (max-width: 768px) {
+    .game-nav {
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+    }
+    .game-tab { --tab-pad-y: 0.38rem; font-size: 0.82rem; }
+    .game-tab-label { padding-inline: 0.75rem; }
+  }
+</style>
+
+<script>
+  // Pictures load on the first hover or keyboard focus of the row, so pages
+  // don't fetch them up front and touch screens never fetch them at all.
+  const nav = document.querySelector('.game-nav');
+  if (nav && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const load = () => {
+      for (const img of nav.querySelectorAll<HTMLImageElement>('img[data-src]')) {
+        img.addEventListener('error', () => {
+          const fallback = img.dataset.fallback;
+          if (fallback && !img.src.endsWith(fallback)) img.src = fallback;
+          else img.remove();
+        });
+        img.src = img.dataset.src!;
+        img.removeAttribute('data-src');
+      }
+    };
+    nav.addEventListener('pointerenter', load, { once: true });
+    nav.addEventListener('focusin', load, { once: true });
+  }
+</script>
