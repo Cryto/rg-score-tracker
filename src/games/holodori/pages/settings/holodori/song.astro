@@ -24,13 +24,11 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     <label>Credited singer / unit <span class="hd-optional">(optional)</span>
       <input id="artist" type="text" autocomplete="off" />
     </label>
-    <label>Song type
-      <select id="category">
-        <option value="">Not set</option>
-        <option value="original">Original</option>
-        <option value="cover">Cover</option>
-      </select>
-    </label>
+    <fieldset class="choice-picker">
+      <legend>Song type <span class="hd-optional">(click again to unset)</span></legend>
+      <label><input type="checkbox" name="category" value="original" /><span>Original</span></label>
+      <label><input type="checkbox" name="category" value="cover" /><span>Cover</span></label>
+    </fieldset>
     <div class="hd-members" id="members-field">
       <label for="member-input">Members <span class="hd-optional">(optional — individual members in this song)</span></label>
       <div id="member-chips" class="hd-chips"></div>
@@ -115,6 +113,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     import { getSupabase } from '@/lib/supabase';
     import { DIFFICULTIES, GROUP_NAMES } from '../../../holodori';
     import { searchKey } from '@/lib/search';
+    import { singleChoice } from '@/lib/choice';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;
@@ -122,7 +121,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     const titleEl = document.getElementById('title') as HTMLInputElement;
     const titleEnEl = document.getElementById('title-en') as HTMLInputElement;
     const artistEl = document.getElementById('artist') as HTMLInputElement;
-    const categoryEl = document.getElementById('category') as HTMLSelectElement;
+    const categoryEl = singleChoice([...document.querySelectorAll<HTMLInputElement>('input[name="category"]')]);
     const datalist = document.getElementById('song-titles')!;
     const matchNote = document.getElementById('match-note')!;
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
