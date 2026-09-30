@@ -16,7 +16,7 @@ create type clear_lamp as enum ('CLEAR', 'FULL_COMBO', 'ALL_PERFECT');
 create table songs (
   id serial primary key,
   -- Title as shown in-game / on the official JP site. Also the identity used
-  -- by the import script, so it must stay unique.
+  -- by the catalog import script, so it must stay unique.
   title_jp text not null unique,
   title_en text,
   artist_jp text,
@@ -27,11 +27,10 @@ create table songs (
   music_en text,
   arrangement_jp text,
   arrangement_en text,
-  -- 'original' / 'cover' per the official music page, or set from
-  -- /settings/holodori/song (e.g. for songs only in the level sheet); null
-  -- when not set.
+  -- 'original' / 'cover', from catalog.json or /settings/holodori/song;
+  -- null when not set.
   category text check (category in ('original', 'cover')),
-  -- Position on the official music page (null for sheet-only songs).
+  -- Position on the official music page (null for songs not listed there).
   official_order integer,
   -- Jackets are linked on the official CDN, not self-hosted.
   jacket_asset_id text,
