@@ -33,7 +33,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       <p id="jacket-note" class="hd-jacket-note"></p>
     </div>
     <fieldset class="choice-picker">
-      <legend>Song type <span class="hd-optional">(click again to unset)</span></legend>
+      <legend>Song type <span class="hd-optional">(required)</span></legend>
       <label><input type="checkbox" name="category" value="original" /><span>Original</span></label>
       <label><input type="checkbox" name="category" value="cover" /><span>Cover</span></label>
     </fieldset>
@@ -361,6 +361,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       if (!supabase) return;
       const titleJp = titleEl.value.trim();
       if (!titleJp) return;
+      if (!categoryEl.value) {
+        status.textContent = 'Pick a song type: Original or Cover.';
+        return;
+      }
       const levels = levelInputs.map((input) => ({ difficulty: input.dataset.difficulty!, level: input.value ? Number(input.value) : null }));
       if (levels.some((l) => l.level != null && (!Number.isInteger(l.level) || l.level < 1 || l.level > 99))) {
         status.textContent = 'Levels must be whole numbers from 1 to 99.';
@@ -384,9 +388,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       if (titleEnEl.value.trim()) songFields.title_en = titleEnEl.value.trim();
       if (artistEl.value.trim()) songFields.artist_en = artistEl.value.trim();
       if (jacketUrl && jacketUrl !== match?.jacketUrl) songFields.jacket_url = jacketUrl;
-      // Song type is shown pre-filled, so save it whenever it changed (incl. back to not set).
-      const category = categoryEl.value || null;
-      if (category !== (match?.category ?? null)) songFields.category = category;
+      // Song type is required and shown pre-filled, so save it whenever it changed.
+      const category = categoryEl.value;
+      if (category !== match?.category) songFields.category = category;
       // A name typed but not yet added with Enter/Add still counts.
       if (memberInput.value.trim()) addMember();
       // Members are shown pre-filled, so save them whenever they differ from
@@ -429,9 +433,13 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
         undoBtn.disabled = true;
         status.textContent = 'Undoing...';
         let err: string | undefined;
+        // RLS turns a delete the account may not make into a silent no-op, so
+        // deletes ask for the removed rows back and treat none as a failure.
+        const noRows = 'nothing was deleted (run db/holodori/migrations/0005_owner_song_deletes.sql)';
         if (!prev) {
-          err = (await supabase.from('charts').delete().eq('song_id', songId)).error?.message
-            ?? (await supabase.from('songs').delete().eq('id', songId)).error?.message;
+          // Charts, and any scores entered since, go with the song (on delete cascade).
+          const { data, error } = await supabase.from('songs').delete().eq('id', songId).select('id');
+          err = error?.message ?? (data?.length ? undefined : noRows);
         } else {
           const restore: Record<string, unknown> = {};
           if ('title_en' in songFields) restore.title_en = prev.titleEn;
@@ -443,7 +451,10 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
           const back = changedDiffs.filter((d) => d in prev.levels).map((d) => ({ song_id: songId, difficulty: d, level: prev.levels[d] }));
           const gone = changedDiffs.filter((d) => !(d in prev.levels));
           if (!err && back.length) err = (await supabase.from('charts').upsert(back, { onConflict: 'song_id,difficulty' })).error?.message;
-          if (!err && gone.length) err = (await supabase.from('charts').delete().eq('song_id', songId).in('difficulty', gone)).error?.message;
+          if (!err && gone.length) {
+            const { data, error } = await supabase.from('charts').delete().eq('song_id', songId).in('difficulty', gone).select('id');
+            err = error?.message ?? (data?.length ? undefined : noRows);
+          }
         }
         undoBtn.disabled = false;
         if (err) { status.textContent = `Undo failed: ${err}`; return; }
@@ -460,6 +471,12 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
 
     undoBtn.addEventListener('click', () => undoAction?.());
 
-    load();
+    // ?song=<title_jp> (the Edit link on /settings/holodori/songs) opens that song.
+    load().then(() => {
+      const song = new URLSearchParams(location.search).get('song');
+      if (!song) return;
+      titleEl.value = song;
+      titleEl.dispatchEvent(new Event('input'));
+    });
   </script>
 </Layout>

@@ -26,6 +26,11 @@ const game: GameDefinition = {
       title: 'Add / Edit a Song',
       description: 'Add a new song with its difficulty levels, or edit an existing one (levels, song type, members).',
     },
+    {
+      href: '/settings/holodori/songs',
+      title: 'Edit Song Database',
+      description: 'Every song in the catalog: remove songs, and find ones missing a song type or member.',
+    },
   ],
 };
 
