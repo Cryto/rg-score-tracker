@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '@/layouts/Layout.astro';
 ---
 <Layout title="Bulk Import Scores" showLogout={true} showHome={true} settingsMode={true}>
   <a href="/settings" class="back-link">← Back to Settings</a>
@@ -28,7 +28,7 @@ SAMPLE SONG,SP,A,1234,CLEAR,15"></textarea>
   <div id="results" style="margin-top:1.5rem;"></div>
 
   <script>
-    import { requireSupabase } from '../../lib/supabase';
+    import { requireSupabase } from '@/lib/supabase';
 
     const supabase = requireSupabase('iidx');
 

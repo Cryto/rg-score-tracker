@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from '@/layouts/Layout.astro';
 ---
 <Layout title="IIDX Score Tracker">
   <div class="page-header">
@@ -139,10 +139,10 @@ import Layout from '../layouts/Layout.astro';
   <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
 
   <script>
-    import { requireSupabase } from '../lib/supabase';
-    import { computeGrade, LAMP_LABELS } from '../lib/grade';
-    import { searchKey } from '../lib/search';
-    import { loadAttempts, historyHtml } from '../lib/history';
+    import { requireSupabase } from '@/lib/supabase';
+    import { computeGrade, LAMP_LABELS } from '../grade';
+    import { searchKey } from '@/lib/search';
+    import { loadAttempts, historyHtml } from '@/lib/history';
 
     const supabase = requireSupabase('iidx');
 

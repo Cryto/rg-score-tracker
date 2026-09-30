@@ -1,5 +1,5 @@
 -- Run in the Supabase SQL Editor if your database predates this migration.
--- New forks running the current db/schema.sql from scratch don't need this.
+-- New forks running the current db/iidx/schema.sql from scratch don't need this.
 --
 -- Tracks which versions a chart was actually playable in (handles charts
 -- removed from rotation and later reinstated), powering the "Playable in"

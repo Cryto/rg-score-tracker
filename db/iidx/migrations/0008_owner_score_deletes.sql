@@ -1,6 +1,6 @@
 -- Run in the Supabase SQL Editor if your database predates this migration
 -- (with your real UUID substituted for <OWNER_UUID> -- never commit that).
--- New forks running the current db/schema.sql from scratch still need to
+-- New forks running the current db/iidx/schema.sql from scratch still need to
 -- run these statements manually, same as the other owner policies.
 --
 -- Lets the owner remove a score and delete individual attempts from the

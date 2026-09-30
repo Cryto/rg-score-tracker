@@ -11,7 +11,7 @@ song data.
   titles, levels, note counts, etc.
 - **Scores** (`scores`) is one row per chart, holding your personal best. Each
   field (EX score, clear lamp, miss count) only ever improves when you submit a
-  new play — see the `ratchet_score()` trigger in [`db/schema.sql`](db/schema.sql).
+  new play — see the `ratchet_score()` trigger in [`db/iidx/schema.sql`](db/iidx/schema.sql).
 - Reads are public to everyone; writes require logging in as the site owner
   (enforced by Postgres Row Level Security, not by hiding an API key).
 
@@ -20,27 +20,36 @@ song data.
 1. Create a [Supabase](https://supabase.com) project (free tier is fine).
 2. Copy `.env.example` to `.env` and fill in your project's URL and
    anon/publishable key (**Project Settings > API**).
-3. In the Supabase SQL Editor, run [`db/schema.sql`](db/schema.sql).
+3. In the Supabase SQL Editor, run [`db/iidx/schema.sql`](db/iidx/schema.sql).
 4. In **Authentication > Users**, add yourself as a user (email + password).
    Copy that user's UUID and replace the `<OWNER_UUID>` placeholders in
-   `db/schema.sql`'s policies, then re-run just those `create policy` statements.
+   `db/iidx/schema.sql`'s policies, then re-run just those `create policy` statements.
 5. `npm install`
 6. Populate the song catalog — see "Song data" below.
 7. `npm run dev`
 
 ## Games
 
-Each game lives in its own folder, `src/games/<id>/game.ts`, which sets its
-name, page, home-page card, settings links, and which env vars hold its
-Supabase project. The nav, home page, login, and settings list whatever game
-folders exist, and only games whose env vars are set (plus "coming soon"
-placeholders) are shown. Any game can be left unconfigured, so a fork can run
-just one game.
+Everything specific to one game lives in its own folders:
 
-- **Add a game:** copy `src/games/djmax/game.ts` as a starting point, then add
-  its page under `src/pages/`.
-- **Remove a game:** leave its env vars unset, or delete its folder under
-  `src/games/` along with its pages.
+```
+src/games/<id>/game.ts   name, home-page card, settings links, Supabase env vars
+src/games/<id>/pages/    the game's pages, laid out like src/pages/
+                         (pages/settings/<id>/new.astro serves /settings/<id>/new)
+src/games/<id>/*.ts      game-only helpers (grading, difficulty names, ...)
+db/<id>/                 the game's Supabase schema, migrations, and import scripts
+```
+
+The shared site (home page, nav, login, settings index, `src/lib/`) lists
+whatever game folders exist, and only shows games whose env vars are set (plus
+"coming soon" placeholders). Game pages import shared code as `@/lib/...` and
+`@/layouts/...`.
+
+- **Run only some games:** leave the other games' env vars unset. To drop a
+  game from your fork entirely, delete `src/games/<id>/` and `db/<id>/`.
+- **Add a game:** start from `src/games/djmax/` (a coming-soon placeholder with
+  one page), give it a Supabase project and env vars in `game.ts`, and add its
+  schema under `db/<id>/`.
 
 ## Song data
 
@@ -51,7 +60,7 @@ publicly writable.
 
 ### Importing from iidx-db
 
-[`db/import/import-iidx-db.mjs`](db/import/import-iidx-db.mjs) imports the
+[`db/iidx/import/import-iidx-db.mjs`](db/iidx/import/import-iidx-db.mjs) imports the
 song/chart catalog from [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db)
 (MIT licensed), whose data is extracted directly from IIDX Infinitas via
 [Reflux](https://github.com/olji/Reflux) — i.e. sourced from the game itself,
@@ -61,8 +70,8 @@ left unset since Infinitas' internal folder grouping doesn't map cleanly to
 arcade version numbers yet.
 
 ```sh
-curl -L -o db/import/songs.tsv https://media.githubusercontent.com/media/vanHavel/iidx-db/master/raw_data/songs.tsv
-node --env-file=.env db/import/import-iidx-db.mjs db/import/songs.tsv
+curl -L -o db/iidx/import/songs.tsv https://media.githubusercontent.com/media/vanHavel/iidx-db/master/raw_data/songs.tsv
+node --env-file=.env db/iidx/import/import-iidx-db.mjs db/iidx/import/songs.tsv
 ```
 
 Requires `SUPABASE_SERVICE_ROLE_KEY` in your `.env` (never commit this key,

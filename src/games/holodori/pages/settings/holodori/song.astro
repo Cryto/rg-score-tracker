@@ -1,6 +1,6 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/holodori';
+import Layout from '@/layouts/Layout.astro';
+import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../holodori';
 ---
 <Layout title="Add / Edit Hololive Dreams Song" showLogout={true} showHome={true} settingsMode={true}>
   <a href="/settings" class="back-link">← Back to Settings</a>
@@ -105,9 +105,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../lib/ho
   </style>
 
   <script>
-    import { getSupabase } from '../../lib/supabase';
-    import { DIFFICULTIES, GROUP_NAMES } from '../../lib/holodori';
-    import { searchKey } from '../../lib/search';
+    import { getSupabase } from '@/lib/supabase';
+    import { DIFFICULTIES, GROUP_NAMES } from '../../../holodori';
+    import { searchKey } from '@/lib/search';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;

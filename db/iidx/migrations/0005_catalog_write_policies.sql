@@ -1,6 +1,6 @@
 -- Run in the Supabase SQL Editor if your database predates this migration
 -- (with your real UUID substituted for <OWNER_UUID> -- never commit that).
--- New forks running the current db/schema.sql from scratch still need to
+-- New forks running the current db/iidx/schema.sql from scratch still need to
 -- run these two statements manually, same as the existing scores policies.
 --
 -- Lets the owner insert/update songs and charts from the browser (the new

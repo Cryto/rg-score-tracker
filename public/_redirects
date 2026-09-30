@@ -9,3 +9,11 @@ https://iidx.cryto.dev/*                https://rg.cryto.dev/:splat     301!
 # Renamed game pages.
 /hololive-dreams  /holodori/  301!
 /djmax-respect-v  /djmax/     301!
+
+# Settings pages moved under each game's own path.
+/settings/new             /settings/iidx/new             301!
+/settings/import          /settings/iidx/import          301!
+/settings/import-json     /settings/iidx/import-json     301!
+/settings/catalog-import  /settings/iidx/catalog-import  301!
+/settings/holodori-new    /settings/holodori/new         301!
+/settings/holodori-song   /settings/holodori/song        301!

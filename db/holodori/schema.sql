@@ -1,6 +1,6 @@
 -- rg-score-tracker: hololive Dreams ("Holodori") schema.
 -- Run this in the SQL Editor of the *Holodori* Supabase project -- each game
--- lives in its own project, separate from IIDX's db/schema.sql.
+-- lives in its own project, separate from IIDX's db/iidx/schema.sql.
 --
 -- Before running the RLS policies at the bottom, create the owner login in
 -- this project too (Authentication > Users > Add user, same email/password as
@@ -37,7 +37,7 @@ create table songs (
   jacket_url text,
   -- Individual members related to the song, separate from the credit above
   -- (e.g. a FUWAMOCO song lists Fuwawa and Mococo). Powers the Member filter
-  -- alongside individual names in the credit; set from /settings/holodori-song.
+  -- alongside individual names in the credit; set from /settings/holodori/song.
   members text[]
 );
 
@@ -193,7 +193,7 @@ for each row execute function recompute_score_after_attempt_delete();
 -- Row Level Security: anyone can read, only the owner account can write.
 -- The import script writes the catalog with the service-role key (bypassing
 -- RLS); the owner policies on songs/charts let the owner also add songs and
--- edit levels from the browser (/settings/holodori-song).
+-- edit levels from the browser (/settings/holodori/song).
 alter table songs enable row level security;
 alter table charts enable row level security;
 alter table scores enable row level security;
