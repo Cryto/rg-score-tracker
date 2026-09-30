@@ -24,6 +24,13 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     <label>Credited singer / unit <span class="hd-optional">(optional)</span>
       <input id="artist" type="text" autocomplete="off" />
     </label>
+    <label>Song type
+      <select id="category">
+        <option value="">Not set</option>
+        <option value="original">Original</option>
+        <option value="cover">Cover</option>
+      </select>
+    </label>
     <div class="hd-members" id="members-field">
       <label for="member-input">Members <span class="hd-optional">(optional — individual members in this song)</span></label>
       <div id="member-chips" class="hd-chips"></div>
@@ -48,8 +55,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     <button type="button" id="undo-btn" style="display:none; align-self:flex-start;">Undo</button>
     <p style="color: var(--text-dim); font-size: 0.85rem;">
       Blank fields are left as they are when editing an existing song. Edits made here survive
-      re-running the catalog import script, which only fills in missing titles, singers and levels
-      (unless run with <code>--force</code>).
+      re-running the catalog import script, which only fills in missing titles, singers, song types
+      and levels (unless run with <code>--force</code>).
     </p>
   </form>
 
@@ -115,13 +122,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     const titleEl = document.getElementById('title') as HTMLInputElement;
     const titleEnEl = document.getElementById('title-en') as HTMLInputElement;
     const artistEl = document.getElementById('artist') as HTMLInputElement;
+    const categoryEl = document.getElementById('category') as HTMLSelectElement;
     const datalist = document.getElementById('song-titles')!;
     const matchNote = document.getElementById('match-note')!;
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
     const status = document.getElementById('status')!;
     const levelInputs = [...document.querySelectorAll<HTMLInputElement>('[data-difficulty]')];
 
-    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; artistEn: string | null; members: string[]; levels: Record<string, number | null> };
+    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; artistEn: string | null; category: string | null; members: string[]; levels: Record<string, number | null> };
     let existing = new Map<string, ExistingSong>();
     let match: ExistingSong | null = null;
 
@@ -181,7 +189,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     }
 
     function clearForm() {
-      titleEl.value = titleEnEl.value = artistEl.value = memberInput.value = '';
+      titleEl.value = titleEnEl.value = artistEl.value = memberInput.value = categoryEl.value = '';
       for (const input of levelInputs) input.value = '';
       members = [];
       match = null;
@@ -210,14 +218,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       });
       let { data, error } = await supabase
         .from('songs')
-        .select('id, title_jp, title_en, artist_jp, artist_en, members, charts ( difficulty, level )');
+        .select('id, title_jp, title_en, artist_jp, artist_en, category, members, charts ( difficulty, level )');
       // Database without migration 0002: work without members.
       if (error && /members/.test(error.message)) {
         membersSupported = false;
         membersField.style.display = 'none';
         ({ data, error } = await supabase
           .from('songs')
-          .select('id, title_jp, title_en, artist_jp, artist_en, charts ( difficulty, level )'));
+          .select('id, title_jp, title_en, artist_jp, artist_en, category, charts ( difficulty, level )'));
       }
       if (error) {
         status.textContent = `Failed to load songs: ${error.message}`;
@@ -228,7 +236,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       existing = new Map();
       const songsList: ExistingSong[] = (data ?? []).map((s: any) => ({
         id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artist: s.artist_en ?? s.artist_jp, artistEn: s.artist_en,
-        members: s.members ?? [],
+        category: s.category, members: s.members ?? [],
         levels: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, c.level])),
       }));
       for (const s of songsList) {
@@ -257,6 +265,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
         titleEnEl.placeholder = match.titleEn ?? '';
         artistEl.placeholder = match.artist ?? '';
         for (const input of levelInputs) input.value = match.levels[input.dataset.difficulty!]?.toString() ?? '';
+        categoryEl.value = match.category ?? '';
         members = [...match.members];
         const credited = splitCredit(match.artist).filter((n) => !GROUP_NAMES.has(n));
         membersNote.textContent = credited.length
@@ -267,6 +276,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
         matchNote.textContent = titleEl.value.trim() ? 'New song.' : '';
         titleEnEl.placeholder = artistEl.placeholder = '';
         for (const input of levelInputs) input.value = '';
+        categoryEl.value = '';
         members = [];
         membersNote.textContent = '';
         submitBtn.textContent = 'Add Song';
@@ -293,6 +303,9 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       const songFields: Record<string, unknown> = {};
       if (titleEnEl.value.trim()) songFields.title_en = titleEnEl.value.trim();
       if (artistEl.value.trim()) songFields.artist_en = artistEl.value.trim();
+      // Song type is shown pre-filled, so save it whenever it changed (incl. back to not set).
+      const category = categoryEl.value || null;
+      if (category !== (match?.category ?? null)) songFields.category = category;
       // A name typed but not yet added with Enter/Add still counts.
       if (memberInput.value.trim()) addMember();
       // Members are shown pre-filled, so save them whenever they differ from
@@ -342,6 +355,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
           const restore: Record<string, unknown> = {};
           if ('title_en' in songFields) restore.title_en = prev.titleEn;
           if ('artist_en' in songFields) restore.artist_en = prev.artistEn;
+          if ('category' in songFields) restore.category = prev.category;
           if ('members' in songFields) restore.members = prev.members.length ? prev.members : null;
           if (Object.keys(restore).length) err = (await supabase.from('songs').update(restore).eq('id', songId)).error?.message;
           const back = changedDiffs.filter((d) => d in prev.levels).map((d) => ({ song_id: songId, difficulty: d, level: prev.levels[d] }));

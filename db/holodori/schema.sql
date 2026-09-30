@@ -27,8 +27,9 @@ create table songs (
   music_en text,
   arrangement_jp text,
   arrangement_en text,
-  -- 'original' / 'cover' per the official music page; null for songs that
-  -- only come from the level sheet (not listed on the official site).
+  -- 'original' / 'cover' per the official music page, or set from
+  -- /settings/holodori/song (e.g. for songs only in the level sheet); null
+  -- when not set.
   category text check (category in ('original', 'cover')),
   -- Position on the official music page (null for sheet-only songs).
   official_order integer,

@@ -24,7 +24,7 @@ const game: GameDefinition = {
     {
       href: '/settings/holodori/song',
       title: 'Add / Edit a Song',
-      description: 'Add a new song with its difficulty levels, or fix levels on an existing one.',
+      description: 'Add a new song with its difficulty levels, or edit an existing one (levels, song type, members).',
     },
   ],
 };

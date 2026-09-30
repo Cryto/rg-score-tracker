@@ -5,12 +5,12 @@
 // rows that actually differ are written. Songs no longer in the source files
 // are left alone, never deleted, and `members` is never touched.
 //
-// Fields also edited outside these files (title_en, artist_en, jacket_url,
-// chart levels) are only filled in where the DB has none, so those edits
-// survive a re-import; where the DB and the files disagree, the DB value is
-// kept and counted. --force overwrites those with the files' values instead.
-// Other official-site fields (credits, category, order) always follow the
-// files. TITLE_RENAMES maps source titles to songs renamed in the DB, since
+// Fields also edited outside these files (title_en, artist_en, category,
+// jacket_url, chart levels) are only filled in where the DB has none, so
+// those edits survive a re-import; where the DB and the files disagree, the
+// DB value is kept and counted. --force overwrites those with the files'
+// values instead. Other official-site fields (credits, order) always follow
+// the files. TITLE_RENAMES maps source titles to songs renamed in the DB, since
 // title_jp is the identity a re-import matches on.
 //
 // Requires in .env (never commit the service-role key):
@@ -62,7 +62,7 @@ export function buildCatalog() {
 }
 
 // Also edited outside the source files: filled in where empty, never overwritten without --force.
-const EDITABLE_FIELDS = ['title_en', 'artist_en', 'jacket_url'];
+const EDITABLE_FIELDS = ['title_en', 'artist_en', 'category', 'jacket_url'];
 
 /**
  * Works out the writes needed to bring the DB in line with the catalog.
