@@ -298,8 +298,15 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         flex: 1;
         min-width: 0;
       }
+      /* clip, not auto: a scroll container would pin the sticky header row to
+         itself instead of the page. The fixed-layout table never overflows. */
       .table-scroll {
-        overflow-x: auto;
+        overflow-x: clip;
+      }
+      /* Header row sticks just under the sticky nav + search toolbar. */
+      .table-scroll thead th {
+        top: calc(var(--header-sticky-height, 0px) + var(--toolbar-height, 0px));
+        z-index: 5;
       }
       .col-chart { width: 90px; }
       .col-ex { width: 90px; }
@@ -309,6 +316,13 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       .show-mobile, .expand-row .show-mobile { display: none; }
       .stats-scroll { overflow-x: auto; }
       .pivot-table { table-layout: auto; }
+      /* Row labels stay put while a wide pivot table scrolls sideways. */
+      .pivot-table tr > :first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background: var(--bg);
+      }
       .sidebar-close-btn { display: none; }
       .song-row {
         cursor: pointer;
@@ -392,7 +406,7 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         .sm-delete:hover { color: #ff9a9a; border-color: #8a3a3a; }
       }
       .sm-note { margin: 0.6rem 0 0; color: var(--text-dim); min-height: 1.2em; }
-      select, input, button {
+      select, input, textarea, button {
         background: var(--surface);
         border: 1px solid var(--border);
         color: var(--text);
@@ -512,15 +526,29 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
           font-size: 0.9rem;
           scrollbar-width: none;
         }
+        .app-nav.more-right {
+          mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+        }
         /* iOS Safari zooms the page into any focused field under 16px. */
         select, input, textarea { font-size: 16px; }
         .hide-mobile { display: none; }
         .expand-row .show-mobile { display: inline-block; }
         table { font-size: 0.85rem; }
         .col-chart { width: 64px; }
-        .col-grade { width: 56px; }
-        .col-lamp { width: 100px; }
+        .col-grade { width: 60px; }
+        .col-lamp { width: 92px; }
         th, td { padding: 0.4rem 0.35rem; }
+        /* Long lamps ("EX Hard Clear") wrap instead of being cut off. */
+        #chart-table td:nth-child(5) { white-space: normal; }
+        .pivot-table th, .pivot-table td { padding: 0.35rem 0.3rem; }
+        /* Stack each field under its label, full width, instead of wrapping
+           beside it at whatever width is left over. */
+        form > label > input:not([type="checkbox"]):not([type="radio"]),
+        form > label > select {
+          display: block;
+          width: 100%;
+          margin-top: 0.3rem;
+        }
         .filters-sidebar { height: 100dvh; overscroll-behavior: contain; }
         .sidebar-close-btn {
           display: block;
@@ -604,6 +632,29 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
       }
       updateHeaderHeights();
       window.addEventListener('resize', updateHeaderHeights);
+
+      // Pages with a sticky search toolbar stack their column headers under it.
+      const toolbar = document.querySelector('.table-toolbar') as HTMLElement | null;
+      if (toolbar) {
+        new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-height', `${toolbar.offsetHeight}px`)).observe(toolbar);
+      }
+
+      // On phones the game links scroll sideways; fade the right edge while
+      // some are still off-screen, and bring the current game's link into view.
+      const appNav = document.querySelector('.app-nav') as HTMLElement;
+      const current = [...appNav.querySelectorAll('a')].find((a) => a.pathname === location.pathname);
+      if (current) {
+        current.setAttribute('aria-current', 'page');
+        const navBox = appNav.getBoundingClientRect();
+        const linkBox = current.getBoundingClientRect();
+        if (linkBox.right > navBox.right) appNav.scrollLeft += linkBox.left - navBox.left - 16;
+      }
+      function updateNavFade() {
+        appNav.classList.toggle('more-right', appNav.scrollLeft + appNav.clientWidth < appNav.scrollWidth - 1);
+      }
+      updateNavFade();
+      appNav.addEventListener('scroll', updateNavFade, { passive: true });
+      window.addEventListener('resize', updateNavFade);
       // Which bars are sticky flips at the mobile breakpoint.
       window.matchMedia('(max-width: 768px)').addEventListener('change', updateHeaderHeights);
     </script>

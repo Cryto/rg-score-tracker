@@ -166,6 +166,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
       grid-template-columns: auto minmax(0, 1fr) auto;
       grid-template-areas: "level score dot" "level grade dot";
       column-gap: 0.45rem;
+      /* Room for the grade badge's thick outline below the score. */
+      row-gap: 0.2rem;
       align-items: center;
       padding: 0.35rem 0.45rem;
       border-radius: 6px;
@@ -354,10 +356,6 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
     document.getElementById('filters-toggle-btn')!.addEventListener('click', () => setSidebarOpen(!filtersSidebarEl.classList.contains('open')));
     sidebarBackdropEl.addEventListener('click', () => setSidebarOpen(false));
     document.getElementById('sidebar-close-btn')!.addEventListener('click', () => setSidebarOpen(false));
-
-    // Keep the column header stuck just under the sticky search toolbar.
-    const toolbarEl = document.querySelector('.table-toolbar') as HTMLElement;
-    new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-height', `${toolbarEl.offsetHeight}px`)).observe(toolbarEl);
 
     function escapeHtml(s: string) {
       return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
