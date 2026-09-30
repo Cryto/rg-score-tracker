@@ -1,108 +1,251 @@
-# rg-score-tracker
+<div align="center">
 
-A personal rhythm-game score tracker, starting with beatmania IIDX. Built with
-[Astro](https://astro.build) (fully static) and [Supabase](https://supabase.com)
-(Postgres + auth). Designed to be forked — plug in your own Supabase project and
-song data.
+# 🎵 rg-score-tracker
 
-## How it works
+**A personal, self-hosted score tracker for rhythm games.**
 
-- **Song/chart catalog** (`versions`, `songs`, `charts`) is public read-only data:
-  titles, levels, note counts, etc.
-- **Scores** (`scores`) is one row per chart, holding your personal best. Each
-  field (EX score, clear lamp, miss count) only ever improves when you submit a
-  new play — see the `ratchet_score()` trigger in [`db/iidx/schema.sql`](db/iidx/schema.sql).
-- Reads are public to everyone; writes require logging in as the site owner
-  (enforced by Postgres Row Level Security, not by hiding an API key).
+Log your personal bests, see every past attempt, and share a read-only page of your scores.
 
-## Setup
+[![Live site](https://img.shields.io/badge/live-rg.cryto.dev-8b5cf6?style=flat-square)](https://rg.cryto.dev)
+[![Astro](https://img.shields.io/badge/Astro-static-ff5d01?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ecf8e?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
+[![Netlify](https://img.shields.io/badge/deploys%20on-Netlify-00c7b7?style=flat-square&logo=netlify&logoColor=white)](https://www.netlify.com)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-1. Create a [Supabase](https://supabase.com) project (free tier is fine).
-2. Copy `.env.example` to `.env` and fill in your project's URL and
-   anon/publishable key (**Project Settings > API**).
-3. In the Supabase SQL Editor, run [`db/iidx/schema.sql`](db/iidx/schema.sql).
-4. In **Authentication > Users**, add yourself as a user (email + password).
-   Copy that user's UUID and replace the `<OWNER_UUID>` placeholders in
-   `db/iidx/schema.sql`'s policies, then re-run just those `create policy` statements.
-5. `npm install`
-6. Populate the song catalog — see "Song data" below.
-7. `npm run dev`
+[Features](#-features) ·
+[Games](#-games) ·
+[Quick start](#-quick-start) ·
+[Configuration](#-configuration) ·
+[Song data](#-song-data) ·
+[Forking](#-forking) ·
+[Project layout](#-project-layout)
 
-## Games
+</div>
 
-Everything specific to one game lives in its own folders:
+---
 
+## ✨ Features
+
+- **Personal bests that only go up.** Each chart keeps one best score. Every
+  field (score, clear lamp, miss count) is improved separately by a Postgres
+  trigger, so a new play never overwrites a better one.
+- **Full play history.** Every submission is kept as an attempt. Deleting a
+  mistyped attempt recomputes the best from the attempts that remain.
+- **Public to read, private to write.** Anyone can browse your scores; only
+  you can change them. That's enforced by Postgres Row Level Security, not by
+  hiding an API key.
+- **Several ways to enter scores.** Manual entry, bulk CSV paste, and (for
+  IIDX) a native JSON score export.
+- **Pick your games.** Each game is a self-contained add-on with its own
+  Supabase project. Run all of them, or fork and keep just one.
+- **Fully static.** Astro builds plain HTML/JS; the browser talks to Supabase
+  directly. No server to run.
+
+## 🎮 Games
+
+| Game | Status | Score entry | Catalog source |
+| --- | --- | --- | --- |
+| **beatmania IIDX** | ✅ Live | Manual, CSV, JSON export | [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db) (from Infinitas) |
+| **Hololive Dreams** | ✅ Live | Manual | Official music pages + a level sheet |
+| **DJMAX Respect V** | 🚧 Coming soon | — | — |
+
+## 🚀 Quick start
+
+**Requirements:** Node.js 22.12+ and a free [Supabase](https://supabase.com)
+account.
+
+```sh
+git clone https://github.com/Cryto/rg-score-tracker.git
+cd rg-score-tracker
+npm install
+cp .env.example .env
 ```
-src/games/<id>/game.ts   name, home-page card, settings links, Supabase env vars
-src/games/<id>/pages/    the game's pages, laid out like src/pages/
-                         (pages/settings/<id>/new.astro serves /settings/<id>/new)
-src/games/<id>/*.ts      game-only helpers (grading, difficulty names, ...)
-db/<id>/                 the game's Supabase schema, migrations, and import scripts
+
+Then set up a database for each game you want (you can skip any of them):
+
+<details>
+<summary><b>beatmania IIDX</b></summary>
+
+1. Create a Supabase project for IIDX.
+2. In **Authentication › Users**, add yourself as a user (email + password)
+   and copy its UUID.
+3. Open [`db/iidx/schema.sql`](db/iidx/schema.sql) in the **SQL Editor**,
+   replace every `<OWNER_UUID>` with your UUID, and run it.
+   Do the replacement in the SQL Editor only, never in the repo.
+4. Put the project's URL and anon/publishable key (**Project Settings › API**)
+   in `.env` as `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY`.
+5. Load the song catalog (see [Song data](#-song-data)).
+
+</details>
+
+<details>
+<summary><b>Hololive Dreams</b></summary>
+
+1. Create a **separate** Supabase project for Hololive Dreams.
+2. Add the same owner login as your other projects (same email and password),
+   so `/login` signs you in to every game at once. Copy its UUID.
+3. Open [`db/holodori/schema.sql`](db/holodori/schema.sql) in the
+   **SQL Editor**, replace every `<OWNER_UUID>` with your UUID, and run it.
+4. Put the URL and anon key in `.env` as `PUBLIC_SUPABASE_URL_HOLODORI` and
+   `PUBLIC_SUPABASE_ANON_KEY_HOLODORI`.
+5. Load the song catalog (see [Song data](#-song-data)).
+
+</details>
+
+Start the dev server:
+
+```sh
+npm run dev
 ```
 
-The shared site (home page, nav, login, settings index, `src/lib/`) lists
-whatever game folders exist, and only shows games whose env vars are set (plus
-"coming soon" placeholders). Game pages import shared code as `@/lib/...` and
-`@/layouts/...`.
+> [!NOTE]
+> If your database was created from an older schema, apply the files in
+> `db/<id>/migrations/` in order. A fresh install from the current
+> `schema.sql` doesn't need them.
 
-- **Run only some games:** leave the other games' env vars unset. To drop a
-  game from your fork entirely, delete `src/games/<id>/` and `db/<id>/`.
-- **Add a game:** start from `src/games/djmax/` (a coming-soon placeholder with
-  one page), give it a Supabase project and env vars in `game.ts`, and add its
-  schema under `db/<id>/`.
+## ⚙️ Configuration
 
-## Song data
+All settings live in `.env` (copy it from [`.env.example`](.env.example)).
+Astro only exposes variables prefixed with `PUBLIC_` to the browser.
 
-The `songs`/`charts` tables are populated separately from the app itself, since
-`songs`/`charts` have no public write policy (only `service_role` can write to
-them, bypassing RLS). This is intentional: catalog data should be curated, not
-publicly writable.
+| Variable | Used for | Required |
+| --- | --- | --- |
+| `PUBLIC_SUPABASE_URL` | IIDX project URL | To enable IIDX |
+| `PUBLIC_SUPABASE_ANON_KEY` | IIDX anon/publishable key | To enable IIDX |
+| `PUBLIC_SUPABASE_URL_HOLODORI` | Hololive Dreams project URL | To enable Hololive Dreams |
+| `PUBLIC_SUPABASE_ANON_KEY_HOLODORI` | Hololive Dreams anon/publishable key | To enable Hololive Dreams |
+| `SUPABASE_SERVICE_ROLE_KEY` | IIDX catalog import scripts | Locally, for imports only |
+| `SUPABASE_SERVICE_ROLE_KEY_HOLODORI` | Hololive Dreams catalog import script | Locally, for imports only |
+| `PUBLIC_SHOW_CRYTO_NAV` | The original author's cryto.dev header bar | ❌ Leave unset on forks |
 
-### Importing from iidx-db
+A game whose URL and key aren't set is simply turned off: it disappears from
+the nav, the home page, login and settings.
 
-[`db/iidx/import/import-iidx-db.mjs`](db/iidx/import/import-iidx-db.mjs) imports the
-song/chart catalog from [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db)
-(MIT licensed), whose data is extracted directly from IIDX Infinitas via
-[Reflux](https://github.com/olji/Reflux) — i.e. sourced from the game itself,
-not scraped from a third-party site. Coverage is whatever's currently in
-Infinitas' rotation, not the full arcade back catalog; `debut_version_id` is
-left unset since Infinitas' internal folder grouping doesn't map cleanly to
-arcade version numbers yet.
+> [!CAUTION]
+> Service role keys bypass Row Level Security entirely. Never commit them,
+> never put them in Netlify, and never give them a `PUBLIC_` prefix.
+
+## 📝 Entering scores
+
+The floating settings button (bottom-left) goes to `/login`, which forwards
+you to `/settings` once you're signed in. The settings hub lists each enabled
+game's tools:
+
+| Game | Page | What it does |
+| --- | --- | --- |
+| IIDX | `/settings/iidx/new` | Search a song/chart, enter EX score, lamp and miss count |
+| IIDX | `/settings/iidx/import` | Paste a CSV of scores matched by title, preview, then import |
+| IIDX | `/settings/iidx/import-json` | Upload a native score export, matched exactly by song ID |
+| IIDX | `/settings/iidx/catalog-import` | Add or update songs and charts (titles, levels, BPM and more) |
+| Hololive Dreams | `/settings/holodori/new` | Pick a song and difficulty, enter score and clear |
+| Hololive Dreams | `/settings/holodori/song` | Add or edit a song, its levels, song type and members |
+
+These pages aren't access-controlled themselves; the RLS policies in the
+database are the only write guard, and they only accept the owner's UUID.
+
+## 📚 Song data
+
+Songs and charts are curated data: the public can read them, but only the
+owner (through the settings pages) or the `service_role` key (through the
+scripts below) can write them.
+
+### beatmania IIDX
+
+[`db/iidx/import/import-iidx-db.mjs`](db/iidx/import/import-iidx-db.mjs)
+imports the catalog from [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db)
+(MIT), whose data is extracted from IIDX Infinitas via
+[Reflux](https://github.com/olji/Reflux), so it comes from the game itself
+rather than a scraped fan site.
 
 ```sh
 curl -L -o db/iidx/import/songs.tsv https://media.githubusercontent.com/media/vanHavel/iidx-db/master/raw_data/songs.tsv
 node --env-file=.env db/iidx/import/import-iidx-db.mjs db/iidx/import/songs.tsv
 ```
 
-Requires `SUPABASE_SERVICE_ROLE_KEY` in your `.env` (never commit this key,
-never expose it to the browser — it bypasses RLS entirely). The script is
-idempotent: re-running it after the source data updates just upserts changes,
-matched by iidx-db's own song ID (`songs.external_id`).
+- Re-running is safe: rows are upserted by iidx-db's own song ID
+  (`songs.external_id`).
+- Coverage is whatever is in Infinitas' current rotation, not the full arcade
+  back catalog, and `debut_version_id` is left unset.
+- [`backfill-romaji.mjs`](db/iidx/import/backfill-romaji.mjs) fills in missing
+  English titles with automatic romaji. Treat its output as a starting point
+  and spot-check it.
 
-### Other sources
+**Other sources:** write a script that produces one row per song plus a list
+of `{ playStyle: 'SP' | 'DP', difficulty: 'B'|'N'|'H'|'A'|'L', level, noteCount }`
+per chart, and upsert it with the Supabase JS client using the service role key.
 
-To import from anywhere else, write a script that maps your source into the
-same shape the importer above produces — one row per song plus a list of
-`{ playStyle: 'SP' | 'DP', difficulty: 'B'|'N'|'H'|'A'|'L', level, noteCount }`
-per chart — and upserts via the Supabase JS client with the service role key.
+### Hololive Dreams
 
-## Score entry
+The catalog is two committed files: [`songs.json`](db/holodori/songs.json)
+(from the official music pages) and [`levels.csv`](db/holodori/levels.csv)
+(chart levels).
 
-- **Manual**: `/settings/new` — search a song/chart, enter EX score / lamp / miss count.
-- **Bulk CSV**: `/settings/import` — paste a CSV (see column format on that page),
-  preview matches against the catalog, then import.
+```sh
+node db/holodori/fetch-official-songs.mjs              # refresh songs.json
+node db/holodori/import-levels-sheet.mjs sheet.csv     # rebuild levels.csv from a level sheet
+node --env-file=.env db/holodori/import-catalog.mjs --dry-run   # preview
+node --env-file=.env db/holodori/import-catalog.mjs             # load into Supabase
+```
 
-These routes aren't in the main site nav — the floating settings button
-(bottom-left) links to `/login`, which redirects to `/settings` (a hub linking
-to both pages above) once you're signed in, or skips straight there if you're
-already logged in. They aren't access-controlled beyond that — the Postgres
-RLS policies on `scores` remain the only write guard.
+The import is idempotent and never deletes songs. Values you've edited in the
+browser (English titles, song type, jacket, levels) are kept unless you pass
+`--force`.
 
-## Branding
+## 🍴 Forking
 
-By default the app is unbranded — just its own dark theme, no references to
-the original author's site. Setting `PUBLIC_SHOW_CRYTO_NAV=true` in `.env`
-adds a cryto.dev-branded header bar (`src/components/CrytoNav.astro`) above
-the app's own nav; this only makes sense for the canonical deployment at
-[rg.cryto.dev](https://rg.cryto.dev). Leave it unset on a fork, or delete
-`CrytoNav.astro` entirely if you don't need the toggle.
+The site is built to be forked, including for just one game.
+
+1. **Keep only the games you want.** Leave the other games' env vars unset, or
+   delete their `src/games/<id>/` and `db/<id>/` folders. Nothing else needs
+   editing; the shared site finds games automatically.
+2. **Leave `PUBLIC_SHOW_CRYTO_NAV` unset.** By default the app is unbranded.
+   That flag adds the original author's cryto.dev header bar
+   ([`CrytoNav.astro`](src/components/CrytoNav.astro)) and only makes sense
+   on [rg.cryto.dev](https://rg.cryto.dev).
+3. **Trim [`public/_redirects`](public/_redirects).** The `iidx.cryto.dev`
+   rules are for the original deployment's old domain.
+4. **Deploy on Netlify.** Build command `npm run build`, publish directory
+   `dist`, and add your `PUBLIC_…` variables under **Site configuration ›
+   Environment variables**. They're read at build time, so redeploy after
+   changing them.
+
+### Adding a game
+
+Start from [`src/games/djmax/`](src/games/djmax), the smallest example (a
+coming-soon placeholder with one page):
+
+1. Fill in `game.ts`: name, route, home-card picture, Supabase env vars and
+   settings links (see [`src/games/types.ts`](src/games/types.ts)).
+2. Add pages under `src/games/<id>/pages/`, laid out like `src/pages/`.
+3. Add the schema, migrations and import scripts under `db/<id>/`.
+4. Add the new env vars to `.env.example`.
+
+## 🗂️ Project layout
+
+```
+src/
+├── pages/                 shared pages: home, login, settings hub
+├── layouts/Layout.astro   shared layout, nav and theme
+├── components/            GameNav, CrytoNav
+├── lib/                   shared helpers (Supabase client, search, history, …)
+└── games/
+    ├── index.ts           finds every games/*/game.ts automatically
+    ├── types.ts           the GameDefinition shape
+    └── <id>/
+        ├── game.ts        name, route, home card, env vars, settings links
+        ├── pages/         the game's pages (pages/settings/<id>/new.astro → /settings/<id>/new)
+        └── *.ts           game-only helpers
+db/<id>/
+├── schema.sql             full schema for a fresh Supabase project
+├── migrations/            upgrades for databases made from older schemas
+└── …                      catalog import scripts and data
+game-pages.mjs             Astro integration that serves src/games/*/pages/
+```
+
+Game pages import shared code as `@/lib/...` and `@/layouts/...`.
+
+## 📄 License
+
+[MIT](LICENSE) © Cryto. Game names, artwork and song data belong to their
+respective owners; home-page pictures are hotlinked from each game's official
+site and never committed.
