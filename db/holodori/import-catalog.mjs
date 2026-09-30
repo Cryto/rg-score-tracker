@@ -1,68 +1,40 @@
-// Loads the Holodori catalog into its Supabase project: songs.json (official
-// song list) + levels.csv (per-chart levels, incl. sheet-only songs).
+// Loads the Holodori catalog (catalog.json, written from the original site's
+// database by export-catalog.mjs) into a Supabase project, e.g. a fork's.
 //
 // Idempotent: songs match on title_jp, charts on (song_id, difficulty); only
-// rows that actually differ are written. Songs no longer in the source files
-// are left alone, never deleted, and `members` is never touched.
+// rows that actually differ are written. Songs no longer in catalog.json are
+// left alone, never deleted, and scores are never touched.
 //
-// Fields also edited outside these files (title_en, artist_en, category,
-// jacket_url, chart levels) are only filled in where the DB has none, so
-// those edits survive a re-import; where the DB and the files disagree, the
-// DB value is kept and counted. --force overwrites those with the files'
-// values instead. Other official-site fields (credits, order) always follow
-// the files. TITLE_RENAMES maps source titles to songs renamed in the DB, since
-// title_jp is the identity a re-import matches on.
+// Fields also edited in the browser (title_en, artist_en, category,
+// jacket_url, members, chart levels) are only filled in where the DB has
+// none, so your own edits survive a re-import; where the DB and catalog.json
+// disagree, the DB value is kept and counted. --force overwrites those with
+// catalog.json's values instead. Other fields (credits, order, jacket asset)
+// always follow catalog.json.
 //
 // Requires in .env (never commit the service-role key):
 //   PUBLIC_SUPABASE_URL_HOLODORI, SUPABASE_SERVICE_ROLE_KEY_HOLODORI
 // Usage: node --env-file=.env db/holodori/import-catalog.mjs [--dry-run] [--force] [--verbose]
 //   --dry-run with the env vars set reads the DB and prints the plan; without
-//   them it only counts the source files. --verbose lists each kept value.
+//   them it only counts catalog.json. --verbose lists each kept value.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-import { parseCsv } from './csv.mjs';
+import { DIFFICULTIES, SONG_FIELDS, selectAll } from './catalog.mjs';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
-const DIFFICULTIES = ['EASY', 'NORMAL', 'HARD', 'EXPERT'];
-// Source title -> the title_jp the song has in the DB.
-const TITLE_RENAMES = {
-  '地獄で会おうぜ！ スバちょこるなたん': '地獄であおうぜ！スバちょこるなたん',
-};
-const renamed = (title) => TITLE_RENAMES[title] ?? title;
 
 /** Song rows plus each song's charts, keyed by title_jp. */
-export function buildCatalog() {
-  const official = JSON.parse(fs.readFileSync(path.join(DIR, 'songs.json'), 'utf8'));
-  const [header, ...rows] = parseCsv(fs.readFileSync(path.join(DIR, 'levels.csv'), 'utf8').trimStart() /* also strips the BOM */)
-    .filter((r) => r.some((f) => f.trim()));
-  const col = Object.fromEntries(header.map((h, i) => [h.trim(), i]));
-  const levelsByTitle = new Map(rows.map((r) => [renamed(r[col.title_jp]), DIFFICULTIES.map((d) => r[col[d.toLowerCase()]]?.trim() || null)]));
-
-  const songs = official.map((s) => ({
-    title_jp: renamed(s.title_jp), title_en: s.title_en,
-    artist_jp: s.artist_jp, artist_en: s.artist_en,
-    lyrics_jp: s.lyrics_jp, lyrics_en: s.lyrics_en,
-    music_jp: s.music_jp, music_en: s.music_en,
-    arrangement_jp: s.arrangement_jp, arrangement_en: s.arrangement_en,
-    category: s.category, official_order: s.order,
-    jacket_asset_id: s.jacket_asset_id, jacket_url: s.jacket_url,
-  }));
-  // Songs only in the level sheet (not on the official music page): title only.
-  const officialTitles = new Set(songs.map((s) => s.title_jp));
-  for (const title of levelsByTitle.keys()) {
-    if (!officialTitles.has(title)) songs.push({ title_jp: title });
-  }
-
-  const charts = new Map(songs.map((s) => [s.title_jp, DIFFICULTIES.map((difficulty, i) => {
-    const level = levelsByTitle.get(s.title_jp)?.[i];
-    return { difficulty, level: level == null ? null : Number(level) };
-  })]));
+export function buildCatalog(entries = JSON.parse(fs.readFileSync(path.join(DIR, 'catalog.json'), 'utf8'))) {
+  const songs = entries.map(({ levels, ...song }) => song);
+  const charts = new Map(entries.map((e) => [e.title_jp, DIFFICULTIES.map((difficulty) => ({
+    difficulty, level: e.levels?.[difficulty] ?? null,
+  }))]));
   return { songs, charts };
 }
 
-// Also edited outside the source files: filled in where empty, never overwritten without --force.
-const EDITABLE_FIELDS = ['title_en', 'artist_en', 'category', 'jacket_url'];
+// Also edited in the browser: filled in where empty, never overwritten without --force.
+const EDITABLE_FIELDS = ['title_en', 'artist_en', 'category', 'jacket_url', 'members'];
 
 /**
  * Works out the writes needed to bring the DB in line with the catalog.
@@ -71,7 +43,8 @@ const EDITABLE_FIELDS = ['title_en', 'artist_en', 'category', 'jacket_url'];
  * where new songs' charts are in newSongs[i].charts and kept lists DB values left in place.
  */
 export function planImport({ songs, charts }, existingSongs, existingCharts, { force = false } = {}) {
-  const same = (a, b) => (a ?? null) === (b ?? null);
+  // JSON so members arrays compare by value.
+  const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
   const songByTitle = new Map(existingSongs.map((s) => [s.title_jp, s]));
   const chartByKey = new Map(existingCharts.map((c) => [`${c.song_id}:${c.difficulty}`, c]));
   const plan = { newSongs: [], songUpdates: [], chartInserts: [], chartUpdates: [], kept: [] };
@@ -86,9 +59,9 @@ export function planImport({ songs, charts }, existingSongs, existingCharts, { f
     for (const [field, value] of Object.entries(song)) {
       if (field === 'title_jp' || same(existing[field], value)) continue;
       if (EDITABLE_FIELDS.includes(field)) {
-        if (value == null) continue; // the files having nothing never clears a DB value
+        if (value == null) continue; // catalog.json having nothing never clears a DB value
         if (existing[field] != null && !force) {
-          plan.kept.push({ title: song.title_jp, field, db: existing[field], file: value });
+          plan.kept.push({ title: song.title_jp, field, db: existing[field], catalog: value });
           continue;
         }
       }
@@ -102,7 +75,7 @@ export function planImport({ songs, charts }, existingSongs, existingCharts, { f
         plan.chartInserts.push({ song_id: existing.id, difficulty, level });
       } else if (level != null && !same(chart.level, level)) {
         if (chart.level != null && !force) {
-          plan.kept.push({ title: song.title_jp, field: `${difficulty} level`, db: chart.level, file: level });
+          plan.kept.push({ title: song.title_jp, field: `${difficulty} level`, db: chart.level, catalog: level });
         } else {
           plan.chartUpdates.push({ song_id: existing.id, difficulty, level });
         }
@@ -110,17 +83,6 @@ export function planImport({ songs, charts }, existingSongs, existingCharts, { f
     }
   }
   return plan;
-}
-
-/** Every row of a table (PostgREST caps a single response at 1000). */
-async function selectAll(supabase, table, columns) {
-  const rows = [];
-  for (let from = 0; ; from += 1000) {
-    const { data, error } = await supabase.from(table).select(columns).order('id').range(from, from + 999);
-    if (error) throw new Error(`${table}: ${error.message}`);
-    rows.push(...data);
-    if (data.length < 1000) return rows;
-  }
 }
 
 async function main() {
@@ -141,7 +103,7 @@ async function main() {
   const { createClient } = await import('@supabase/supabase-js');
   const supabase = createClient(url, key, { auth: { persistSession: false } });
 
-  const songColumns = ['id', ...new Set(songs.flatMap(Object.keys))].join(', ');
+  const songColumns = ['id', ...SONG_FIELDS].join(', ');
   const plan = planImport(
     catalog,
     await selectAll(supabase, 'songs', songColumns),
@@ -154,11 +116,11 @@ async function main() {
   for (const { title_jp, patch } of plan.songUpdates) console.log(`  update ${title_jp}: ${Object.keys(patch).join(', ')}`);
   for (const { song_id, difficulty, level } of plan.chartUpdates) console.log(`  level song ${song_id} ${difficulty} -> ${level}`);
   if (plan.kept.length) {
-    console.log(`Kept ${plan.kept.length} DB value(s) that differ from the files (--force to overwrite):`);
+    console.log(`Kept ${plan.kept.length} DB value(s) that differ from catalog.json (--force to overwrite):`);
     const byField = Map.groupBy(plan.kept, (k) => k.field);
     for (const [field, ks] of byField) console.log(`  ${field}: ${ks.length}`);
     if (process.argv.includes('--verbose')) {
-      for (const k of plan.kept) console.log(`  ${k.title} ${k.field}: DB ${JSON.stringify(k.db)}, files ${JSON.stringify(k.file)}`);
+      for (const k of plan.kept) console.log(`  ${k.title} ${k.field}: DB ${JSON.stringify(k.db)}, catalog.json ${JSON.stringify(k.catalog)}`);
     }
   }
   if (dryRun) return;

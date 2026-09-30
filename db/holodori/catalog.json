@@ -1,0 +1,3738 @@
+[
+  {
+    "title_jp": "Shiny Smily Story (2022 ver.)",
+    "title_en": "Shiny Smily Story (2022 ver.)",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "金丸佳史",
+    "lyrics_en": "Yoshifumi Kanamaru",
+    "music_jp": "中野領太",
+    "music_en": "Ryota Nakano",
+    "arrangement_jp": "秋浦智裕",
+    "arrangement_en": "Tomohiro Akiura",
+    "category": "original",
+    "official_order": 1,
+    "jacket_asset_id": "91627563df014e9b95a515dbdae4370b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/91627563df014e9b95a515dbdae4370b/Shiny%20Smily%20Story%20(2022%20ver.).png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 8,
+      "HARD": 16,
+      "EXPERT": 22
+    }
+  },
+  {
+    "title_jp": "青春アーカイブ",
+    "title_en": "Seishun Archive",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "HoneyWorks",
+    "lyrics_en": "HoneyWorks",
+    "music_jp": "HoneyWorks",
+    "music_en": "HoneyWorks",
+    "arrangement_jp": "HoneyWorks",
+    "arrangement_en": "HoneyWorks",
+    "category": "original",
+    "official_order": 2,
+    "jacket_asset_id": "f05ab96b725041aeb6c2317a6268fa5c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/f05ab96b725041aeb6c2317a6268fa5c/%E9%9D%92%E6%98%A5%E3%82%A2%E3%83%BC%E3%82%AB%E3%82%A4%E3%83%95%E3%82%99.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "夢見る空へ",
+    "title_en": "Yumemiru Sora He",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "永塚健登",
+    "lyrics_en": "Kento Nagatsuka",
+    "music_jp": "永塚健登",
+    "music_en": "Kento Nagatsuka",
+    "arrangement_jp": "永塚健登",
+    "arrangement_en": "Kento Nagatsuka",
+    "category": "original",
+    "official_order": 3,
+    "jacket_asset_id": "c9e41e8e8c4941d29549c9c4e206310d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/c9e41e8e8c4941d29549c9c4e206310d/%E5%A4%A2%E8%A6%8B%E3%82%8B%E7%A9%BA%E3%81%B8.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "キラメキライダー☆",
+    "title_en": "Kirameki Rider",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "辻純更",
+    "lyrics_en": "Junko Tsuji",
+    "music_jp": "石濱 翔",
+    "music_en": "Kakeru Ishihama",
+    "arrangement_jp": "石濱 翔",
+    "arrangement_en": "Kakeru Ishihama",
+    "category": "original",
+    "official_order": 4,
+    "jacket_asset_id": "21f56b5f6a8d49c7a3ec39677ed28f13",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/21f56b5f6a8d49c7a3ec39677ed28f13/%E3%82%AD%E3%83%A9%E3%83%A1%E3%82%AD%E3%83%A9%E3%82%A4%E3%82%BF%E3%82%99%E3%83%BC%E2%98%86.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Dreaming Days",
+    "title_en": "Dreaming Days",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "本多友紀",
+    "lyrics_en": "Yuki Honda",
+    "music_jp": "本多友紀、酒井拓也",
+    "music_en": "Yuki Honda, Takuya Sakai",
+    "arrangement_jp": "本多友紀、酒井拓也",
+    "arrangement_en": "Yuki Honda, Takuya Sakai",
+    "category": "original",
+    "official_order": 5,
+    "jacket_asset_id": "f0e517825d78405b857805cd8bab13ab",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/f0e517825d78405b857805cd8bab13ab/Dreaming%20Days.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "あすいろClearSky",
+    "title_en": "AsuiroClearSky",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "森本練",
+    "lyrics_en": "Ren Morimoto",
+    "music_jp": "森本練",
+    "music_en": "Ren Morimoto",
+    "arrangement_jp": "脇眞富",
+    "arrangement_en": "Masatomi Waki",
+    "category": "original",
+    "official_order": 6,
+    "jacket_asset_id": "8be6a790d598460f9d9b3e5777baae3f",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/8be6a790d598460f9d9b3e5777baae3f/%E3%81%82%E3%81%99%E3%81%84%E3%82%8DClearSky.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Prism Melody",
+    "title_en": "Prism Melody",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "5u5h1",
+    "lyrics_en": "5u5h1",
+    "music_jp": "5u5h1",
+    "music_en": "5u5h1",
+    "arrangement_jp": "5u5h1",
+    "arrangement_en": "5u5h1",
+    "category": "original",
+    "official_order": 7,
+    "jacket_asset_id": "9346bed8efa343a892fea3ca7452d2fd",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9346bed8efa343a892fea3ca7452d2fd/Prism%20Melody.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "Our Bright Parade",
+    "title_en": "Our Bright Parade",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "堀江晶太",
+    "lyrics_en": "Shota Horie",
+    "music_jp": "堀江晶太",
+    "music_en": "Shota Horie",
+    "arrangement_jp": "堀江晶太",
+    "arrangement_en": "Shota Horie",
+    "category": "original",
+    "official_order": 8,
+    "jacket_asset_id": "769034f0b41d464dac98a9df9aefe139",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/769034f0b41d464dac98a9df9aefe139/Our%20Bright%20Parade.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Capture the Moment",
+    "title_en": "Capture the Moment",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "金丸佳史、中野領太",
+    "lyrics_en": "Yoshifumi Kanamaru,Ryota Nakano",
+    "music_jp": "中野領太",
+    "music_en": "Ryota Nakano",
+    "arrangement_jp": "中野領太",
+    "arrangement_en": "Ryota Nakano",
+    "category": "original",
+    "official_order": 9,
+    "jacket_asset_id": "b12ca19d6ab244198d1c10d1736bca32",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/b12ca19d6ab244198d1c10d1736bca32/Capture%20the%20Moment.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 9,
+      "HARD": 17,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "Color Rise Harmony",
+    "title_en": "Color Rise Harmony",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "ナナホシ管弦楽団",
+    "lyrics_en": "Nanahoshi Orchestra",
+    "music_jp": "岩見 陸",
+    "music_en": "Takashi Iwami",
+    "arrangement_jp": "ナナホシ管弦楽団",
+    "arrangement_en": "Nanahoshi Orchestra",
+    "category": "original",
+    "official_order": 10,
+    "jacket_asset_id": "3686f8357c3743858b695c511913d671",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3686f8357c3743858b695c511913d671/Color%20Rise%20Harmony.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Ridin' on Dreams",
+    "title_en": "Ridin' on Dreams",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "小池竜暉",
+    "lyrics_en": "Ryuki Koike",
+    "music_jp": "小池竜暉",
+    "music_en": "Ryuki Koike",
+    "arrangement_jp": "小池竜暉, 熊谷主毅, 青木隆多",
+    "arrangement_en": "Ryuki Koike, Kazuki  Kumagai, Ryuta Aoki",
+    "category": "original",
+    "official_order": 11,
+    "jacket_asset_id": "d772150e494640dea42a8914af8be820",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d772150e494640dea42a8914af8be820/Ridin'%20on%20Dreams.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "夢色ワンダー",
+    "title_en": "yumeiro wonder",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "やしきん（F.M.F）",
+    "lyrics_en": "yashikin（F.M.F）",
+    "music_jp": "高尾奏之介（F.M.F）",
+    "music_en": "Sonosuke Takao（F.M.F）",
+    "arrangement_jp": "高尾奏之介（F.M.F）",
+    "arrangement_en": "Sonosuke Takao（F.M.F）",
+    "category": "original",
+    "official_order": 12,
+    "jacket_asset_id": "84330cb7db5346de8879d6437f872595",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/84330cb7db5346de8879d6437f872595/%E5%A4%A2%E8%89%B2%E3%83%AF%E3%83%B3%E3%82%BF%E3%82%99%E3%83%BC.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 14,
+      "HARD": 23,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "ギミギミエンターテイメント",
+    "title_en": "Gimmick Gimmick Entertainment",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "青柳諒",
+    "lyrics_en": "Makoto Aoyagi",
+    "music_jp": "青柳諒",
+    "music_en": "Makoto Aoyagi",
+    "arrangement_jp": "青柳諒",
+    "arrangement_en": "Makoto Aoyagi",
+    "category": "original",
+    "official_order": 13,
+    "jacket_asset_id": "3c602ced22ba45ed9439af87d65bba10",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3c602ced22ba45ed9439af87d65bba10/%E3%82%AD%E3%82%99%E3%83%9F%E3%82%AD%E3%82%99%E3%83%9F%E3%82%A8%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%86%E3%82%A4%E3%83%A1%E3%83%B3%E3%83%88.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Dream☆Story",
+    "title_en": "Dream☆Story",
+    "artist_jp": "ときのそら",
+    "artist_en": "Tokino Sora",
+    "lyrics_jp": "キノシタ",
+    "lyrics_en": "kinoshita",
+    "music_jp": "キノシタ",
+    "music_en": "kinoshita",
+    "arrangement_jp": "キノシタ",
+    "arrangement_en": "kinoshita",
+    "category": "original",
+    "official_order": 14,
+    "jacket_asset_id": "37620077a93d460b925f68fb2831a576",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/37620077a93d460b925f68fb2831a576/Dream%E2%98%86Story.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "スタースタースタート",
+    "title_en": "Star,star,start",
+    "artist_jp": "ときのそら",
+    "artist_en": "Tokino Sora",
+    "lyrics_jp": "ナユタン星人",
+    "lyrics_en": "Nayutan Seijin",
+    "music_jp": "ナユタン星人",
+    "music_en": "Nayutan Seijin",
+    "arrangement_jp": "ナユタン星人",
+    "arrangement_en": "Nayutan Seijin",
+    "category": "original",
+    "official_order": 15,
+    "jacket_asset_id": "50974520ef72470eb9c53e9fd6d35a52",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/50974520ef72470eb9c53e9fd6d35a52/img_music_jacket_m0072.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 14,
+      "HARD": 20,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "リルビ",
+    "title_en": "rirubi",
+    "artist_jp": "ロボ子さん",
+    "artist_en": "Robocosan",
+    "lyrics_jp": "てにをは",
+    "lyrics_en": "teniwoha",
+    "music_jp": "てにをは",
+    "music_en": "teniwoha",
+    "arrangement_jp": "てにをは",
+    "arrangement_en": "teniwoha",
+    "category": "original",
+    "official_order": 16,
+    "jacket_asset_id": "3e836f659ad64429afd3c91526541bd8",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3e836f659ad64429afd3c91526541bd8/%E3%83%AA%E3%83%AB%E3%83%92%E3%82%99.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ω猫",
+    "title_en": "ω cat",
+    "artist_jp": "AZKi",
+    "artist_en": "AZKi",
+    "lyrics_jp": "ナユタン星人",
+    "lyrics_en": "Nayutan Seijin",
+    "music_jp": "ナユタン星人",
+    "music_en": "Nayutan Seijin",
+    "arrangement_jp": "ナユタン星人",
+    "arrangement_en": "Nayutan Seijin",
+    "category": "original",
+    "official_order": 17,
+    "jacket_asset_id": "c88ae46d1f0142e4a8c4c804d782e6b9",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/c88ae46d1f0142e4a8c4c804d782e6b9/%CF%89%E7%8C%AB.png",
+    "levels": {
+      "EASY": 9,
+      "NORMAL": 16,
+      "HARD": 23,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "いのち(2024 ver.)",
+    "title_en": "Inochi(2024 ver.)",
+    "artist_jp": "AZKi",
+    "artist_en": "AZKi",
+    "lyrics_jp": "瀬名航(SOVA)",
+    "lyrics_en": "Wataru Sena(SOVA)",
+    "music_jp": "瀬名航(SOVA)",
+    "music_en": "Wataru Sena(SOVA)",
+    "arrangement_jp": "瀬名航(SOVA)",
+    "arrangement_en": "Wataru Sena(SOVA)",
+    "category": "original",
+    "official_order": 18,
+    "jacket_asset_id": "b37264f86c184c11b146b9e1b248dfb5",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/b37264f86c184c11b146b9e1b248dfb5/%E3%81%84%E3%81%AE%E3%81%A1(2024%20ver.).png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 9,
+      "HARD": 15,
+      "EXPERT": 22
+    }
+  },
+  {
+    "title_jp": "flower rhapsody",
+    "title_en": "flower rhapsody",
+    "artist_jp": "さくらみこ",
+    "artist_en": "Sakura Miko",
+    "lyrics_jp": "堀江晶太",
+    "lyrics_en": "Shota Horie",
+    "music_jp": "堀江晶太",
+    "music_en": "Shota Horie",
+    "arrangement_jp": "神田ジョン",
+    "arrangement_en": "John Kanda",
+    "category": "original",
+    "official_order": 19,
+    "jacket_asset_id": "9411009d6ce043499f3b74b4f964c351",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9411009d6ce043499f3b74b4f964c351/flower%20rhapsody.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "DAI DAI DAI ファンタジスタ",
+    "title_en": "DAI DAI DAI Fantasista",
+    "artist_jp": "さくらみこ",
+    "artist_en": "Sakura Miko",
+    "lyrics_jp": "じん",
+    "lyrics_en": "JIN",
+    "music_jp": "じん",
+    "music_en": "JIN",
+    "arrangement_jp": "じん",
+    "arrangement_en": "JIN",
+    "category": "original",
+    "official_order": 20,
+    "jacket_asset_id": "ca4aa252be7541718c308c0a9343b659",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/ca4aa252be7541718c308c0a9343b659/DAI%20DAI%20DAI%20%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B7%E3%82%99%E3%82%B9%E3%82%BF.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "Stellar Stellar",
+    "title_en": "Stellar Stellar",
+    "artist_jp": "星街すいせい",
+    "artist_en": "Hoshimachi Suisei",
+    "lyrics_jp": "星街すいせい",
+    "lyrics_en": "Hoshimachi Suisei",
+    "music_jp": "TAKU INOUE",
+    "music_en": "TAKU INOUE",
+    "arrangement_jp": "TAKU INOUE",
+    "arrangement_en": "TAKU INOUE",
+    "category": "original",
+    "official_order": 21,
+    "jacket_asset_id": "fc18811691ea4d219515e08f06958725",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/fc18811691ea4d219515e08f06958725/Stellar%20Stellar.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ビビデバ",
+    "title_en": "BIBBIDIBA",
+    "artist_jp": "星街すいせい",
+    "artist_en": "Hoshimachi Suisei",
+    "lyrics_jp": "ツミキ",
+    "lyrics_en": "tsumiki",
+    "music_jp": "ツミキ",
+    "music_en": "tsumiki",
+    "arrangement_jp": "ツミキ",
+    "arrangement_en": "tsumiki",
+    "category": "original",
+    "official_order": 22,
+    "jacket_asset_id": "0cf57835f6f040d1bcc0bd730afe27a3",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/0cf57835f6f040d1bcc0bd730afe27a3/%E3%83%92%E3%82%99%E3%83%92%E3%82%99%E3%83%86%E3%82%99%E3%83%8F%E3%82%99.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "シャルイース",
+    "title_en": "SHALLYS",
+    "artist_jp": "アキ・ローゼンタール",
+    "artist_en": "Aki Rosenthal",
+    "lyrics_jp": "as",
+    "lyrics_en": "as",
+    "music_jp": "kotokI",
+    "music_en": "kotokI",
+    "arrangement_jp": "kotokI",
+    "arrangement_en": "kotokI",
+    "category": "original",
+    "official_order": 23,
+    "jacket_asset_id": "a2a86bb33b474a909ee174fdf98119ce",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/a2a86bb33b474a909ee174fdf98119ce/%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%A4%E3%83%BC%E3%82%B9.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 12,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "感触",
+    "title_en": "sensation -KANSHOKU-",
+    "artist_jp": "赤井はあと",
+    "artist_en": "Akai Haato",
+    "lyrics_jp": "塩野 海",
+    "lyrics_en": "Kai Shiono",
+    "music_jp": "塩野 海",
+    "music_en": "Kai Shiono",
+    "arrangement_jp": "塩野 海",
+    "arrangement_en": "Kai Shiono",
+    "category": "original",
+    "official_order": 24,
+    "jacket_asset_id": "4213fd7cc67740b19290e09583cfe65b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4213fd7cc67740b19290e09583cfe65b/%E6%84%9F%E8%A7%A6.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 18,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "SUPERNOVA",
+    "title_en": "SUPERNOVA",
+    "artist_jp": "白上フブキ",
+    "artist_en": "Shirakami Fubuki",
+    "lyrics_jp": "小池竜暉",
+    "lyrics_en": "Ryuki Koike",
+    "music_jp": "小池竜暉",
+    "music_en": "Ryuki Koike",
+    "arrangement_jp": "小池竜暉",
+    "arrangement_en": "Ryuki Koike",
+    "category": "original",
+    "official_order": 25,
+    "jacket_asset_id": "80e165592147406f8fa0f617bd779be0",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/80e165592147406f8fa0f617bd779be0/SUPERNOVA.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 14,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ばーちゃらぶ",
+    "title_en": "Virtualove",
+    "artist_jp": "夏色まつり",
+    "artist_en": "Natsuiro Matsuri",
+    "lyrics_jp": "Medansy",
+    "lyrics_en": "Medansy",
+    "music_jp": "Medansy",
+    "music_en": "Medansy",
+    "arrangement_jp": "Medansy",
+    "arrangement_en": "Medansy",
+    "category": "original",
+    "official_order": 26,
+    "jacket_asset_id": "d5fec6c5005f4171a15bd29543d8f3d0",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d5fec6c5005f4171a15bd29543d8f3d0/%E3%81%AF%E3%82%99%E3%83%BC%E3%81%A1%E3%82%83%E3%82%89%E3%81%B5%E3%82%99.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 14,
+      "HARD": 22,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "宵の余、良い！",
+    "title_en": "Yoi no Yo, Yoi!",
+    "artist_jp": "百鬼あやめ",
+    "artist_en": "Nakiri Ayame",
+    "lyrics_jp": "武田将弥(Dream Monster)",
+    "lyrics_en": "Masahiro Takeda(Dream Monster)",
+    "music_jp": "武田将弥(Dream Monster)",
+    "music_en": "Masahiro Takeda(Dream Monster)",
+    "arrangement_jp": "武田将弥(Dream Monster)",
+    "arrangement_en": "Masahiro Takeda(Dream Monster)",
+    "category": "original",
+    "official_order": 27,
+    "jacket_asset_id": "8a03be0449f746199cf3292b260b94c7",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/8a03be0449f746199cf3292b260b94c7/%E5%AE%B5%E3%81%AE%E4%BD%99%E3%80%81%E8%89%AF%E3%81%84%EF%BC%81.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "NoDistance",
+    "title_en": "NoDistance",
+    "artist_jp": "癒月ちょこ",
+    "artist_en": "Yuzuki Choco",
+    "lyrics_jp": "涼木シンジ （KEYTONE）",
+    "lyrics_en": "shinji suzuki",
+    "music_jp": "涼木シンジ （KEYTONE）",
+    "music_en": "shinji suzuki",
+    "arrangement_jp": "涼木シンジ （KEYTONE）",
+    "arrangement_en": "shinji suzuki",
+    "category": "original",
+    "official_order": 28,
+    "jacket_asset_id": "26636553903e45b7b125c2c6faa57a8e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/26636553903e45b7b125c2c6faa57a8e/NoDistance.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ぷ・れ・あ・で・す！",
+    "title_en": "Pleiades!",
+    "artist_jp": "大空スバル",
+    "artist_en": "Oozora Subaru",
+    "lyrics_jp": "Mitsu（TRYTONELABO）",
+    "lyrics_en": "Mitsu（TRYTONELABO）",
+    "music_jp": "滝澤俊輔（TRYTONELABO）",
+    "music_en": "ShunsukeTakizawa（TRYTONELABO）",
+    "arrangement_jp": "滝澤俊輔（TRYTONELABO）",
+    "arrangement_en": "ShunsukeTakizawa（TRYTONELABO）",
+    "category": "original",
+    "official_order": 29,
+    "jacket_asset_id": "c6cecaace324451bb79ee0b012fef6c8",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/c6cecaace324451bb79ee0b012fef6c8/%E3%81%B5%E3%82%9A%E3%83%BB%E3%82%8C%E3%83%BB%E3%81%82%E3%83%BB%E3%81%A6%E3%82%99%E3%83%BB%E3%81%99%EF%BC%81.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Howling",
+    "title_en": "Howling",
+    "artist_jp": "大神ミオ",
+    "artist_en": "Ookami Mio",
+    "lyrics_jp": "ZAQ",
+    "lyrics_en": "ZAQ",
+    "music_jp": "ZAQ",
+    "music_en": "ZAQ",
+    "arrangement_jp": "KanadeYUK",
+    "arrangement_en": "KanadeYUK",
+    "category": "original",
+    "official_order": 30,
+    "jacket_asset_id": "cff3810f29b94989b1008941e2a4e407",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/cff3810f29b94989b1008941e2a4e407/Howling.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 9,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "Colorful Universe",
+    "title_en": "Colorful Universe",
+    "artist_jp": "大神ミオ",
+    "artist_en": "Ookami Mio",
+    "lyrics_jp": "伊藤和馬",
+    "lyrics_en": "Kazuma Ito",
+    "music_jp": "伊藤和馬",
+    "music_en": "Kazuma Ito",
+    "arrangement_jp": "伊藤和馬",
+    "arrangement_en": "Kazuma Ito",
+    "category": "original",
+    "official_order": 31,
+    "jacket_asset_id": "d91a5458a2164a15a44ec34ab381f859",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d91a5458a2164a15a44ec34ab381f859/Colorful%20Universe.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "もぐもぐYUMMY！",
+    "title_en": "Mogu Mogu YUMMY！",
+    "artist_jp": "猫又おかゆ",
+    "artist_en": "Nekomata Okayu",
+    "lyrics_jp": "ピノキオピー",
+    "lyrics_en": "PinocchioP",
+    "music_jp": "ピノキオピー",
+    "music_en": "PinocchioP",
+    "arrangement_jp": "ピノキオピー",
+    "arrangement_en": "PinocchioP",
+    "category": "original",
+    "official_order": 32,
+    "jacket_asset_id": "23c1072ad2d14f5b88c63ab299314d61",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/23c1072ad2d14f5b88c63ab299314d61/%E3%82%82%E3%81%8F%E3%82%99%E3%82%82%E3%81%8F%E3%82%99YUMMY%EF%BC%81.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ネコカブリーナ",
+    "title_en": "Neko Kaburi-Na",
+    "artist_jp": "猫又おかゆ",
+    "artist_en": "Nekomata Okayu",
+    "lyrics_jp": "ピノキオピー",
+    "lyrics_en": "PinocchioP",
+    "music_jp": "ピノキオピー",
+    "music_en": "PinocchioP",
+    "arrangement_jp": "ピノキオピー",
+    "arrangement_en": "PinocchioP",
+    "category": "original",
+    "official_order": 33,
+    "jacket_asset_id": "4af59b3d97be4486a1b4967d62230ba6",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4af59b3d97be4486a1b4967d62230ba6/%E3%83%8D%E3%82%B3%E3%82%AB%E3%83%95%E3%82%99%E3%83%AA%E3%83%BC%E3%83%8A.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Doggy god's street",
+    "title_en": "Doggy god's street",
+    "artist_jp": "戌神ころね",
+    "artist_en": "Inugami Korone",
+    "lyrics_jp": "トップハムハット狂",
+    "lyrics_en": "TOPHAMHAT-KYO",
+    "music_jp": "FAKE TYPE.",
+    "music_en": "FAKE TYPE.",
+    "arrangement_jp": "DYES IWASAKI",
+    "arrangement_en": "DYES IWASAKI",
+    "category": "original",
+    "official_order": 34,
+    "jacket_asset_id": "5727c61fd61349d0b63a1eceba41843c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/5727c61fd61349d0b63a1eceba41843c/Doggy%20god's%20street.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ぺこらんだむぶれいん!",
+    "title_en": "PEKORANDOMBRAIN",
+    "artist_jp": "兎田ぺこら",
+    "artist_en": "Usada Pekora",
+    "lyrics_jp": "畑亜貴",
+    "lyrics_en": "Aki Hata",
+    "music_jp": "俊龍",
+    "music_en": "Shunryu",
+    "arrangement_jp": "よる。",
+    "arrangement_en": "Yoru",
+    "category": "original",
+    "official_order": 35,
+    "jacket_asset_id": "10ab7efdda44468f939f28d45650b2c2",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/10ab7efdda44468f939f28d45650b2c2/%E3%81%B8%E3%82%9A%E3%81%93%E3%82%89%E3%82%93%E3%81%9F%E3%82%99%E3%82%80%E3%81%B5%E3%82%99%E3%82%8C%E3%81%84%E3%82%93!.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "全人類　兎化計画！",
+    "title_en": "ZenjinruiUsagikakeikaku!",
+    "artist_jp": "兎田ぺこら",
+    "artist_en": "Usada Pekora",
+    "lyrics_jp": "前山田健一",
+    "lyrics_en": "Kenichi Maeyamada",
+    "music_jp": "前山田健一",
+    "music_en": "Kenichi Maeyamada",
+    "arrangement_jp": "藤原燈太",
+    "arrangement_en": "Tota Fujiwara",
+    "category": "original",
+    "official_order": 36,
+    "jacket_asset_id": "4dabe8d7c81c47e28361b73cb12ae1a4",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4dabe8d7c81c47e28361b73cb12ae1a4/%E5%85%A8%E4%BA%BA%E9%A1%9E%E3%80%80%E5%85%8E%E5%8C%96%E8%A8%88%E7%94%BB%EF%BC%81.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "全力ジャンピング！",
+    "title_en": "Zenryoku-Jumping!",
+    "artist_jp": "不知火フレア",
+    "artist_en": "Shiranui Flare",
+    "lyrics_jp": "篠崎あやと、橘亮祐",
+    "lyrics_en": "Ayato Shinozaki、Ryousuke Tachibana",
+    "music_jp": "篠崎あやと、橘亮祐",
+    "music_en": "Ayato Shinozaki、Ryousuke Tachibana",
+    "arrangement_jp": "篠崎あやと、橘亮祐",
+    "arrangement_en": "Ayato Shinozaki、Ryousuke Tachibana",
+    "category": "original",
+    "official_order": 37,
+    "jacket_asset_id": "59132d2d23d74005ac13b8dddc0dbd51",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/59132d2d23d74005ac13b8dddc0dbd51/%E5%85%A8%E5%8A%9B%E3%82%B7%E3%82%99%E3%83%A3%E3%83%B3%E3%83%92%E3%82%9A%E3%83%B3%E3%82%AF%E3%82%99%EF%BC%81.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "ぎゅーどんかーにばる！",
+    "title_en": "Gyu-Don Carnival!",
+    "artist_jp": "白銀ノエル",
+    "artist_en": "Shirogane Noel",
+    "lyrics_jp": "まろん (IOSYS)",
+    "lyrics_en": "MARON (IOSYS)",
+    "music_jp": "まろん (IOSYS)",
+    "music_en": "MARON (IOSYS)",
+    "arrangement_jp": "まろん (IOSYS)",
+    "arrangement_en": "MARON (IOSYS)",
+    "category": "original",
+    "official_order": 38,
+    "jacket_asset_id": "2189bb8e398b4aef93b8b858ca6e4867",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2189bb8e398b4aef93b8b858ca6e4867/%E3%81%8D%E3%82%99%E3%82%85%E3%83%BC%E3%81%A8%E3%82%99%E3%82%93%E3%81%8B%E3%83%BC%E3%81%AB%E3%81%AF%E3%82%99%E3%82%8B%EF%BC%81.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Ahoy!! 我ら宝鐘海賊団☆",
+    "title_en": "Ahoy!! We are Houshou Pirates",
+    "artist_jp": "宝鐘マリン",
+    "artist_en": "Houshou Marine",
+    "lyrics_jp": "まろん (IOSYS)",
+    "lyrics_en": "Maron (IOSYS)",
+    "music_jp": "ARM (IOSYS)",
+    "music_en": "ARM (IOSYS)",
+    "arrangement_jp": "ARM (IOSYS)",
+    "arrangement_en": "ARM (IOSYS)",
+    "category": "original",
+    "official_order": 39,
+    "jacket_asset_id": "2adbb0d9ae8c48a0944da10b80a820ce",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2adbb0d9ae8c48a0944da10b80a820ce/Ahoy!!%20%E6%88%91%E3%82%89%E5%AE%9D%E9%90%98%E6%B5%B7%E8%B3%8A%E5%9B%A3%E2%98%86.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "美少女無罪♡パイレーツ",
+    "title_en": "Bishoujyo Muzai♡Pirates",
+    "artist_jp": "宝鐘マリン",
+    "artist_en": "Houshou Marine",
+    "lyrics_jp": "ナナホシ管弦楽団",
+    "lyrics_en": "Nanahoshi Orchestra",
+    "music_jp": "岩見 陸",
+    "music_en": "Takashi Iwami",
+    "arrangement_jp": "ナナホシ管弦楽団",
+    "arrangement_en": "Nanahoshi Orchestra",
+    "category": "original",
+    "official_order": 40,
+    "jacket_asset_id": "becc021f4ac9442f80197857ed436120",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/becc021f4ac9442f80197857ed436120/%E7%BE%8E%E5%B0%91%E5%A5%B3%E7%84%A1%E7%BD%AA%E2%99%A1%E3%83%8F%E3%82%9A%E3%82%A4%E3%83%AC%E3%83%BC%E3%83%84.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "My song",
+    "title_en": "My song",
+    "artist_jp": "角巻わため",
+    "artist_en": "Tsunomaki Watame",
+    "lyrics_jp": "田淵智也",
+    "lyrics_en": "Tabuchi Tomoya",
+    "music_jp": "堀江晶太",
+    "music_en": "Shota Horie",
+    "arrangement_jp": "堀江晶太",
+    "arrangement_en": "Shota Horie",
+    "category": "original",
+    "official_order": 41,
+    "jacket_asset_id": "68962e5238c8480c94cf874690de5158",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/68962e5238c8480c94cf874690de5158/img_music_jacket_m0037.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "What an amazing swing",
+    "title_en": "What an amazing swing",
+    "artist_jp": "角巻わため",
+    "artist_en": "Tsunomaki Watame",
+    "lyrics_jp": "TOPHAMHAT-KYO (FAKE TYPE.)",
+    "lyrics_en": "TOPHAMHAT-KYO (FAKE TYPE.)",
+    "music_jp": "FAKE TYPE.",
+    "music_en": "FAKE TYPE.",
+    "arrangement_jp": "DYES IWASAKI (FAKE TYPE.)",
+    "arrangement_en": "DYES IWASAKI (FAKE TYPE.)",
+    "category": "original",
+    "official_order": 42,
+    "jacket_asset_id": "565842616ddb465abf71fdf01f315796",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/565842616ddb465abf71fdf01f315796/What%20an%20amazing%20swing.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Palette",
+    "title_en": "Palette",
+    "artist_jp": "常闇トワ",
+    "artist_en": "Tokoyami Towa",
+    "lyrics_jp": "常闇トワ",
+    "lyrics_en": "Tokoyami Towa",
+    "music_jp": "niki",
+    "music_en": "niki",
+    "arrangement_jp": "niki",
+    "arrangement_en": "niki",
+    "category": "original",
+    "official_order": 43,
+    "jacket_asset_id": "1310498c4f1a4fb58813544f023f35c8",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/1310498c4f1a4fb58813544f023f35c8/Palette.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "守護ってルーナイト",
+    "title_en": "Escort me! Luknight",
+    "artist_jp": "姫森ルーナ",
+    "artist_en": "Himemori Luna",
+    "lyrics_jp": "ナナホシ管弦楽団",
+    "lyrics_en": "Nanahoshi Orchestra",
+    "music_jp": "岩見 陸",
+    "music_en": "Iwami Takashi",
+    "arrangement_jp": "ナナホシ管弦楽団",
+    "arrangement_en": "Nanahoshi Orchestra",
+    "category": "original",
+    "official_order": 44,
+    "jacket_asset_id": "65c1d9462f9f464295165ec1a758bf5a",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/65c1d9462f9f464295165ec1a758bf5a/%E5%AE%88%E8%AD%B7%E3%81%A3%E3%81%A6%E3%83%AB%E3%83%BC%E3%83%8A%E3%82%A4%E3%83%88.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "明日への境界線",
+    "title_en": "Asuenokyokaisen",
+    "artist_jp": "雪花ラミィ",
+    "artist_en": "Yukihana Lamy",
+    "lyrics_jp": "ENA☆",
+    "lyrics_en": "ENA",
+    "music_jp": "佐々木裕",
+    "music_en": "Hiroshi Sasaki",
+    "arrangement_jp": "佐々木裕",
+    "arrangement_en": "Hiroshi Sasaki",
+    "category": "original",
+    "official_order": 45,
+    "jacket_asset_id": "8e61f7838b3d4a95a66f4ad5226b096e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/8e61f7838b3d4a95a66f4ad5226b096e/%E6%98%8E%E6%97%A5%E3%81%B8%E3%81%AE%E5%A2%83%E7%95%8C%E7%B7%9A.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ねねねねねねねね！大爆走",
+    "title_en": "NENENENENENENENE!DAIBAKUSOU",
+    "artist_jp": "桃鈴ねね",
+    "artist_en": "Momosuzu Nene",
+    "lyrics_jp": "ヒゲドライバー",
+    "lyrics_en": "Hige Driver",
+    "music_jp": "ヒゲドライバー",
+    "music_en": "Hige Driver",
+    "arrangement_jp": "ヒゲドライバー",
+    "arrangement_en": "Hige Driver",
+    "category": "original",
+    "official_order": 46,
+    "jacket_asset_id": "304123edcf114386acebb19d9a50f0ea",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/304123edcf114386acebb19d9a50f0ea/%E3%81%AD%E3%81%AD%E3%81%AD%E3%81%AD%E3%81%AD%E3%81%AD%E3%81%AD%E3%81%AD%EF%BC%81%E5%A4%A7%E7%88%86%E8%B5%B0.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Lioness’ Pride",
+    "title_en": "Lioness’ Pride",
+    "artist_jp": "獅白ぼたん",
+    "artist_en": "Shishiro Botan",
+    "lyrics_jp": "かめりあ",
+    "lyrics_en": "Camellia",
+    "music_jp": "かめりあ",
+    "music_en": "Camellia",
+    "arrangement_jp": "かめりあ",
+    "arrangement_en": "Camellia",
+    "category": "original",
+    "official_order": 47,
+    "jacket_asset_id": "dfe59128c8b44ba4adae898a7ad86019",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/dfe59128c8b44ba4adae898a7ad86019/Lioness%E2%80%99%20Pride.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ぽ",
+    "title_en": "Po",
+    "artist_jp": "尾丸ポルカ",
+    "artist_en": "Omaru Polka",
+    "lyrics_jp": "立秋",
+    "lyrics_en": "Rish",
+    "music_jp": "立秋",
+    "music_en": "Rish",
+    "arrangement_jp": "立秋",
+    "arrangement_en": "Rish",
+    "category": "original",
+    "official_order": 48,
+    "jacket_asset_id": "64c23f895ed0444b92811c50ecec5066",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/64c23f895ed0444b92811c50ecec5066/%E3%81%BB%E3%82%9A.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 15,
+      "HARD": 22,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "興味ないよ",
+    "title_en": "Not Interested",
+    "artist_jp": "ラプラス・ダークネス",
+    "artist_en": "La+ Darknesss",
+    "lyrics_jp": "jon-YAKITORY",
+    "lyrics_en": "jon-YAKITORY",
+    "music_jp": "jon-YAKITORY",
+    "music_en": "jon-YAKITORY",
+    "arrangement_jp": "jon-YAKITORY",
+    "arrangement_en": "jon-YAKITORY",
+    "category": "original",
+    "official_order": 49,
+    "jacket_asset_id": "df5e6554e3ac43b9a144ec97b67fd214",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/df5e6554e3ac43b9a144ec97b67fd214/%E8%88%88%E5%91%B3%E3%81%AA%E3%81%84%E3%82%88.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "オーバード",
+    "title_en": "Overd",
+    "artist_jp": "鷹嶺ルイ",
+    "artist_en": "Takane Lui",
+    "lyrics_jp": "柊キライ",
+    "lyrics_en": "Hiiragi Kirai",
+    "music_jp": "柊キライ",
+    "music_en": "Hiiragi Kirai",
+    "arrangement_jp": "柊キライ",
+    "arrangement_en": "Hiiragi Kirai",
+    "category": "original",
+    "official_order": 50,
+    "jacket_asset_id": "c73903ea5bcd49d7a0940c084b333a11",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/c73903ea5bcd49d7a0940c084b333a11/%E3%82%AA%E3%83%BC%E3%83%8F%E3%82%99%E3%83%BC%E3%83%88%E3%82%99.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 13,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "WAO!!(2025 ver.)",
+    "title_en": "WAO!!(2025 ver.)",
+    "artist_jp": "博衣こより",
+    "artist_en": "Hakui Koyori",
+    "lyrics_jp": "DECO*27 (OTOIRO)",
+    "lyrics_en": "DECO*27 (OTOIRO)",
+    "music_jp": "DECO*27 (OTOIRO)",
+    "music_en": "DECO*27 (OTOIRO)",
+    "arrangement_jp": "Rockwell",
+    "arrangement_en": "Rockwell",
+    "category": "original",
+    "official_order": 51,
+    "jacket_asset_id": "1dc1069293e449d489760fca9a6a7cbe",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/1dc1069293e449d489760fca9a6a7cbe/WAO!!(2025%20ver.).png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "いろはすてっぷ！",
+    "title_en": "IrohaStep!",
+    "artist_jp": "風真いろは",
+    "artist_en": "Kazama Iroha",
+    "lyrics_jp": "40mP",
+    "lyrics_en": "40mP",
+    "music_jp": "40mP",
+    "music_en": "40mP",
+    "arrangement_jp": "40mP",
+    "arrangement_en": "40mP",
+    "category": "original",
+    "official_order": 52,
+    "jacket_asset_id": "85b3ef70e2ed45f1a1c45e53e1c13d5f",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/85b3ef70e2ed45f1a1c45e53e1c13d5f/%E3%81%84%E3%82%8D%E3%81%AF%E3%81%99%E3%81%A6%E3%81%A3%E3%81%B5%E3%82%9A%EF%BC%81.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ALiCE&u",
+    "title_en": "ALiCE&u",
+    "artist_jp": "Ayunda Risu",
+    "artist_en": "Ayunda Risu",
+    "lyrics_jp": "Ayunda Risu / Feryquitous",
+    "lyrics_en": "Ayunda Risu / Feryquitous",
+    "music_jp": "Feryquitous",
+    "music_en": "Feryquitous",
+    "arrangement_jp": "Feryquitous",
+    "arrangement_en": "Feryquitous",
+    "category": "original",
+    "official_order": 53,
+    "jacket_asset_id": "50aae6d97450477ea61f1eaafe61867a",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/50aae6d97450477ea61f1eaafe61867a/ALiCE%26u.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 12,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "High Tide",
+    "title_en": "High Tide",
+    "artist_jp": "Moona Hoshinova",
+    "artist_en": "Moona Hoshinova",
+    "lyrics_jp": "ZSunder",
+    "lyrics_en": "ZSunder",
+    "music_jp": "ZSunder",
+    "music_en": "ZSunder",
+    "arrangement_jp": "ZSunder",
+    "arrangement_en": "ZSunder",
+    "category": "original",
+    "official_order": 54,
+    "jacket_asset_id": "aa564d4bc55f45a9b1fdedd83f8ae446",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/aa564d4bc55f45a9b1fdedd83f8ae446/High%20Tide.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Q&A=E",
+    "title_en": "Q&A=E",
+    "artist_jp": "Airani Iofifteen",
+    "artist_en": "Airani Iofifteen",
+    "lyrics_jp": "Junky",
+    "lyrics_en": "Junky",
+    "music_jp": "Junky",
+    "music_en": "Junky",
+    "arrangement_jp": "Junky",
+    "arrangement_en": "Junky",
+    "category": "original",
+    "official_order": 55,
+    "jacket_asset_id": "ed5ccd1db764408cac9517d7d0e408e2",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/ed5ccd1db764408cac9517d7d0e408e2/Q%26A%3DE.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "JOLLIE JOLLIE",
+    "title_en": "JOLLIE JOLLIE",
+    "artist_jp": "Kureiji Ollie",
+    "artist_en": "Kureiji Ollie",
+    "lyrics_jp": "KOTONOHOUSE",
+    "lyrics_en": "KOTONOHOUSE",
+    "music_jp": "KOTONOHOUSE",
+    "music_en": "KOTONOHOUSE",
+    "arrangement_jp": "KOTONOHOUSE",
+    "arrangement_en": "KOTONOHOUSE",
+    "category": "original",
+    "official_order": 56,
+    "jacket_asset_id": "a56322fe90bb4578aea38ee70574620e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/a56322fe90bb4578aea38ee70574620e/JOLLIE%20JOLLIE.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "アンリアルヴェイル",
+    "title_en": "Unreal Veil",
+    "artist_jp": "Anya Melfissa",
+    "artist_en": "Anya Melfissa",
+    "lyrics_jp": "ぼっちぼろまる",
+    "lyrics_en": "Bocchi Boromaru",
+    "music_jp": "ぼっちぼろまる",
+    "music_en": "Bocchi Boromaru",
+    "arrangement_jp": "HAMA-kgn (Felion Sounds)",
+    "arrangement_en": "HAMA-kgn (Felion Sounds)",
+    "category": "original",
+    "official_order": 57,
+    "jacket_asset_id": "d98af9cd770c43d2a36a58002337b825",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d98af9cd770c43d2a36a58002337b825/%E3%82%A2%E3%83%B3%E3%83%AA%E3%82%A2%E3%83%AB%E3%82%A6%E3%82%99%E3%82%A7%E3%82%A4%E3%83%AB.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 15,
+      "HARD": 21,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Gate Open: START!",
+    "title_en": "Gate Open: START!",
+    "artist_jp": "Pavolia Reine",
+    "artist_en": "Pavolia Reine",
+    "lyrics_jp": "Farhan Sarasin , Pavolia Reine",
+    "lyrics_en": "Farhan Sarasin , Pavolia Reine",
+    "music_jp": "Farhan Sarasin",
+    "music_en": "Farhan Sarasin",
+    "arrangement_jp": "Farhan Sarasin",
+    "arrangement_en": "Farhan Sarasin",
+    "category": "original",
+    "official_order": 58,
+    "jacket_asset_id": "35500b36c098444eb25b1dccc0d6bbb7",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/35500b36c098444eb25b1dccc0d6bbb7/Gate%20Open%E3%80%80START!.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "You're Mine",
+    "title_en": "You're Mine",
+    "artist_jp": "Vestia Zeta",
+    "artist_en": "Vestia Zeta",
+    "lyrics_jp": "arvin home aya",
+    "lyrics_en": "arvin home aya",
+    "music_jp": "Yusuke Nakamura a.k.a ynkmr.(BLU-SWING)",
+    "music_en": "Yusuke Nakamura a.k.a ynkmr.(BLU-SWING)",
+    "arrangement_jp": "Yusuke Nakamura a.k.a ynkmr.(BLU-SWING)",
+    "arrangement_en": "Yusuke Nakamura a.k.a ynkmr.(BLU-SWING)",
+    "category": "original",
+    "official_order": 59,
+    "jacket_asset_id": "37926ade9380453fb1f4752dbce82be8",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/37926ade9380453fb1f4752dbce82be8/You're%20Mine.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "dahlah.",
+    "title_en": "dahlah.",
+    "artist_jp": "Kaela Kovalskia",
+    "artist_en": "Kaela Kovalskia",
+    "lyrics_jp": "Prince Husein,Kaela Kovalskia",
+    "lyrics_en": "Prince Husein,Kaela Kovalskia",
+    "music_jp": "Eka Gustiwana,Prince Husein",
+    "music_en": "Eka Gustiwana,Prince Husein",
+    "arrangement_jp": "Eka Gustiwana",
+    "arrangement_en": "Eka Gustiwana",
+    "category": "original",
+    "official_order": 60,
+    "jacket_asset_id": "da527c0d04e149d7849020a154f89ac9",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/da527c0d04e149d7849020a154f89ac9/dahlah..png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 12,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Mantra Hujan",
+    "title_en": "Mantra Hujan",
+    "artist_jp": "Kobo Kanaeru",
+    "artist_en": "Kobo Kanaeru",
+    "lyrics_jp": "Kobo Kanaeru",
+    "lyrics_en": "Kobo Kanaeru",
+    "music_jp": "Kobo Kanaeru",
+    "music_en": "Kobo Kanaeru",
+    "arrangement_jp": "Matalino Musicworks",
+    "arrangement_en": "Matalino Musicworks",
+    "category": "original",
+    "official_order": 61,
+    "jacket_asset_id": "7daf6d7fef904158b6a1cf8ae837d029",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/7daf6d7fef904158b6a1cf8ae837d029/Mantra%20Hujan.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "失礼しますが、RIP♡",
+    "title_en": "Excuse My Rudeness, But Could You Please RIP?",
+    "artist_jp": "Mori Calliope",
+    "artist_en": "Mori Calliope",
+    "lyrics_jp": "Mori Calliope",
+    "lyrics_en": "Mori Calliope",
+    "music_jp": "K’s",
+    "music_en": "K’s",
+    "arrangement_jp": "K’s",
+    "arrangement_en": "K’s",
+    "category": "original",
+    "official_order": 62,
+    "jacket_asset_id": "9ac864d495fb4c99aeda9d9694ac133c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9ac864d495fb4c99aeda9d9694ac133c/%E5%A4%B1%E7%A4%BC%E3%81%97%E3%81%BE%E3%81%99%E3%81%8B%E3%82%99%E3%80%81RIP%E2%99%A1.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "DEAD BEATS",
+    "title_en": "DEAD BEATS",
+    "artist_jp": "Mori Calliope",
+    "artist_en": "Mori Calliope",
+    "lyrics_jp": "Mori Calliope",
+    "lyrics_en": "Mori Calliope",
+    "music_jp": "Mori Calliope & K’s",
+    "music_en": "Mori Calliope & K’s",
+    "arrangement_jp": "Mori Calliope & K’s",
+    "arrangement_en": "Mori Calliope & K’s",
+    "category": "original",
+    "official_order": 63,
+    "jacket_asset_id": "a4ee0078128b4b34a79cd86e258527d5",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/a4ee0078128b4b34a79cd86e258527d5/DEAD%20BEATS.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "SPARKS",
+    "title_en": "SPARKS",
+    "artist_jp": "Takanashi Kiara",
+    "artist_en": "Takanashi Kiara",
+    "lyrics_jp": "KIRA",
+    "lyrics_en": "KIRA",
+    "music_jp": "KIRA",
+    "music_en": "KIRA",
+    "arrangement_jp": "KIRA",
+    "arrangement_en": "KIRA",
+    "category": "original",
+    "official_order": 64,
+    "jacket_asset_id": "eb5d266c2b844dc9afc73e7100cc79cb",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/eb5d266c2b844dc9afc73e7100cc79cb/SPARKS.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "VIOLET",
+    "title_en": "VIOLET",
+    "artist_jp": "Ninomae Ina'nis",
+    "artist_en": "Ninomae Ina'nis",
+    "lyrics_jp": "LUMINA",
+    "lyrics_en": "LUMINA",
+    "music_jp": "seibin",
+    "music_en": "seibin",
+    "arrangement_jp": "seibin",
+    "arrangement_en": "seibin",
+    "category": "original",
+    "official_order": 65,
+    "jacket_asset_id": "bdeaefb87bc9487bb6fb55f8d518cfe6",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/bdeaefb87bc9487bb6fb55f8d518cfe6/VIOLET.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Carbonated Love",
+    "title_en": "Carbonated Love",
+    "artist_jp": "IRyS",
+    "artist_en": "IRyS",
+    "lyrics_jp": "monii",
+    "lyrics_en": "monii",
+    "music_jp": "賀佐泰洋 (SUPA LOVE)",
+    "music_en": "Yasuhiro Gasa",
+    "arrangement_jp": "賀佐泰洋 (SUPA LOVE)",
+    "arrangement_en": "Yasuhiro Gasa",
+    "category": "original",
+    "official_order": 66,
+    "jacket_asset_id": "dceb9ecbefa4414a94135edf759e56a4",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/dceb9ecbefa4414a94135edf759e56a4/Carbonated%20Love.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 14,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "Daydream",
+    "title_en": "Daydream",
+    "artist_jp": "Ouro Kronii",
+    "artist_en": "Ouro Kronii",
+    "lyrics_jp": "モリタコータ",
+    "lyrics_en": "Kota Morita",
+    "music_jp": "矢野達也",
+    "music_en": "Tatsuya Yano",
+    "arrangement_jp": "矢野達也",
+    "arrangement_en": "Tatsuya Yano",
+    "category": "original",
+    "official_order": 67,
+    "jacket_asset_id": "dea5a6332bbe4c129fc9bb5eebc34270",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/dea5a6332bbe4c129fc9bb5eebc34270/Daydream.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 9,
+      "HARD": 15,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "PSYCHO",
+    "title_en": "PSYCHO",
+    "artist_jp": "Hakos Baelz",
+    "artist_en": "Hakos Baelz",
+    "lyrics_jp": "ZAQ",
+    "lyrics_en": "ZAQ",
+    "music_jp": "タカハシヒビキ, Tom-H@ck",
+    "music_en": "HibikiTakahashi, Tom-H@ck",
+    "arrangement_jp": "タカハシヒビキ",
+    "arrangement_en": "HibikiTakahashi",
+    "category": "original",
+    "official_order": 68,
+    "jacket_asset_id": "caf9a5a3499344108901f2dad8c35c4c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/caf9a5a3499344108901f2dad8c35c4c/PSYCHO.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 14,
+      "HARD": 21,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "Monsters and Men",
+    "title_en": "Monsters and Men",
+    "artist_jp": "Shiori Novella",
+    "artist_en": "Shiori Novella",
+    "lyrics_jp": "monii",
+    "lyrics_en": "monii",
+    "music_jp": "MELOIMAGE",
+    "music_en": "MELOIMAGE",
+    "arrangement_jp": "MELOIMAGE",
+    "arrangement_en": "MELOIMAGE",
+    "category": "original",
+    "official_order": 69,
+    "jacket_asset_id": "1924b200f3154caba6c0c84ee1aec9bd",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/1924b200f3154caba6c0c84ee1aec9bd/Monsters%20and%20Men.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 14,
+      "HARD": 20,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "プリズムの魔法",
+    "title_en": "Prism no Mahou",
+    "artist_jp": "Koseki Bijou",
+    "artist_en": "Koseki Bijou",
+    "lyrics_jp": "YUC’e",
+    "lyrics_en": "YUC’e",
+    "music_jp": "YUC’e",
+    "music_en": "YUC’e",
+    "arrangement_jp": "YUC’e",
+    "arrangement_en": "YUC’e",
+    "category": "original",
+    "official_order": 70,
+    "jacket_asset_id": "567a43d0c6ab45c0812d95237669b0db",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/567a43d0c6ab45c0812d95237669b0db/%E3%83%95%E3%82%9A%E3%83%AA%E3%82%B9%E3%82%99%E3%83%A0%E3%81%AE%E9%AD%94%E6%B3%95.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 10,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "Say My Name",
+    "title_en": "Say My Name",
+    "artist_jp": "Nerissa Ravencroft",
+    "artist_en": "Nerissa Ravencroft",
+    "lyrics_jp": "Kris Roche, Nerissa Ravencroft",
+    "lyrics_en": "Kris Roche, Nerissa Ravencroft",
+    "music_jp": "Kris Roche",
+    "music_en": "Kris Roche",
+    "arrangement_jp": "Kris Roche",
+    "arrangement_en": "Kris Roche",
+    "category": "original",
+    "official_order": 71,
+    "jacket_asset_id": "7f04a07daeb94c36abb33cb6788f67ea",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/7f04a07daeb94c36abb33cb6788f67ea/Say%20My%20Name.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Lifetime Showtime",
+    "title_en": "Lifetime Showtime",
+    "artist_jp": "FUWAMOCO",
+    "artist_en": "FUWAMOCO",
+    "lyrics_jp": "周防パトラ, FUWAMOCO",
+    "lyrics_en": "Patra Suou, FUWAMOCO",
+    "music_jp": "周防パトラ",
+    "music_en": "Patra Suou",
+    "arrangement_jp": "周防パトラ",
+    "arrangement_en": "Patra Suou",
+    "category": "original",
+    "official_order": 72,
+    "jacket_asset_id": "b559a611a543423a854c6abc54ae6339",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/b559a611a543423a854c6abc54ae6339/Lifetime%20Showtime.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "Born to be \"BAU\"DOL☆★",
+    "title_en": "Born to be \"BAU\"DOL☆★",
+    "artist_jp": "FUWAMOCO",
+    "artist_en": "FUWAMOCO",
+    "lyrics_jp": "PandaBoY",
+    "lyrics_en": "PandaBoY",
+    "music_jp": "PandaBoY",
+    "music_en": "PandaBoY",
+    "arrangement_jp": "PandaBoY",
+    "arrangement_en": "PandaBoY",
+    "category": "original",
+    "official_order": 73,
+    "jacket_asset_id": "f2ba5a4c1e8846d9a8f43ec6b6351939",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/f2ba5a4c1e8846d9a8f43ec6b6351939/img_music_jacket_m0192.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "GREATEST",
+    "title_en": "GREATEST",
+    "artist_jp": "音乃瀬奏",
+    "artist_en": "Otonose Kanade",
+    "lyrics_jp": "ナナホシ管弦楽団",
+    "lyrics_en": "Nanahoshi Orchestra",
+    "music_jp": "岩見 陸",
+    "music_en": "Iwami Takashi",
+    "arrangement_jp": "ナナホシ管弦楽団",
+    "arrangement_en": "Nanahoshi Orchestra",
+    "category": "original",
+    "official_order": 74,
+    "jacket_asset_id": "49c9c16e9a8848d9893fdf37fa9b6f59",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/49c9c16e9a8848d9893fdf37fa9b6f59/GREATEST.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "今日も大天才っ！",
+    "title_en": "Kyoumodaitensai!",
+    "artist_jp": "一条莉々華",
+    "artist_en": "Ichijou Ririka",
+    "lyrics_jp": "小池竜暉",
+    "lyrics_en": "Ryuki Koike",
+    "music_jp": "小池竜暉",
+    "music_en": "Ryuki Koike",
+    "arrangement_jp": "小池竜暉",
+    "arrangement_en": "Ryuki Koike",
+    "category": "original",
+    "official_order": 75,
+    "jacket_asset_id": "796273fa2d30457fb9c00bdd3073d361",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/796273fa2d30457fb9c00bdd3073d361/%E4%BB%8A%E6%97%A5%E3%82%82%E5%A4%A7%E5%A4%A9%E6%89%8D%E3%81%A3%EF%BC%81.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 14,
+      "HARD": 22,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "JAPANの美術史♪お·ぼ·え·ま·SHOW！",
+    "title_en": "Japan no bijutsushi oboemasho",
+    "artist_jp": "儒烏風亭らでん",
+    "artist_en": "Juufuutei Raden",
+    "lyrics_jp": "ぼっちぼろまる",
+    "lyrics_en": "Botchi Boromaru",
+    "music_jp": "ぼっちぼろまる",
+    "music_en": "Botchi Boromaru",
+    "arrangement_jp": "ぼっちぼろまる",
+    "arrangement_en": "Botchi Boromaru",
+    "category": "original",
+    "official_order": 76,
+    "jacket_asset_id": "2bae18c8f04e4e31b52fbe3d49010a75",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2bae18c8f04e4e31b52fbe3d49010a75/JAPAN%E3%81%AE%E7%BE%8E%E8%A1%93%E5%8F%B2%E2%99%AA%E3%81%8A%C2%B7%E3%81%BB%E3%82%99%C2%B7%E3%81%88%C2%B7%E3%81%BE%C2%B7SHOW%EF%BC%81.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Countach",
+    "title_en": "Countach",
+    "artist_jp": "轟はじめ",
+    "artist_en": "Todoroki Hajime",
+    "lyrics_jp": "浦島健太",
+    "lyrics_en": "Kenta Urashima",
+    "music_jp": "山元祐介",
+    "music_en": "Yusuke Yamamoto",
+    "arrangement_jp": "山元祐介",
+    "arrangement_en": "Yusuke Yamamoto",
+    "category": "original",
+    "official_order": 77,
+    "jacket_asset_id": "32123531d81d4d32903b2752f8d8b603",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/32123531d81d4d32903b2752f8d8b603/Countach.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Myth or Treat",
+    "title_en": "Myth or Treat",
+    "artist_jp": "hololive English -Myth-",
+    "artist_en": "hololive English -Myth-",
+    "lyrics_jp": "Mori Calliope",
+    "lyrics_en": "Mori Calliope",
+    "music_jp": "Farhan Sarasin",
+    "music_en": "Farhan Sarasin",
+    "arrangement_jp": "Farhan Sarasin",
+    "arrangement_en": "Farhan Sarasin",
+    "category": "original",
+    "official_order": 78,
+    "jacket_asset_id": "5f8edfb4202441b2871d27fd7be68697",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/5f8edfb4202441b2871d27fd7be68697/Myth%20or%20Treat.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Secret Garden",
+    "title_en": "Secret Garden",
+    "artist_jp": "hololive 1st Generation",
+    "artist_en": "hololive 1st Generation",
+    "lyrics_jp": "宮崎まゆ(SUPA LOVE)",
+    "lyrics_en": "Mayu Miyazaki",
+    "music_jp": "宮崎まゆ(SUPA LOVE)",
+    "music_en": "Mayu Miyazaki",
+    "arrangement_jp": "賀佐泰洋(SUPA LOVE)",
+    "arrangement_en": "Yasuhiro Gasa",
+    "category": "original",
+    "official_order": 79,
+    "jacket_asset_id": "37762ba493bb4c8b981612f2ddd8622e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/37762ba493bb4c8b981612f2ddd8622e/Secret%20Garden.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "BLUE CLAPPER",
+    "title_en": "BLUE CLAPPER",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "PandaBoY",
+    "lyrics_en": "PandaBoY",
+    "music_jp": "PandaBoY",
+    "music_en": "PandaBoY",
+    "arrangement_jp": "PandaBoY",
+    "arrangement_en": "PandaBoY",
+    "category": "original",
+    "official_order": 80,
+    "jacket_asset_id": "2eec6571798f4280b38a20b744cc0f32",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2eec6571798f4280b38a20b744cc0f32/BLUE%20CLAPPER.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 14,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "常夜リペイント",
+    "title_en": "Jouya Repaint",
+    "artist_jp": "秘密結社holoX",
+    "artist_en": "Secret Society holoX",
+    "lyrics_jp": "yuzen（Hifumi,inc.）",
+    "lyrics_en": "yuzen（Hifumi,inc.）",
+    "music_jp": "yuzen（Hifumi,inc.）",
+    "music_en": "yuzen（Hifumi,inc.）",
+    "arrangement_jp": "yuzen（Hifumi,inc.）",
+    "arrangement_en": "yuzen（Hifumi,inc.）",
+    "category": "original",
+    "official_order": 81,
+    "jacket_asset_id": "597c1bbbd8ab4885a64e4627e1cff5cb",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/597c1bbbd8ab4885a64e4627e1cff5cb/%E5%B8%B8%E5%A4%9C%E3%83%AA%E3%83%98%E3%82%9A%E3%82%A4%E3%83%B3%E3%83%88.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "ブライダルドリーム",
+    "title_en": "Bridal Dream",
+    "artist_jp": "兎田ぺこら, 宝鐘マリン",
+    "artist_en": "Usada Pekora, Houshou Marine",
+    "lyrics_jp": "HoneyWorks, MARUMOCHI",
+    "lyrics_en": "HoneyWorks, MARUMOCHI",
+    "music_jp": "HoneyWorks",
+    "music_en": "HoneyWorks",
+    "arrangement_jp": "HoneyWorks, MARUMOCHI",
+    "arrangement_en": "HoneyWorks, MARUMOCHI",
+    "category": "original",
+    "official_order": 82,
+    "jacket_asset_id": "6b623ab465d84c87acba704e495bd832",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/6b623ab465d84c87acba704e495bd832/%E3%83%95%E3%82%99%E3%83%A9%E3%82%A4%E3%82%BF%E3%82%99%E3%83%AB%E3%83%88%E3%82%99%E3%83%AA%E3%83%BC%E3%83%A0.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Our Promise",
+    "title_en": "Our Promise",
+    "artist_jp": "hololive English -Promise-",
+    "artist_en": "hololive English -Promise-",
+    "lyrics_jp": "noire",
+    "lyrics_en": "noire",
+    "music_jp": "Jeremy Robson",
+    "music_en": "Jeremy Robson",
+    "arrangement_jp": "Jeremy Robson",
+    "arrangement_en": "Jeremy Robson",
+    "category": "original",
+    "official_order": 83,
+    "jacket_asset_id": "0dca15f0f559404ca79ea67394456469",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/0dca15f0f559404ca79ea67394456469/Our%20Promise.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 15,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Rebellion",
+    "title_en": "Rebellion",
+    "artist_jp": "hololive English -Advent-",
+    "artist_en": "hololive English -Advent-",
+    "lyrics_jp": "Mas Kimura",
+    "lyrics_en": "Mas Kimura",
+    "music_jp": "八木雄一",
+    "music_en": "yuichi yagi",
+    "arrangement_jp": "八木雄一",
+    "arrangement_en": "yuichi yagi",
+    "category": "original",
+    "official_order": 84,
+    "jacket_asset_id": "4254a1f19bc242e2a667d1aa27327c48",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4254a1f19bc242e2a667d1aa27327c48/Rebellion.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "HI-15",
+    "title_en": "HI-15",
+    "artist_jp": "hololive Indonesia 1st Generation",
+    "artist_en": "hololive Indonesia 1st Generation",
+    "lyrics_jp": "おぐらあすか(Hifumi,inc.), saji（Hifumi,inc.）,加藤ひろあき",
+    "lyrics_en": "Asuka Ogura(Hifumi,inc.), saji（Hifumi,inc.）,HIROAKI KATO",
+    "music_jp": "佐高陵平（Hifumi,inc.）",
+    "music_en": "Ryohei Sataka",
+    "arrangement_jp": "佐高陵平（Hifumi,inc.）",
+    "arrangement_en": "Ryohei Sataka",
+    "category": "original",
+    "official_order": 85,
+    "jacket_asset_id": "b41055be06bd4927992075b768193997",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/b41055be06bd4927992075b768193997/HI-15.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 13,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Slap by Step",
+    "title_en": "Slap by Step",
+    "artist_jp": "hololive Indonesia 2nd Generation",
+    "artist_en": "hololive Indonesia 2nd Generation",
+    "lyrics_jp": "後藤涼輔,Muhammad Iqbal (ikkubaru)",
+    "lyrics_en": "Ryosuke Goto, Muhammad Iqbal (ikkubaru)",
+    "music_jp": "後藤涼輔",
+    "music_en": "Ryosuke Goto",
+    "arrangement_jp": "後藤涼輔",
+    "arrangement_en": "Ryosuke Goto",
+    "category": "original",
+    "official_order": 86,
+    "jacket_asset_id": "4dddbc02365243c7a03579e46801d6f0",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4dddbc02365243c7a03579e46801d6f0/Slap%20by%20Step.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 15,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "save our hearts",
+    "title_en": "save our hearts",
+    "artist_jp": "hololive Indonesia 3rd Generation",
+    "artist_en": "hololive Indonesia 3rd Generation",
+    "lyrics_jp": "yuzen(Hifumi,inc.), Datenkou",
+    "lyrics_en": "yuzen(Hifumi,inc.), Datenkou",
+    "music_jp": "yuzen(Hifumi,inc.)",
+    "music_en": "yuzen(Hifumi,inc.)",
+    "arrangement_jp": "yuzen(Hifumi,inc.)",
+    "arrangement_en": "yuzen(Hifumi,inc.)",
+    "category": "original",
+    "official_order": 87,
+    "jacket_asset_id": "6ed012add32c44feb07d6a94409a0e11",
+    "jacket_url": "https://img.game8.jp/12791305/27f5521952853c243fd609e10e93a8ba.webp/show",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "瞬間ハートビート",
+    "title_en": "Shunkan Heartbeat",
+    "artist_jp": "ReGLOSS",
+    "artist_en": "ReGLOSS",
+    "lyrics_jp": "OHTORA",
+    "lyrics_en": "OHTORA",
+    "music_jp": "OHTORA,maeshima soshi",
+    "music_en": "OHTORA,maeshima soshi",
+    "arrangement_jp": "maeshima soshi",
+    "arrangement_en": "maeshima soshi",
+    "category": "original",
+    "official_order": 88,
+    "jacket_asset_id": "9e67389df6fe42528f788da304622e18",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9e67389df6fe42528f788da304622e18/%E7%9E%AC%E9%96%93%E3%83%8F%E3%83%BC%E3%83%88%E3%83%92%E3%82%99%E3%83%BC%E3%83%88.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "刹那ティックコード",
+    "title_en": "Setsunatick Code",
+    "artist_jp": "SorAZ",
+    "artist_en": "SorAZ",
+    "lyrics_jp": "高瀬愛虹",
+    "lyrics_en": "Aiko Takase",
+    "music_jp": "渡部チェル",
+    "music_en": "Cher Watanabe",
+    "arrangement_jp": "渡部チェル",
+    "arrangement_en": "Cher Watanabe",
+    "category": "original",
+    "official_order": 89,
+    "jacket_asset_id": "d46005554bbb482b8ef7fdd79840352e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d46005554bbb482b8ef7fdd79840352e/%E5%88%B9%E9%82%A3%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF%E3%82%B3%E3%83%BC%E3%83%88%E3%82%99.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 12,
+      "HARD": 21,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Suspect",
+    "title_en": "Suspect",
+    "artist_jp": "hololive IDOL PROJECT",
+    "artist_en": "hololive IDOL PROJECT",
+    "lyrics_jp": "Kyota.",
+    "lyrics_en": "Kyota.",
+    "music_jp": "Kyota.",
+    "music_en": "Kyota.",
+    "arrangement_jp": "Kyota.",
+    "arrangement_en": "Kyota.",
+    "category": "original",
+    "official_order": 90,
+    "jacket_asset_id": "54adeccae6784b26b6b7f846333b7394",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/54adeccae6784b26b6b7f846333b7394/Suspect.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "なかま歌",
+    "title_en": "NAKAMAKA",
+    "artist_jp": "不知火建設",
+    "artist_en": "Shiranui Construction",
+    "lyrics_jp": "佐々木喫茶",
+    "lyrics_en": "Kissa Sasaki",
+    "music_jp": "佐々木喫茶",
+    "music_en": "Kissa Sasaki",
+    "arrangement_jp": "佐々木喫茶",
+    "arrangement_en": "Kissa Sasaki",
+    "category": "original",
+    "official_order": 91,
+    "jacket_asset_id": "2902ebdfa1b7447b8797debb70ef014c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2902ebdfa1b7447b8797debb70ef014c/%E3%81%AA%E3%81%8B%E3%81%BE%E6%AD%8C.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 15,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "Wicked feat. Mori Calliope",
+    "title_en": "Wicked feat. Mori Calliope",
+    "artist_jp": "星街すいせい, Mori Calliope",
+    "artist_en": "Hoshimachi Suisei, Mori Calliope",
+    "lyrics_jp": "Mori Calliope,　HIROMI",
+    "lyrics_en": "Mori Calliope,　HIROMI",
+    "music_jp": "Giga",
+    "music_en": "Giga",
+    "arrangement_jp": "Giga",
+    "arrangement_en": "Giga",
+    "category": "original",
+    "official_order": 92,
+    "jacket_asset_id": "aee8fd1ff3b94d00bbfec33ba826fa14",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/aee8fd1ff3b94d00bbfec33ba826fa14/Wicked%20feat.%20Mori%20Calliope.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 9,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "おにけもだんす",
+    "title_en": "ONIKEMODANCE",
+    "artist_jp": "いろはにほへっと あやふぶみ",
+    "artist_en": "AyaFubuMi",
+    "lyrics_jp": "PandaBoY",
+    "lyrics_en": "PandaBoY",
+    "music_jp": "PandaBoY",
+    "music_en": "PandaBoY",
+    "arrangement_jp": "PandaBoY",
+    "arrangement_en": "PandaBoY",
+    "category": "original",
+    "official_order": 93,
+    "jacket_asset_id": "3cedde32a376460b88595ea86d055574",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3cedde32a376460b88595ea86d055574/%E3%81%8A%E3%81%AB%E3%81%91%E3%82%82%E3%81%9F%E3%82%99%E3%82%93%E3%81%99.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 14,
+      "HARD": 23,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "地獄であおうぜ！スバちょこるなたん",
+    "title_en": "zigokudeaouze!subachocolunatan",
+    "artist_jp": "スバちょこるなたん",
+    "artist_en": "subachocolunatan",
+    "lyrics_jp": "七条レタス",
+    "lyrics_en": "Shichijo Lettuce",
+    "music_jp": "D.watt",
+    "music_en": "D.watt",
+    "arrangement_jp": "D.watt",
+    "arrangement_en": "D.watt",
+    "category": "original",
+    "official_order": 94,
+    "jacket_asset_id": "0aa9e26254744b548374f90afe0f94f6",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/0aa9e26254744b548374f90afe0f94f6/%E5%9C%B0%E7%8D%84%E3%81%A6%E3%82%99%E4%BC%9A%E3%81%8A%E3%81%86%E3%81%9B%E3%82%99%EF%BC%81%20%E3%82%B9%E3%83%8F%E3%82%99%E3%81%A1%E3%82%87%E3%81%93%E3%82%8B%E3%81%AA%E3%81%9F%E3%82%93.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 22,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "ORANGE PARADE feat.戌神ころね",
+    "title_en": "ORANGE PARADE feat. Inugami Korone",
+    "artist_jp": "猫又おかゆ, 戌神ころね",
+    "artist_en": "Nekomata Okayu, Inugami Korone",
+    "lyrics_jp": "TOPHAMHAT-KYO",
+    "lyrics_en": "TOPHAMHAT-KYO",
+    "music_jp": "FAKE TYPE.",
+    "music_en": "FAKE TYPE.",
+    "arrangement_jp": "DYES IWASAKI",
+    "arrangement_en": "DYES IWASAKI",
+    "category": "original",
+    "official_order": 95,
+    "jacket_asset_id": "b02f56c2145440c2ab0181305e5f5ddb",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/b02f56c2145440c2ab0181305e5f5ddb/ORANGE%20PARADE%20feat.%E6%88%8C%E7%A5%9E%E3%81%93%E3%82%8D%E3%81%AD.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "I I I",
+    "title_en": "I I I",
+    "artist_jp": "宝鐘マリン & Kobo Kanaeru",
+    "artist_en": "Houshou Marine & Kobo Kanaeru",
+    "lyrics_jp": "Sena Kiryuin",
+    "lyrics_en": "Sena Kiryuin",
+    "music_jp": "Giga",
+    "music_en": "Giga",
+    "arrangement_jp": "Giga",
+    "arrangement_en": "Giga",
+    "category": "original",
+    "official_order": 96,
+    "jacket_asset_id": "fe01381ddfc546e190b865f97cb54186",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/fe01381ddfc546e190b865f97cb54186/III.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ししわたクッキング feat.獅白ぼたん",
+    "title_en": "Shishi Wata Cooking feat. Shishiro Botan",
+    "artist_jp": "角巻わため, 獅白ぼたん",
+    "artist_en": "Tsunomaki Watame, Shishiro Botan",
+    "lyrics_jp": "まろん (IOSYS)",
+    "lyrics_en": "MARON (IOSYS)",
+    "music_jp": "REDALiCE",
+    "music_en": "REDALiCE",
+    "arrangement_jp": "REDALiCE",
+    "arrangement_en": "REDALiCE",
+    "category": "original",
+    "official_order": 97,
+    "jacket_asset_id": "276eb83e18dd48a584e8b8e90910c26c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/276eb83e18dd48a584e8b8e90910c26c/%E3%81%97%E3%81%97%E3%82%8F%E3%81%9F%E3%82%AF%E3%83%83%E3%82%AD%E3%83%B3%E3%82%AF%E3%82%99%20feat.%E7%8D%85%E7%99%BD%E3%81%BB%E3%82%99%E3%81%9F%E3%82%93.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 10,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "また傷に触れる",
+    "title_en": "Touch the hurt again",
+    "artist_jp": "Blue Journey",
+    "artist_en": "Blue Journey",
+    "lyrics_jp": "中居廉",
+    "lyrics_en": "Ren Nakai",
+    "music_jp": "中居廉",
+    "music_en": "Ren Nakai",
+    "arrangement_jp": "樂",
+    "arrangement_en": "Raku",
+    "category": "original",
+    "official_order": 98,
+    "jacket_asset_id": "4aadcda2d8b14472975ba6218b2533a2",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4aadcda2d8b14472975ba6218b2533a2/%E3%81%BE%E3%81%9F%E5%82%B7%E3%81%AB%E8%A7%A6%E3%82%8C%E3%82%8B.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 17,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "青く在れ",
+    "title_en": "Stay Blue",
+    "artist_jp": "不知火フレア & IRyS",
+    "artist_en": "Shiranui Flare & IRyS",
+    "lyrics_jp": "遠藤信吾",
+    "lyrics_en": "Shingo Endo",
+    "music_jp": "遠藤信吾",
+    "music_en": "Shingo Endo",
+    "arrangement_jp": "遠藤信吾",
+    "arrangement_en": "Shingo Endo",
+    "category": "original",
+    "official_order": 99,
+    "jacket_asset_id": "472d6457d9544f97985ab4f32ce53698",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/472d6457d9544f97985ab4f32ce53698/%E9%9D%92%E3%81%8F%E5%9C%A8%E3%82%8C.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 14,
+      "HARD": 22,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "みっころね×しょうたいむ!!",
+    "title_en": "Mikkorone×Showtime!!",
+    "artist_jp": "さくらみこ, 戌神ころね",
+    "artist_en": "Sakura Miko, Inugami Korone",
+    "lyrics_jp": "まろん (IOSYS)",
+    "lyrics_en": "MARON (IOSYS)",
+    "music_jp": "ARM (IOSYS)",
+    "music_en": "ARM (IOSYS)",
+    "arrangement_jp": "ARM (IOSYS) 、紅維流星",
+    "arrangement_en": "ARM (IOSYS) ,Akai Ryusei",
+    "category": "original",
+    "official_order": 100,
+    "jacket_asset_id": "3198a9b33159456f8da9e76aab145b1b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3198a9b33159456f8da9e76aab145b1b/%E3%81%BF%E3%81%A3%E3%81%93%E3%82%8D%E3%81%AD%C3%97%E3%81%97%E3%82%87%E3%81%86%E3%81%9F%E3%81%84%E3%82%80!!.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "鬼ノ宴",
+    "title_en": "ONINO UTAGE",
+    "artist_jp": "ロボ子さん",
+    "artist_en": "Robocosan",
+    "lyrics_jp": "友成空",
+    "lyrics_en": "TOMONARISORA",
+    "music_jp": "友成空",
+    "music_en": "TOMONARISORA",
+    "category": "cover",
+    "official_order": 101,
+    "jacket_asset_id": "7a6ff28aa4a044e59609ca3b67f7d274",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/7a6ff28aa4a044e59609ca3b67f7d274/%E9%AC%BC%E3%83%8E%E5%AE%B4.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "気まぐれメルシィ",
+    "title_en": "Kimagure Mercy",
+    "artist_jp": "アキ・ローゼンタール",
+    "artist_en": "Aki Rosenthal",
+    "lyrics_jp": "八王子P・q*Left",
+    "lyrics_en": "Hachioji P・q*Left",
+    "music_jp": "八王子P",
+    "music_en": "Hachioji P",
+    "category": "cover",
+    "official_order": 102,
+    "jacket_asset_id": "fb3ef5e618954905a1a17d27a46793b0",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/fb3ef5e618954905a1a17d27a46793b0/%E6%B0%97%E3%81%BE%E3%81%8F%E3%82%99%E3%82%8C%E3%83%A1%E3%83%AB%E3%82%B7%E3%82%A3.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "ブタサンダー",
+    "title_en": "BUTASANDER",
+    "artist_jp": "赤井はあと",
+    "artist_en": "Akai Haato",
+    "lyrics_jp": "ゆこぴ",
+    "lyrics_en": "Yukopi",
+    "music_jp": "ゆこぴ",
+    "music_en": "Yukopi",
+    "category": "cover",
+    "official_order": 103,
+    "jacket_asset_id": "766f445536f8457cbf9355666b2572ca",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/766f445536f8457cbf9355666b2572ca/%E3%83%95%E3%82%99%E3%82%BF%E3%82%B5%E3%83%B3%E3%82%BF%E3%82%99%E3%83%BC.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "シル・ヴ・プレジデント",
+    "title_en": "Sʼil vous President",
+    "artist_jp": "白上フブキ",
+    "artist_en": "Shirakami Fubuki",
+    "lyrics_jp": "ナナホシ管弦楽団",
+    "lyrics_en": "Nanahoshi Orchestra",
+    "music_jp": "岩見 陸",
+    "music_en": "Iwami Takashi",
+    "category": "cover",
+    "official_order": 104,
+    "jacket_asset_id": "aa0ef353009e410e9905f00c332eceb6",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/aa0ef353009e410e9905f00c332eceb6/%E3%82%B7%E3%83%AB%E3%83%BB%E3%82%A6%E3%82%99%E3%83%BB%E3%83%95%E3%82%9A%E3%83%AC%E3%82%B7%E3%82%99%E3%83%86%E3%82%99%E3%83%B3%E3%83%88.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 21,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "同担☆拒否",
+    "title_en": "DOUTAN KYOHI",
+    "artist_jp": "夏色まつり",
+    "artist_en": "Natsuiro Matsuri",
+    "lyrics_jp": "shito, Gom",
+    "lyrics_en": "shito, Gom",
+    "music_jp": "shito",
+    "music_en": "shito",
+    "category": "cover",
+    "official_order": 105,
+    "jacket_asset_id": "3212911919044327851f30e4ce91919e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3212911919044327851f30e4ce91919e/%E5%90%8C%E6%8B%85%E2%98%86%E6%8B%92%E5%90%A6.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "グッバイ宣言",
+    "title_en": "Goodbye Declaration",
+    "artist_jp": "百鬼あやめ",
+    "artist_en": "Nakiri Ayame",
+    "lyrics_jp": "Chinozo",
+    "lyrics_en": "Chinozo",
+    "music_jp": "Chinozo",
+    "music_en": "Chinozo",
+    "category": "cover",
+    "official_order": 106,
+    "jacket_asset_id": "4ee45e3ce369469d9728d9f7d667e40c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/4ee45e3ce369469d9728d9f7d667e40c/%E3%82%AF%E3%82%99%E3%83%83%E3%83%8F%E3%82%99%E3%82%A4%E5%AE%A3%E8%A8%80.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "妄想税",
+    "title_en": "Delusion Tax",
+    "artist_jp": "癒月ちょこ",
+    "artist_en": "Yuzuki Choco",
+    "lyrics_jp": "DECO*27",
+    "lyrics_en": "DECO*27",
+    "music_jp": "DECO*27",
+    "music_en": "DECO*27",
+    "category": "cover",
+    "official_order": 107,
+    "jacket_asset_id": "9c829e0f31d446eca0853b966c7ba53b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9c829e0f31d446eca0853b966c7ba53b/%E5%A6%84%E6%83%B3%E7%A8%8E.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 12,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "どぅーまいべすと！",
+    "title_en": "Do my best!",
+    "artist_jp": "大空スバル",
+    "artist_en": "Oozora Subaru",
+    "lyrics_jp": "キノシタ",
+    "lyrics_en": "kinoshita",
+    "music_jp": "キノシタ",
+    "music_en": "kinoshita",
+    "category": "cover",
+    "official_order": 108,
+    "jacket_asset_id": "ad557ed6d4fb46309318a835a268f54b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/ad557ed6d4fb46309318a835a268f54b/%E3%81%A8%E3%82%99%E3%81%85%E3%83%BC%E3%81%BE%E3%81%84%E3%81%B8%E3%82%99%E3%81%99%E3%81%A8%EF%BC%81.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "唱",
+    "title_en": "Show",
+    "artist_jp": "戌神ころね",
+    "artist_en": "Inugami Korone",
+    "lyrics_jp": "TOPHAMHAT-KYO (FAKE TYPE.)",
+    "lyrics_en": "TOPHAMHAT-KYO (FAKE TYPE.)",
+    "music_jp": "Giga & TeddyLoid",
+    "music_en": "Giga & TeddyLoid",
+    "category": "cover",
+    "official_order": 109,
+    "jacket_asset_id": "215b05e6c349422eade0d3ba8fca22da",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/215b05e6c349422eade0d3ba8fca22da/%E5%94%B1.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "怪物",
+    "title_en": "Kaibutsu",
+    "artist_jp": "不知火フレア",
+    "artist_en": "Shiranui Flare",
+    "lyrics_jp": "Ayase",
+    "lyrics_en": "Ayase",
+    "music_jp": "Ayase",
+    "music_en": "Ayase",
+    "category": "cover",
+    "official_order": 110,
+    "jacket_asset_id": "7616b53bba924dc3b3edb27c7bbd7918",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/7616b53bba924dc3b3edb27c7bbd7918/%E6%80%AA%E7%89%A9.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "寝起きヤシの木",
+    "title_en": "Waking Yashinoki",
+    "artist_jp": "白銀ノエル",
+    "artist_en": "Shirogane Noel",
+    "lyrics_jp": "ゆこぴ",
+    "lyrics_en": "Yukopi",
+    "music_jp": "ゆこぴ",
+    "music_en": "Yukopi",
+    "category": "cover",
+    "official_order": 111,
+    "jacket_asset_id": "3e42b189415944969acb1edf07c098d8",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3e42b189415944969acb1edf07c098d8/%E5%AF%9D%E8%B5%B7%E3%81%8D%E3%83%A4%E3%82%B7%E3%81%AE%E6%9C%A8.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "-ERROR",
+    "title_en": "-ERROR",
+    "artist_jp": "常闇トワ",
+    "artist_en": "Tokoyami Towa",
+    "lyrics_jp": "niki",
+    "lyrics_en": "niki",
+    "music_jp": "niki",
+    "music_en": "niki",
+    "category": "cover",
+    "official_order": 112,
+    "jacket_asset_id": "f4b2ce0f827c43adb9e9c1254ae53bbb",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/f4b2ce0f827c43adb9e9c1254ae53bbb/-ERROR.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ふわふわ時間",
+    "title_en": "FUWAFUWA TIME",
+    "artist_jp": "姫森ルーナ",
+    "artist_en": "Himemori Luna",
+    "lyrics_jp": "秋山 澪",
+    "lyrics_en": "Mio Akiyama",
+    "music_jp": "前澤 寛之",
+    "music_en": "Hiroyuki Maezawa",
+    "category": "cover",
+    "official_order": 113,
+    "jacket_asset_id": "208b03fd092f45309b972d90a4291afc",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/208b03fd092f45309b972d90a4291afc/%E3%81%B5%E3%82%8F%E3%81%B5%E3%82%8F%E6%99%82%E9%96%93.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 9,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "勇者",
+    "title_en": "The Brave",
+    "artist_jp": "雪花ラミィ",
+    "artist_en": "Yukihana Lamy",
+    "lyrics_jp": "Ayase",
+    "lyrics_en": "Ayase",
+    "music_jp": "Ayase",
+    "music_en": "Ayase",
+    "category": "cover",
+    "official_order": 114,
+    "jacket_asset_id": "67a1b00b01d645ea9f1fed1585693e0a",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/67a1b00b01d645ea9f1fed1585693e0a/%E5%8B%87%E8%80%85.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ちゅ、多様性。",
+    "title_en": "Chu,Tayousei.",
+    "artist_jp": "桃鈴ねね",
+    "artist_en": "Momosuzu Nene",
+    "lyrics_jp": "あの／真部脩一",
+    "lyrics_en": "ano/Shuichi Mabe",
+    "music_jp": "真部脩一",
+    "music_en": "Shuichi Mabe",
+    "category": "cover",
+    "official_order": 115,
+    "jacket_asset_id": "a5b55b588238462dbefcef9c9e1d7e8d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/a5b55b588238462dbefcef9c9e1d7e8d/%E3%81%A1%E3%82%85%E3%80%81%E5%A4%9A%E6%A7%98%E6%80%A7%E3%80%82.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 14,
+      "HARD": 20,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ノンブレス・オブリージュ",
+    "title_en": "Non-breath oblige",
+    "artist_jp": "獅白ぼたん",
+    "artist_en": "Shishiro Botan",
+    "lyrics_jp": "ピノキオピー",
+    "lyrics_en": "PinocchioP",
+    "music_jp": "ピノキオピー",
+    "music_en": "PinocchioP",
+    "category": "cover",
+    "official_order": 116,
+    "jacket_asset_id": "14aefece5c4044c39b57b8e150ee89ce",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/14aefece5c4044c39b57b8e150ee89ce/%E3%83%8E%E3%83%B3%E3%83%95%E3%82%99%E3%83%AC%E3%82%B9%E3%83%BB%E3%82%AA%E3%83%95%E3%82%99%E3%83%AA%E3%83%BC%E3%82%B7%E3%82%99%E3%83%A5.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "エンヴィーベイビー",
+    "title_en": "ENVY BABY",
+    "artist_jp": "尾丸ポルカ",
+    "artist_en": "Omaru Polka",
+    "lyrics_jp": "Kanaria",
+    "lyrics_en": "Kanaria",
+    "music_jp": "Kanaria",
+    "music_en": "Kanaria",
+    "category": "cover",
+    "official_order": 117,
+    "jacket_asset_id": "fb73b6bd556c4c188b2ddf7e50629e37",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/fb73b6bd556c4c188b2ddf7e50629e37/%E3%82%A8%E3%83%B3%E3%82%A6%E3%82%99%E3%82%A3%E3%83%BC%E3%83%98%E3%82%99%E3%82%A4%E3%83%92%E3%82%99%E3%83%BC.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "神っぽいな",
+    "title_en": "God-ish",
+    "artist_jp": "ラプラス・ダークネス",
+    "artist_en": "La+ Darknesss",
+    "lyrics_jp": "ピノキオピー",
+    "lyrics_en": "PinocchioP",
+    "music_jp": "ピノキオピー",
+    "music_en": "PinocchioP",
+    "category": "cover",
+    "official_order": 118,
+    "jacket_asset_id": "76d3a2b116884d019c7624ff0e700fec",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/76d3a2b116884d019c7624ff0e700fec/%E7%A5%9E%E3%81%A3%E3%81%BB%E3%82%9A%E3%81%84%E3%81%AA.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "フクロウさん",
+    "title_en": "Owl",
+    "artist_jp": "鷹嶺ルイ",
+    "artist_en": "Takane Lui",
+    "lyrics_jp": "すりぃ",
+    "lyrics_en": "THREEE",
+    "music_jp": "すりぃ",
+    "music_en": "THREEE",
+    "category": "cover",
+    "official_order": 119,
+    "jacket_asset_id": "d174e0ce83ff4336a3a7d5d8081b93b7",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d174e0ce83ff4336a3a7d5d8081b93b7/%E3%83%95%E3%82%AF%E3%83%AD%E3%82%A6%E3%81%95%E3%82%93.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "God knows...",
+    "title_en": "God knows...",
+    "artist_jp": "博衣こより",
+    "artist_en": "Hakui Koyori",
+    "lyrics_jp": "畑 亜貴",
+    "lyrics_en": "Aki Hata",
+    "music_jp": "神前 暁",
+    "music_en": "Satoru Kosaki",
+    "category": "cover",
+    "official_order": 120,
+    "jacket_asset_id": "d7da0bdb56b04329b610d920e403d560",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/d7da0bdb56b04329b610d920e403d560/God%20knows....png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "きゅうくらりん",
+    "title_en": "Kyu-kurarin",
+    "artist_jp": "風真いろは",
+    "artist_en": "Kazama Iroha",
+    "lyrics_jp": "いよわ",
+    "lyrics_en": "Iyowa",
+    "music_jp": "いよわ",
+    "music_en": "Iyowa",
+    "category": "cover",
+    "official_order": 121,
+    "jacket_asset_id": "edcc2bfa89714194a019b000783e6eec",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/edcc2bfa89714194a019b000783e6eec/%E3%81%8D%E3%82%85%E3%81%86%E3%81%8F%E3%82%89%E3%82%8A%E3%82%93.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 14,
+      "HARD": 21,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "Snow halation",
+    "title_en": "Snow halation",
+    "artist_jp": "Ayunda Risu",
+    "artist_en": "Ayunda Risu",
+    "lyrics_jp": "畑 亜貴",
+    "lyrics_en": "Aki Hata",
+    "music_jp": "山田高弘",
+    "music_en": "Takahiro Yamada",
+    "category": "cover",
+    "official_order": 122,
+    "jacket_asset_id": "34b8e67a4c674617a5e2702d1f5aa39b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/34b8e67a4c674617a5e2702d1f5aa39b/Snow%20halation.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 11,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "FIRE BIRD",
+    "title_en": "FIRE BIRD",
+    "artist_jp": "Moona Hoshinova",
+    "artist_en": "Moona Hoshinova",
+    "lyrics_jp": "上松範康（Elements Garden）",
+    "lyrics_en": "Noriyasu Agematsu (Elements Garden)",
+    "music_jp": "上松範康（Elements Garden）",
+    "music_en": "Noriyasu Agematsu (Elements Garden)",
+    "category": "cover",
+    "official_order": 123,
+    "jacket_asset_id": "f74ea8858ee742acbb13723e84fa3a69",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/f74ea8858ee742acbb13723e84fa3a69/FIRE%20BIRD.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "エイリアンエイリアン",
+    "title_en": "Alien Alien",
+    "artist_jp": "Airani Iofifteen",
+    "artist_en": "Airani Iofifteen",
+    "lyrics_jp": "ナユタン星人",
+    "lyrics_en": "NayutalieN",
+    "music_jp": "ナユタン星人",
+    "music_en": "NayutalieN",
+    "category": "cover",
+    "official_order": 124,
+    "jacket_asset_id": "83d9d0c06ae24054a9194d5d96783cd3",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/83d9d0c06ae24054a9194d5d96783cd3/%E3%82%A8%E3%82%A4%E3%83%AA%E3%82%A2%E3%83%B3%E3%82%A8%E3%82%A4%E3%83%AA%E3%82%A2%E3%83%B3.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 14,
+      "HARD": 21,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "狂乱 Hey Kids!!",
+    "title_en": "Kyouran Hey Kids!!",
+    "artist_jp": "Kureiji Ollie",
+    "artist_en": "Kureiji Ollie",
+    "lyrics_jp": "山中拓也",
+    "lyrics_en": "Yamanaka Takuya",
+    "music_jp": "山中拓也",
+    "music_en": "Yamanaka Takuya",
+    "category": "cover",
+    "official_order": 125,
+    "jacket_asset_id": "bd9eb8314dbc4045a3cb1926f9ee1b5d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/bd9eb8314dbc4045a3cb1926f9ee1b5d/%E7%8B%82%E4%B9%B1%20Hey%20Kids!!.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 14,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "マーシャル・マキシマイザー",
+    "title_en": "Marshall Maximizer",
+    "artist_jp": "Anya Melfissa",
+    "artist_en": "Anya Melfissa",
+    "lyrics_jp": "柊マグネタイト",
+    "lyrics_en": "Hiiragi Magnetite",
+    "music_jp": "柊マグネタイト",
+    "music_en": "Hiiragi Magnetite",
+    "category": "cover",
+    "official_order": 126,
+    "jacket_asset_id": "0ce37544905f4d6a9a7e9483eccd4baf",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/0ce37544905f4d6a9a7e9483eccd4baf/%E3%83%9E%E3%83%BC%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%BB%E3%83%9E%E3%82%AD%E3%82%B7%E3%83%9E%E3%82%A4%E3%82%B5%E3%82%99%E3%83%BC.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 14,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "うっせぇわ",
+    "title_en": "Usseewa",
+    "artist_jp": "Pavolia Reine",
+    "artist_en": "Pavolia Reine",
+    "lyrics_jp": "syudou",
+    "lyrics_en": "syudou",
+    "music_jp": "syudou",
+    "music_en": "syudou",
+    "category": "cover",
+    "official_order": 127,
+    "jacket_asset_id": "0cc6f39d4501422784f044f03dde59a2",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/0cc6f39d4501422784f044f03dde59a2/%E3%81%86%E3%81%A3%E3%81%9B%E3%81%87%E3%82%8F.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 13,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "可愛くてごめん",
+    "title_en": "KAWAIKUTE GOMEN",
+    "artist_jp": "Vestia Zeta",
+    "artist_en": "Vestia Zeta",
+    "lyrics_jp": "shito",
+    "lyrics_en": "shito",
+    "music_jp": "shito",
+    "music_en": "shito",
+    "category": "cover",
+    "official_order": 128,
+    "jacket_asset_id": "88a1965f6e3a438e93c8c9dd40f98760",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/88a1965f6e3a438e93c8c9dd40f98760/%E5%8F%AF%E6%84%9B%E3%81%8F%E3%81%A6%E3%81%93%E3%82%99%E3%82%81%E3%82%93.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "brave heart",
+    "title_en": "Brave Heart",
+    "artist_jp": "Kaela Kovalskia",
+    "artist_en": "Kaela Kovalskia",
+    "lyrics_jp": "大森 祥子",
+    "lyrics_en": "OOMORI Shouko",
+    "music_jp": "太田 美知彦",
+    "music_en": "OOTA Michihiko",
+    "category": "cover",
+    "official_order": 129,
+    "jacket_asset_id": "948407a019c844a8b5f259181f625666",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/948407a019c844a8b5f259181f625666/brave%20heart.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 22
+    }
+  },
+  {
+    "title_jp": "Overdose",
+    "title_en": "Overdose",
+    "artist_jp": "Kobo Kanaeru",
+    "artist_en": "Kobo Kanaeru",
+    "lyrics_jp": "なとり",
+    "lyrics_en": "natori",
+    "music_jp": "なとり",
+    "music_en": "natori",
+    "category": "cover",
+    "official_order": 130,
+    "jacket_asset_id": "e01de556afba46d9bbc42a6d66dca35d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/e01de556afba46d9bbc42a6d66dca35d/Overdose.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 12,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "ヴァンパイア",
+    "title_en": "The Vampire",
+    "artist_jp": "Takanashi Kiara",
+    "artist_en": "Takanashi Kiara",
+    "lyrics_jp": "DECO*27",
+    "lyrics_en": "DECO*27",
+    "music_jp": "DECO*27",
+    "music_en": "DECO*27",
+    "category": "cover",
+    "official_order": 131,
+    "jacket_asset_id": "3008746180744f25a6678679f370a69c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/3008746180744f25a6678679f370a69c/%E3%82%A6%E3%82%99%E3%82%A1%E3%83%B3%E3%83%8F%E3%82%9A%E3%82%A4%E3%82%A2.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ないない",
+    "title_en": "NAI NAI",
+    "artist_jp": "Ninomae Ina'nis",
+    "artist_en": "Ninomae Ina'nis",
+    "lyrics_jp": "ハヤシケイ／毛蟹",
+    "lyrics_en": "Kei Hayashi/Kegani",
+    "music_jp": "毛蟹",
+    "music_en": "Kegani",
+    "category": "cover",
+    "official_order": 132,
+    "jacket_asset_id": "6a14ee3efed245d69f8746c749fc2a4e",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/6a14ee3efed245d69f8746c749fc2a4e/%E3%81%AA%E3%81%84%E3%81%AA%E3%81%84.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 9,
+      "HARD": 18,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "アイドル",
+    "title_en": "IDOL",
+    "artist_jp": "IRyS",
+    "artist_en": "IRyS",
+    "lyrics_jp": "Ayase",
+    "lyrics_en": "Ayase",
+    "music_jp": "Ayase",
+    "music_en": "Ayase",
+    "category": "cover",
+    "official_order": 133,
+    "jacket_asset_id": "226e9abf6c2f447b9602b5c9534efd3c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/226e9abf6c2f447b9602b5c9534efd3c/%E3%82%A2%E3%82%A4%E3%83%88%E3%82%99%E3%83%AB.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 11,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "マフィア",
+    "title_en": "Mafia",
+    "artist_jp": "Ouro Kronii",
+    "artist_en": "Ouro Kronii",
+    "lyrics_jp": "wotaku",
+    "lyrics_en": "wotaku",
+    "music_jp": "wotaku",
+    "music_en": "wotaku",
+    "category": "cover",
+    "official_order": 134,
+    "jacket_asset_id": "9ee0edfb374445ac979e6123d3d653a1",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9ee0edfb374445ac979e6123d3d653a1/%E3%83%9E%E3%83%95%E3%82%A3%E3%82%A2.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 16,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "Los! Los! Los!",
+    "title_en": "Los! Los! Los!",
+    "artist_jp": "Hakos Baelz",
+    "artist_en": "Hakos Baelz",
+    "lyrics_jp": "hotaru",
+    "lyrics_en": "hotaru",
+    "music_jp": "八木雄一",
+    "music_en": "Yuichi Yagi",
+    "category": "cover",
+    "official_order": 135,
+    "jacket_asset_id": "71d52a2f421a4b3cb2fdf79fa20a0efb",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/71d52a2f421a4b3cb2fdf79fa20a0efb/Los!%20Los!%20Los!.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "強風オールバック",
+    "title_en": "Kyoufuu All Back",
+    "artist_jp": "Shiori Novella",
+    "artist_en": "Shiori Novella",
+    "lyrics_jp": "ゆこぴ",
+    "lyrics_en": "Yukopi",
+    "music_jp": "ゆこぴ",
+    "music_en": "Yukopi",
+    "category": "cover",
+    "official_order": 136,
+    "jacket_asset_id": "cd4f78004e9048f695e4cc0fb0e70eef",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/cd4f78004e9048f695e4cc0fb0e70eef/%E5%BC%B7%E9%A2%A8%E3%82%AA%E3%83%BC%E3%83%AB%E3%83%8F%E3%82%99%E3%83%83%E3%82%AF.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "鏡面の波",
+    "title_en": "The Mirror’s Ripples",
+    "artist_jp": "Koseki Bijou",
+    "artist_en": "Koseki Bijou",
+    "lyrics_jp": "照井順政",
+    "lyrics_en": "Yoshimasa Terui",
+    "music_jp": "照井順政",
+    "music_en": "Yoshimasa Terui",
+    "category": "cover",
+    "official_order": 137,
+    "jacket_asset_id": "8a5368ef82b94b908ffa772b09213c03",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/8a5368ef82b94b908ffa772b09213c03/%E9%8F%A1%E9%9D%A2%E3%81%AE%E6%B3%A2.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "雪の華",
+    "title_en": "YUKINO HANA",
+    "artist_jp": "Nerissa Ravencroft",
+    "artist_en": "Nerissa Ravencroft",
+    "lyrics_jp": "Satomi",
+    "lyrics_en": "Satomi",
+    "music_jp": "松本良喜",
+    "music_en": "Ryoki Matsumoto",
+    "category": "cover",
+    "official_order": 138,
+    "jacket_asset_id": "35926d63503b4515abc2df0f1536c700",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/35926d63503b4515abc2df0f1536c700/%E9%9B%AA%E3%81%AE%E8%8F%AF.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 8,
+      "HARD": 15,
+      "EXPERT": 22
+    }
+  },
+  {
+    "title_jp": "キュートなカノジョ",
+    "title_en": "Cute Na Kanojo",
+    "artist_jp": "FUWAMOCO",
+    "artist_en": "FUWAMOCO",
+    "lyrics_jp": "syudou",
+    "lyrics_en": "syudou",
+    "music_jp": "syudou",
+    "music_en": "syudou",
+    "category": "cover",
+    "official_order": 139,
+    "jacket_asset_id": "c5cbf7b047a04cd4868066664597385f",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/c5cbf7b047a04cd4868066664597385f/%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%88%E3%81%AA%E3%82%AB%E3%83%8E%E3%82%B7%E3%82%99%E3%83%A7.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Let Me Be With You",
+    "title_en": "Let Me Be With You",
+    "artist_jp": "FUWAMOCO",
+    "artist_en": "FUWAMOCO",
+    "lyrics_jp": "北川 勝利",
+    "lyrics_en": "Katsutoshi Kitagawa",
+    "music_jp": "北川 勝利",
+    "music_en": "Katsutoshi Kitagawa",
+    "category": "cover",
+    "official_order": 140,
+    "jacket_asset_id": "6dd9488a274746d783e95fd85b07a069",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/6dd9488a274746d783e95fd85b07a069/Let%20Me%20Be%20With%20You.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "奏（かなで）",
+    "title_en": "KANADE",
+    "artist_jp": "音乃瀬奏",
+    "artist_en": "Otonose Kanade",
+    "lyrics_jp": "大橋卓弥・常田真太郎",
+    "lyrics_en": "Takuya Ohashi / Shintaro Tokita",
+    "music_jp": "大橋卓弥・常田真太郎",
+    "music_en": "Takuya Ohashi / Shintaro Tokita",
+    "category": "cover",
+    "official_order": 141,
+    "jacket_asset_id": "356466be8b924a98b70f66a58e3f96c6",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/356466be8b924a98b70f66a58e3f96c6/%E5%A5%8F%EF%BC%88%E3%81%8B%E3%81%AA%E3%81%A6%E3%82%99%EF%BC%89.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 8,
+      "HARD": 15,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "チェリーポップ",
+    "title_en": "Cherry Pop",
+    "artist_jp": "一条莉々華",
+    "artist_en": "Ichijou Ririka",
+    "lyrics_jp": "DECO*27",
+    "lyrics_en": "DECO*27",
+    "music_jp": "DECO*27",
+    "music_en": "DECO*27",
+    "category": "cover",
+    "official_order": 142,
+    "jacket_asset_id": "b52841c57ec84b53890810d15414276d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/b52841c57ec84b53890810d15414276d/%E3%83%81%E3%82%A7%E3%83%AA%E3%83%BC%E3%83%9B%E3%82%9A%E3%83%83%E3%83%95%E3%82%9A.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 14,
+      "HARD": 23,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "ピ ピカソ",
+    "title_en": "PI PIKASO",
+    "artist_jp": "儒烏風亭らでん",
+    "artist_en": "Juufuutei Raden",
+    "lyrics_jp": "矢倉 邦晃 / 保山 宗明玉 / チャンキー松本",
+    "lyrics_en": "YAGURA KUNIAKI / HOZAN MUNEMYOUOU / CHANKII MATSUMOTO",
+    "music_jp": "本間 勇輔",
+    "music_en": "HONMA YUUSUKE",
+    "category": "cover",
+    "official_order": 143,
+    "jacket_asset_id": "366d411758e94a1391a5c4d05ff3ec6b",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/366d411758e94a1391a5c4d05ff3ec6b/%E3%83%92%E3%82%9A%20%E3%83%92%E3%82%9A%E3%82%AB%E3%82%BD.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 13,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "ツッパリHigh School Rock'n Roll(登校編)",
+    "title_en": "Tsuppari High School Rock'n Roll (Toukou-hen)",
+    "artist_jp": "轟はじめ",
+    "artist_en": "Todoroki Hajime",
+    "lyrics_jp": "タミヤヨシユキ",
+    "lyrics_en": "Tamiya Yoshiyuki",
+    "music_jp": "タミヤヨシユキ",
+    "music_en": "Tamiya Yoshiyuki",
+    "category": "cover",
+    "official_order": 144,
+    "jacket_asset_id": "2bfb91702bfb4e2381c954d361737ad2",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2bfb91702bfb4e2381c954d361737ad2/%E3%83%84%E3%83%83%E3%83%8F%E3%82%9A%E3%83%AAHigh%20School%20Rock'n%20Roll(%E7%99%BB%E6%A0%A1%E7%B7%A8).png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "回レ！雪月花",
+    "title_en": "Maware! Setsugetsuka",
+    "artist_jp": "AZKi, 白上フブキ, 宝鐘マリン",
+    "artist_en": "AZKi, Shirakami Fubuki, Houshou Marine",
+    "lyrics_jp": "ヒゲドライバー",
+    "lyrics_en": "Hige Driver",
+    "music_jp": "ヒゲドライバー",
+    "music_en": "Hige Driver",
+    "category": "cover",
+    "official_order": 145,
+    "jacket_asset_id": "51a80ac1e4be42948e122b33d18fdb7d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/51a80ac1e4be42948e122b33d18fdb7d/%E5%9B%9E%E3%83%AC%EF%BC%81%E9%9B%AA%E6%9C%88%E8%8A%B1.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 14,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "デビルじゃないもん",
+    "title_en": "(Not) A Devil",
+    "artist_jp": "AZKi, 風真いろは",
+    "artist_en": "AZKi, Kazama Iroha",
+    "lyrics_jp": "DECO*27, ピノキオピー",
+    "lyrics_en": "DECO*27, PinocchioP",
+    "music_jp": "DECO*27, ピノキオピー",
+    "music_en": "DECO*27, PinocchioP",
+    "category": "cover",
+    "official_order": 146,
+    "jacket_asset_id": "9a195340cdc447a0884aa5722e88c61c",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/9a195340cdc447a0884aa5722e88c61c/%E3%83%86%E3%82%99%E3%83%92%E3%82%99%E3%83%AB%E3%81%97%E3%82%99%E3%82%83%E3%81%AA%E3%81%84%E3%82%82%E3%82%93.png",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 18,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "ハオ",
+    "title_en": "HAO",
+    "artist_jp": "角巻わため, Pavolia Reine",
+    "artist_en": "Tsunomaki Watame, Pavolia Reine",
+    "lyrics_jp": "DECO*27",
+    "lyrics_en": "DECO*27",
+    "music_jp": "DECO*27",
+    "music_en": "DECO*27",
+    "category": "cover",
+    "official_order": 147,
+    "jacket_asset_id": "e50c81583cba4e18930a788fddfb83f6",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/e50c81583cba4e18930a788fddfb83f6/%E3%83%8F%E3%82%AA.png",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "わたしの一番かわいいところ",
+    "title_en": "Watashi no Ichiban Kawaiitokoro",
+    "artist_jp": "さくらみこ, 姫森ルーナ, Airani Iofifteen, Fuwawa Abyssgard, Mococo Abyssgard",
+    "artist_en": "Sakura Miko, Himemori Luna, Airani Iofifteen, Fuwawa Abyssgard, Mococo Abyssgard",
+    "lyrics_jp": "ヤマモトショウ",
+    "lyrics_en": "Sho Yamamoto",
+    "music_jp": "ヤマモトショウ",
+    "music_en": "Sho Yamamoto",
+    "category": "cover",
+    "official_order": 148,
+    "jacket_asset_id": "a3358231e20d416498b003df2f0fd36a",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/a3358231e20d416498b003df2f0fd36a/%E3%82%8F%E3%81%9F%E3%81%97%E3%81%AE%E4%B8%80%E7%95%AA%E3%81%8B%E3%82%8F%E3%81%84%E3%81%84%E3%81%A8%E3%81%93%E3%82%8D.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 9,
+      "HARD": 17,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "メギツネ",
+    "title_en": "Megitsune",
+    "artist_jp": "hololive English -Advent-",
+    "artist_en": "hololive English -Advent-",
+    "lyrics_jp": "NORiMETAL/MK-METAL",
+    "lyrics_en": "NORiMETAL/MK-METAL",
+    "music_jp": "NORiMETAL",
+    "music_en": "NORiMETAL",
+    "category": "cover",
+    "official_order": 149,
+    "jacket_asset_id": "c52b50b0ecc74d7bb8e0b94606c99c29",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/c52b50b0ecc74d7bb8e0b94606c99c29/%E3%83%A1%E3%82%AD%E3%82%99%E3%83%84%E3%83%8D.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "ヒャダインのじょーじょーゆーじょー",
+    "title_en": "Hyadain no Jojo Yujo",
+    "artist_jp": "猫又おかゆ, 戌神ころね",
+    "artist_en": "Nekomata Okayu, Inugami Korone",
+    "lyrics_jp": "前山田健一",
+    "lyrics_en": "Kenichi Maeyamada",
+    "music_jp": "前山田健一",
+    "music_en": "Kenichi Maeyamada",
+    "category": "cover",
+    "official_order": 150,
+    "jacket_asset_id": "0182d89a0e964522aa93646d231ca057",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/0182d89a0e964522aa93646d231ca057/%E3%83%92%E3%83%A3%E3%82%BF%E3%82%99%E3%82%A4%E3%83%B3%E3%81%AE%E3%81%97%E3%82%99%E3%82%87%E3%83%BC%E3%81%97%E3%82%99%E3%82%87%E3%83%BC%E3%82%86%E3%83%BC%E3%81%97%E3%82%99%E3%82%87%E3%83%BC.png",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 16,
+      "HARD": 23,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "再会",
+    "title_en": "SAIKAI",
+    "artist_jp": "星街すいせい, Moona Hoshinova",
+    "artist_en": "Hoshimachi Suisei, Moona Hoshinova",
+    "lyrics_jp": "Ayase",
+    "lyrics_en": "Ayase",
+    "music_jp": "Ayase",
+    "music_en": "Ayase",
+    "category": "cover",
+    "official_order": 151,
+    "jacket_asset_id": "f55d809bcd8644fbbf0f0c12078dec83",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/f55d809bcd8644fbbf0f0c12078dec83/%E5%86%8D%E4%BC%9A.png",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 22
+    }
+  },
+  {
+    "title_jp": "神のまにまに",
+    "title_en": "KAMINO MANIMANI",
+    "artist_jp": "癒月ちょこ, 大空スバル, 姫森ルーナ",
+    "artist_en": "Yuzuki Choco, Oozora Subaru, Himemori Luna",
+    "lyrics_jp": "れるりり",
+    "lyrics_en": "Rerulili",
+    "music_jp": "れるりり",
+    "music_en": "Rerulili",
+    "category": "cover",
+    "official_order": 152,
+    "jacket_asset_id": "58a4fe4aa73d435f9cf7730f1c30fc3d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/58a4fe4aa73d435f9cf7730f1c30fc3d/%E7%A5%9E%E3%81%AE%E3%81%BE%E3%81%AB%E3%81%BE%E3%81%AB.png",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 20,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "い～やい～やい～や",
+    "title_en": "I~ya I~ya I~ya",
+    "artist_jp": "Takanashi Kiara, Ninomae Ina'nis",
+    "artist_en": "Takanashi Kiara, Ninomae Ina'nis",
+    "lyrics_jp": "Neru & z’5",
+    "lyrics_en": "Neru & z’5",
+    "music_jp": "Neru & z’5",
+    "music_en": "Neru & z’5",
+    "category": "cover",
+    "official_order": 153,
+    "jacket_asset_id": "04a1a0ce80b4451daee200f2faa205f7",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/04a1a0ce80b4451daee200f2faa205f7/%E3%81%84%EF%BD%9E%E3%82%84%E3%81%84%EF%BD%9E%E3%82%84%E3%81%84%EF%BD%9E%E3%82%84.png",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 17,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "選んでくれてありがとう。",
+    "title_en": "Erandekurete Arigatou",
+    "artist_jp": "IRyS, Hakos Baelz",
+    "artist_en": "IRyS, Hakos Baelz",
+    "lyrics_jp": "shito, Gom",
+    "lyrics_en": "shito, Gom",
+    "music_jp": "shito",
+    "music_en": "shito",
+    "category": "cover",
+    "official_order": 154,
+    "jacket_asset_id": "a4f0e49ff76c412ba32a780dc15b358d",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/a4f0e49ff76c412ba32a780dc15b358d/%E9%81%B8%E3%82%93%E3%81%A6%E3%82%99%E3%81%8F%E3%82%8C%E3%81%A6%E3%81%82%E3%82%8A%E3%81%8B%E3%82%99%E3%81%A8%E3%81%86%E3%80%82.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 10,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "六兆年と一夜物語",
+    "title_en": "A Tale of Six Trillion Years and a Night",
+    "artist_jp": "SorAZ",
+    "artist_en": "SorAZ",
+    "lyrics_jp": "kemu",
+    "lyrics_en": "kemu",
+    "music_jp": "kemu",
+    "music_en": "kemu",
+    "category": "cover",
+    "official_order": 155,
+    "jacket_asset_id": "e8cd0c25dcaa4c73bd992853ffe041f2",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/e8cd0c25dcaa4c73bd992853ffe041f2/%E5%85%AD%E5%85%86%E5%B9%B4%E3%81%A8%E4%B8%80%E5%A4%9C%E7%89%A9%E8%AA%9E.png",
+    "levels": {
+      "EASY": 11,
+      "NORMAL": 17,
+      "HARD": 25,
+      "EXPERT": 30
+    }
+  },
+  {
+    "title_jp": "オレンジ",
+    "title_en": "Orange",
+    "artist_jp": "桃鈴ねね, Takanashi Kiara",
+    "artist_en": "Momosuzu Nene, Takanashi Kiara",
+    "lyrics_jp": "渡邊 亜希子",
+    "lyrics_en": "Akiko Watanabe",
+    "music_jp": "Funta3",
+    "music_en": "Funta3",
+    "category": "cover",
+    "official_order": 156,
+    "jacket_asset_id": "2145976eef9f44a282a5113f19aef8d9",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/2145976eef9f44a282a5113f19aef8d9/%E3%82%AA%E3%83%AC%E3%83%B3%E3%82%B7%E3%82%99.png",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "Bling-Bang-Bang-Born",
+    "title_en": "Bling-Bang-Bang-Born",
+    "artist_jp": "Ninomae Ina'nis, Hakos Baelz",
+    "artist_en": "Ninomae Ina'nis, Hakos Baelz",
+    "lyrics_jp": "R-指定",
+    "lyrics_en": "R-Shitei",
+    "music_jp": "DJ松永",
+    "music_en": "DJ Matsunaga",
+    "category": "cover",
+    "official_order": 157,
+    "jacket_asset_id": "8ae84b088ece420983daef455162e4fc",
+    "jacket_url": "https://images.microcms-assets.io/assets/f5f18e8e6a3c4c81af28f013b94e7f38/8ae84b088ece420983daef455162e4fc/Bling-Bang-Bang-Born.png",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "01:15",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 8,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "64",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Backseat",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 10,
+      "HARD": 16,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "FACT",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "GHOST",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "Glitch Through",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "Grave of Halo",
+    "levels": {
+      "EASY": 10,
+      "NORMAL": 15,
+      "HARD": 24,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "HELP！！",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 16,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "Here I am",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 9,
+      "HARD": 15,
+      "EXPERT": 22
+    }
+  },
+  {
+    "title_jp": "Illusion Night",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Infinity（Remastered）",
+    "levels": {
+      "EASY": 1,
+      "NORMAL": 9,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "KINGWORLD",
+    "levels": {
+      "EASY": 12,
+      "NORMAL": 18,
+      "HARD": 26,
+      "EXPERT": 30
+    }
+  },
+  {
+    "title_jp": "LET'S JUST CRASH",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "NIGHTBREAK",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "Oshi Mode ON",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "QUEEN",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "Say！ファンファーレ！",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 13,
+      "HARD": 18,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "TwiLight",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "UFO",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 16,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "UNDEAD",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "We are GAMERS !!!!",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 13,
+      "HARD": 22,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "You＆合図",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "カミサマ・ネコサマ",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "きゅんきゅんみこきゅんきゅん♡",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ころねの最凶天災☆わんだふぉー♡わーるど",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 13,
+      "HARD": 21,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "シミュラクル",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 13,
+      "HARD": 22,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "シュガーラッシュ",
+    "levels": {
+      "EASY": 5,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "ナイトループ",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "ホットダック！",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 14,
+      "HARD": 20,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "ほめのび",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 23
+    }
+  },
+  {
+    "title_jp": "ホロホーク",
+    "levels": {
+      "EASY": 7,
+      "NORMAL": 12,
+      "HARD": 20,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "めくるめくランデヴー",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 11,
+      "HARD": 17,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "リーサルドーズ・パラノイド",
+    "levels": {
+      "EASY": 8,
+      "NORMAL": 14,
+      "HARD": 24,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "万歳☆満開",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 19,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "三位一体♡ラブシステム",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 10,
+      "HARD": 17,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "夏宿り",
+    "levels": {
+      "EASY": 2,
+      "NORMAL": 10,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "夜光通信",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 18,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "天たこ観測",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 14,
+      "HARD": 19,
+      "EXPERT": 25
+    }
+  },
+  {
+    "title_jp": "幽霊船戦",
+    "levels": {
+      "EASY": 6,
+      "NORMAL": 13,
+      "HARD": 23,
+      "EXPERT": 29
+    }
+  },
+  {
+    "title_jp": "恋愛サーキュレーション",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 18,
+      "EXPERT": 24
+    }
+  },
+  {
+    "title_jp": "星屑カプセル",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 18,
+      "EXPERT": 28
+    }
+  },
+  {
+    "title_jp": "毒の王子さま",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 9,
+      "HARD": 16,
+      "EXPERT": 26
+    }
+  },
+  {
+    "title_jp": "爆夏！！トロピカバケーション",
+    "levels": {
+      "EASY": 3,
+      "NORMAL": 12,
+      "HARD": 19,
+      "EXPERT": 27
+    }
+  },
+  {
+    "title_jp": "美少女戦士まつりみっとZero",
+    "levels": {
+      "EASY": 4,
+      "NORMAL": 11,
+      "HARD": 20,
+      "EXPERT": 26
+    }
+  }
+]

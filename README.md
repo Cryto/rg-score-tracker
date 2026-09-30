@@ -46,7 +46,7 @@ Log your personal bests, see every past attempt, and share a read-only page of y
 | Game | Status | Score entry | Catalog source |
 | --- | --- | --- | --- |
 | **beatmania IIDX** | ✅ Live | Manual, CSV, JSON export | [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db) (from Infinitas) |
-| **Hololive Dreams** | ✅ Live | Manual | Official music pages + a level sheet |
+| **Hololive Dreams** | ✅ Live | Manual | Curated in the original site's database, exported to [`catalog.json`](db/holodori/catalog.json) |
 | **DJMAX Respect V** | 🚧 Coming soon | — | — |
 
 ## 🚀 Quick start
@@ -176,20 +176,31 @@ per chart, and upsert it with the Supabase JS client using the service role key.
 
 ### Hololive Dreams
 
-The catalog is two committed files: [`songs.json`](db/holodori/songs.json)
-(from the official music pages) and [`levels.csv`](db/holodori/levels.csv)
-(chart levels).
+The catalog lives in the original site's database, where songs are added and
+edited from `/settings/holodori/song`. [`catalog.json`](db/holodori/catalog.json)
+is a committed snapshot of it: every song with its credits, song type,
+members, jacket and chart levels. It's exported from the `songs` and `charts`
+tables only, never scores.
+
+**Loading it into your project** (a fork, or a fresh database) needs the
+service role key, since it writes songs and charts:
 
 ```sh
-node db/holodori/fetch-official-songs.mjs              # refresh songs.json
-node db/holodori/import-levels-sheet.mjs sheet.csv     # rebuild levels.csv from a level sheet
 node --env-file=.env db/holodori/import-catalog.mjs --dry-run   # preview
 node --env-file=.env db/holodori/import-catalog.mjs             # load into Supabase
 ```
 
-The import is idempotent and never deletes songs. Values you've edited in the
-browser (English titles, song type, jacket, levels) are kept unless you pass
-`--force`.
+The import is idempotent and never deletes songs, so re-run it to pick up a
+newer `catalog.json`. Values you've edited in the browser (English titles,
+song type, jacket, members, levels) are kept unless you pass `--force`.
+
+**Refreshing the snapshot** (original site only) is done by hand after
+editing songs, then committing the new file. It only reads public tables, so
+the anon key in `.env` is enough:
+
+```sh
+node --env-file=.env db/holodori/export-catalog.mjs
+```
 
 ## 🍴 Forking
 
