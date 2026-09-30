@@ -24,6 +24,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     <label>Credited singer / unit <span class="hd-optional">(optional)</span>
       <input id="artist" type="text" autocomplete="off" />
     </label>
+    <div class="hd-jacket-field">
+      <label for="jacket-link">Jacket <span class="hd-optional">(optional — YouTube video or image link)</span></label>
+      <div class="hd-jacket-row">
+        <div class="hd-jacket-preview" id="jacket-preview" aria-hidden="true"><img id="jacket-img" alt="" hidden /></div>
+        <input id="jacket-link" type="url" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=..." />
+      </div>
+      <p id="jacket-note" class="hd-jacket-note"></p>
+    </div>
     <fieldset class="choice-picker">
       <legend>Song type <span class="hd-optional">(click again to unset)</span></legend>
       <label><input type="checkbox" name="category" value="original" /><span>Original</span></label>
@@ -53,8 +61,8 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     <button type="button" id="undo-btn" style="display:none; align-self:flex-start;">Undo</button>
     <p style="color: var(--text-dim); font-size: 0.85rem;">
       Blank fields are left as they are when editing an existing song. Edits made here survive
-      re-running the catalog import script, which only fills in missing titles, singers, song types
-      and levels (unless run with <code>--force</code>).
+      re-running the catalog import script, which only fills in missing titles, singers, song
+      types, jackets and levels (unless run with <code>--force</code>).
     </p>
   </form>
 
@@ -79,6 +87,20 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     .hd-level-inputs label { display: flex; flex-direction: column; gap: 0.25rem; }
     .hd-level-inputs span { color: var(--diff); font-weight: 700; font-size: 0.85rem; }
     .hd-level-inputs input { width: 100%; border-color: var(--diff); text-align: center; font-weight: 700; }
+    .hd-jacket-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .hd-jacket-row { display: flex; gap: 0.6rem; align-items: center; }
+    .hd-jacket-row input { flex: 1; min-width: 0; }
+    .hd-jacket-preview {
+      flex: none;
+      width: 56px;
+      height: 56px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--border), var(--surface));
+    }
+    .hd-jacket-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hd-jacket-note { margin: 0; font-size: 0.8rem; color: var(--text-dim); min-height: 1em; }
+    .hd-jacket-note.error { color: #ff8080; }
     .hd-members { display: flex; flex-direction: column; gap: 0.35rem; }
     .hd-member-row { display: flex; gap: 0.4rem; }
     .hd-member-row input { flex: 1; min-width: 0; }
@@ -111,7 +133,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
 
   <script>
     import { getSupabase } from '@/lib/supabase';
-    import { DIFFICULTIES, GROUP_NAMES } from '../../../holodori';
+    import { DIFFICULTIES, GROUP_NAMES, jacketFromLink } from '../../../holodori';
     import { searchKey } from '@/lib/search';
     import { singleChoice } from '@/lib/choice';
 
@@ -128,7 +150,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     const status = document.getElementById('status')!;
     const levelInputs = [...document.querySelectorAll<HTMLInputElement>('[data-difficulty]')];
 
-    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; artistEn: string | null; category: string | null; members: string[]; levels: Record<string, number | null> };
+    type ExistingSong = { id: number; titleJp: string; titleEn: string | null; artist: string | null; artistEn: string | null; category: string | null; jacketUrl: string | null; members: string[]; levels: Record<string, number | null> };
     let existing = new Map<string, ExistingSong>();
     let match: ExistingSong | null = null;
 
@@ -180,6 +202,55 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       }
     });
 
+    // Jacket: a pasted link is previewed right away and saved to songs.jacket_url.
+    // Blank keeps the current jacket, which the preview shows when editing.
+    const jacketEl = document.getElementById('jacket-link') as HTMLInputElement;
+    const jacketImg = document.getElementById('jacket-img') as HTMLImageElement;
+    const jacketNote = document.getElementById('jacket-note')!;
+    // Resolves to whether the linked image loaded; null when the field is blank.
+    let jacketCheck: Promise<boolean> | null = null;
+
+    function showJacket(src: string | null) {
+      jacketImg.hidden = !src;
+      if (src) jacketImg.src = src;
+      else jacketImg.removeAttribute('src');
+    }
+
+    function updateJacket() {
+      jacketNote.classList.remove('error');
+      const link = jacketEl.value.trim();
+      if (!link) {
+        jacketCheck = null;
+        jacketNote.textContent = match?.jacketUrl ? 'Current jacket. Paste a link to replace it.' : '';
+        showJacket(match?.jacketUrl ?? null);
+        return;
+      }
+      const src = jacketFromLink(link);
+      if (!src) {
+        jacketCheck = Promise.resolve(false);
+        jacketNote.textContent = 'That isn\'t an https:// link.';
+        jacketNote.classList.add('error');
+        showJacket(null);
+        return;
+      }
+      jacketNote.textContent = 'Loading preview...';
+      showJacket(src);
+      const check = new Promise<boolean>((resolve) => {
+        jacketImg.onload = () => resolve(true);
+        jacketImg.onerror = () => resolve(false);
+      });
+      jacketCheck = check;
+      check.then((ok) => {
+        if (jacketCheck !== check) return; // the link changed since
+        jacketNote.textContent = ok
+          ? (src === link ? 'New jacket.' : 'New jacket (video thumbnail).')
+          : 'Couldn\'t load an image from that link.';
+        jacketNote.classList.toggle('error', !ok);
+        if (!ok) showJacket(null);
+      });
+    }
+    jacketEl.addEventListener('input', updateJacket);
+
     const undoBtn = document.getElementById('undo-btn') as HTMLButtonElement;
     let undoAction: (() => Promise<void>) | null = null;
     function setUndo(fn: (() => Promise<void>) | null) {
@@ -188,7 +259,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
     }
 
     function clearForm() {
-      titleEl.value = titleEnEl.value = artistEl.value = memberInput.value = categoryEl.value = '';
+      titleEl.value = titleEnEl.value = artistEl.value = jacketEl.value = memberInput.value = categoryEl.value = '';
       for (const input of levelInputs) input.value = '';
       members = [];
       match = null;
@@ -197,6 +268,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       titleEnEl.placeholder = artistEl.placeholder = '';
       submitBtn.textContent = 'Add Song';
       renderChips();
+      updateJacket();
       status.textContent = '';
       setUndo(null);
       titleEl.focus();
@@ -217,14 +289,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       });
       let { data, error } = await supabase
         .from('songs')
-        .select('id, title_jp, title_en, artist_jp, artist_en, category, members, charts ( difficulty, level )');
+        .select('id, title_jp, title_en, artist_jp, artist_en, category, jacket_url, members, charts ( difficulty, level )');
       // Database without migration 0002: work without members.
       if (error && /members/.test(error.message)) {
         membersSupported = false;
         membersField.style.display = 'none';
         ({ data, error } = await supabase
           .from('songs')
-          .select('id, title_jp, title_en, artist_jp, artist_en, category, charts ( difficulty, level )'));
+          .select('id, title_jp, title_en, artist_jp, artist_en, category, jacket_url, charts ( difficulty, level )'));
       }
       if (error) {
         status.textContent = `Failed to load songs: ${error.message}`;
@@ -235,7 +307,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       existing = new Map();
       const songsList: ExistingSong[] = (data ?? []).map((s: any) => ({
         id: s.id, titleJp: s.title_jp, titleEn: s.title_en, artist: s.artist_en ?? s.artist_jp, artistEn: s.artist_en,
-        category: s.category, members: s.members ?? [],
+        category: s.category, jacketUrl: s.jacket_url, members: s.members ?? [],
         levels: Object.fromEntries((s.charts ?? []).map((c: any) => [c.difficulty, c.level])),
       }));
       for (const s of songsList) {
@@ -281,6 +353,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
         submitBtn.textContent = 'Add Song';
       }
       renderChips();
+      updateJacket();
     });
 
     form.addEventListener('submit', async (e) => {
@@ -293,6 +366,14 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
         status.textContent = 'Levels must be whole numbers from 1 to 99.';
         return;
       }
+      let jacketUrl: string | null = null;
+      if (jacketEl.value.trim()) {
+        if (!(await jacketCheck)) {
+          status.textContent = 'Fix the jacket link or clear it: no image loads from it.';
+          return;
+        }
+        jacketUrl = jacketFromLink(jacketEl.value);
+      }
       const filled = levels.map((l) => l.level).filter((n): n is number => n != null);
       const warning = filled.some((n, i) => i && n < filled[i - 1]) ? ' (Heads up: levels don\'t go up from Easy to Expert.)' : '';
       submitBtn.disabled = true;
@@ -302,6 +383,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       const songFields: Record<string, unknown> = {};
       if (titleEnEl.value.trim()) songFields.title_en = titleEnEl.value.trim();
       if (artistEl.value.trim()) songFields.artist_en = artistEl.value.trim();
+      if (jacketUrl && jacketUrl !== match?.jacketUrl) songFields.jacket_url = jacketUrl;
       // Song type is shown pre-filled, so save it whenever it changed (incl. back to not set).
       const category = categoryEl.value || null;
       if (category !== (match?.category ?? null)) songFields.category = category;
@@ -355,6 +437,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
           if ('title_en' in songFields) restore.title_en = prev.titleEn;
           if ('artist_en' in songFields) restore.artist_en = prev.artistEn;
           if ('category' in songFields) restore.category = prev.category;
+          if ('jacket_url' in songFields) restore.jacket_url = prev.jacketUrl;
           if ('members' in songFields) restore.members = prev.members.length ? prev.members : null;
           if (Object.keys(restore).length) err = (await supabase.from('songs').update(restore).eq('id', songId)).error?.message;
           const back = changedDiffs.filter((d) => d in prev.levels).map((d) => ({ song_id: songId, difficulty: d, level: prev.levels[d] }));
@@ -371,6 +454,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '../../../hol
       });
       submitBtn.disabled = false;
       await load();
+      jacketEl.value = '';
       titleEl.dispatchEvent(new Event('input'));
     });
 

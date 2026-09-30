@@ -82,3 +82,29 @@ const S_FILL = 'linear-gradient(155deg, #FFE46B 8%, #FFC7A0 30%, #FAABCD 48%, #C
 export function gradeFill(grade: string): string {
   return grade.startsWith('S') ? S_FILL : GRADE_FILLS[grade] ?? '#fff';
 }
+
+/**
+ * Jacket image URL for a link pasted on the song form: a YouTube video link
+ * becomes that video's thumbnail, any other http(s) URL is used as is.
+ * Returns null when the text isn't a URL; plain http image links are
+ * refused, since the https site would block them as mixed content.
+ */
+export function jacketFromLink(link: string): string | null {
+  let url: URL;
+  try {
+    url = new URL(link.trim());
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+  const host = url.hostname.replace(/^(www\.|m\.|music\.)/, '');
+  let videoId: string | null = null;
+  if (host === 'youtu.be') videoId = url.pathname.split('/')[1] ?? null;
+  else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    videoId = url.searchParams.get('v') ?? url.pathname.match(/^\/(?:shorts|embed|live|v)\/([^/]+)/)?.[1] ?? null;
+  }
+  // mqdefault is 16:9 with no letterbox bars and exists for every video,
+  // unlike maxresdefault; jackets are cropped to a square anyway.
+  if (videoId && /^[\w-]{11}$/.test(videoId)) return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+  return url.protocol === 'https:' ? url.href : null;
+}
