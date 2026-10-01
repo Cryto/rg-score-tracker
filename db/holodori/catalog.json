@@ -1576,6 +1576,10 @@
     "official_order": 72,
     "jacket_asset_id": "b559a611a543423a854c6abc54ae6339",
     "jacket_url": "https://img.game8.jp/12791308/4937e43e4bea4ea066deb8ab3b9d50e0.webp/show",
+    "members": [
+      "Fuwawa Abyssgard",
+      "Mococo Abyssgard"
+    ],
     "levels": {
       "EASY": 8,
       "NORMAL": 13,
@@ -1739,6 +1743,12 @@
     "official_order": 79,
     "jacket_asset_id": "37762ba493bb4c8b981612f2ddd8622e",
     "jacket_url": "https://img.game8.jp/12791237/73e9dd3f0d166cce79c19842717ed326.webp/show",
+    "members": [
+      "Shirakami Fubuki",
+      "Akai Haato",
+      "Natsuiro Matsuri",
+      "Aki Rosenthal"
+    ],
     "levels": {
       "EASY": 5,
       "NORMAL": 10,
@@ -1761,6 +1771,12 @@
     "official_order": 80,
     "jacket_asset_id": "2eec6571798f4280b38a20b744cc0f32",
     "jacket_url": "https://img.game8.jp/12791244/140e299c6b0d1bf33d563697f8ada07f.webp/show",
+    "members": [
+      "Yukihana Lamy",
+      "Momosuzu Nene",
+      "Shishiro Botan",
+      "Omaru Polka"
+    ],
     "levels": {
       "EASY": 6,
       "NORMAL": 14,
@@ -1998,6 +2014,10 @@
     "official_order": 89,
     "jacket_asset_id": "d46005554bbb482b8ef7fdd79840352e",
     "jacket_url": "https://img.game8.jp/12791271/302737cfef641660307157938d449f40.webp/show",
+    "members": [
+      "AZKi",
+      "Tokino Sora"
+    ],
     "levels": {
       "EASY": 3,
       "NORMAL": 12,
@@ -2098,6 +2118,11 @@
     "official_order": 93,
     "jacket_asset_id": "3cedde32a376460b88595ea86d055574",
     "jacket_url": "https://img.game8.jp/12791300/221eec5ee222c76551572259d6868d28.webp/show",
+    "members": [
+      "Shirakami Fubuki",
+      "Nakiri Ayame",
+      "Ookami Mio"
+    ],
     "levels": {
       "EASY": 8,
       "NORMAL": 14,
@@ -3075,6 +3100,10 @@
     "official_order": 140,
     "jacket_asset_id": "6dd9488a274746d783e95fd85b07a069",
     "jacket_url": "https://img.game8.jp/12791495/0ecd793bed571b2afb2d938e226d9ea8.webp/show",
+    "members": [
+      "Fuwawa Abyssgard",
+      "Mococo Abyssgard"
+    ],
     "levels": {
       "EASY": 5,
       "NORMAL": 10,
@@ -3435,6 +3464,7 @@
   },
   {
     "title_jp": "01:15",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12823136/ed0250382657abed2faaf1466e909546.webp/show",
     "members": [
       "Ayunda Risu"
@@ -3448,6 +3478,7 @@
   },
   {
     "title_jp": "64",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/13018159/fd297e04e6d085b8410e34d151501749.webp/show",
     "members": [
       "Anya Melfissa"
@@ -3461,6 +3492,7 @@
   },
   {
     "title_jp": "Backseat",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12927606/beafbf668a30d16f924c9ef1dc3302ac.webp/show",
     "members": [
       "Kaela Kovalskia"
@@ -3474,6 +3506,7 @@
   },
   {
     "title_jp": "FACT",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12858600/13459ead306ce1f856906340964f3784.webp/show",
     "members": [
       "Tokoyami Towa"
@@ -3487,6 +3520,7 @@
   },
   {
     "title_jp": "GHOST",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12853065/fb3cecfb45a4cd61d9af35dc3c6f2624.webp/show",
     "members": [
       "Hoshimachi Suisei"
@@ -3500,6 +3534,7 @@
   },
   {
     "title_jp": "Glitch Through",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/13018162/31d8fec9f3f7c1d6f14d0bc7ed50e25a.webp/show",
     "members": [
       "Shiori Novella"
@@ -3513,6 +3548,7 @@
   },
   {
     "title_jp": "Grave of Halo",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/13018160/9ca98186c03c3ba2da518ab133b078c0.webp/show",
     "members": [
       "Aki Rosenthal"
@@ -3526,6 +3562,7 @@
   },
   {
     "title_jp": "HELP！！",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12804531/f884f2b64d8b79be8a9f3b2a9ace83f8.webp/show",
     "members": [
       "Kobo Kanaeru"
@@ -3539,6 +3576,7 @@
   },
   {
     "title_jp": "Here I am",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12831902/1b5f3e8b9e8982c1133a47964d63a21c.webp/show",
     "members": [
       "Airani Iofifteen"
@@ -3552,6 +3590,7 @@
   },
   {
     "title_jp": "Illusion Night",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/13017704/53cb6f7fb2acde3810f9863fac8e8ca7.webp/show",
     "members": [
       "Pavolia Reine"
@@ -3565,6 +3604,7 @@
   },
   {
     "title_jp": "Infinity（Remastered）",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12889352/14faaf7af07e70d41c130159bba8b1ad.webp/show",
     "members": [
       "Akai Haato"
@@ -3578,6 +3618,7 @@
   },
   {
     "title_jp": "KINGWORLD",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12848101/2f1ff1939db149f4d091bf1d033f6108.webp/show",
     "members": [
       "Shirakami Fubuki"
@@ -3591,6 +3632,7 @@
   },
   {
     "title_jp": "LET'S JUST CRASH",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12842321/39e961cc1693e7717f3d5bc7bbe47639.webp/show",
     "members": [
       "Mori Calliope"
@@ -3604,6 +3646,7 @@
   },
   {
     "title_jp": "NIGHTBREAK",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12891683/e337304a2a34a079781178ccf7b6e7ce.webp/show",
     "members": [
       "Mori Calliope"
@@ -3617,6 +3660,7 @@
   },
   {
     "title_jp": "Oshi Mode ON",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12891910/3eb52692f9ae5026c7635e04458f6816.webp/show",
     "members": [
       "Kureiji Ollie"
@@ -3630,6 +3674,8 @@
   },
   {
     "title_jp": "Play Dice!",
+    "category": "original",
+    "jacket_url": "https://img.game8.jp/13041693/34592456c96f30ba9e05d14542e04cb4.webp/show",
     "members": [
       "Hakos Baelz"
     ],
@@ -3642,6 +3688,7 @@
   },
   {
     "title_jp": "QUEEN",
+    "category": "cover",
     "jacket_url": "https://img.game8.jp/12837149/903542e82f8e26770c998b4491d5928b.webp/show",
     "members": [
       "La+ Darknesss"
@@ -3655,6 +3702,7 @@
   },
   {
     "title_jp": "Say！ファンファーレ！",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12922988/a46ce80b9b71482ba6ce56e2729e4d67.webp/show",
     "members": [
       "Shirakami Fubuki"
@@ -3668,6 +3716,7 @@
   },
   {
     "title_jp": "TwiLight",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12804532/ff09770f59018867f80c18e6b7acd0f2.webp/show",
     "members": [
       "IRyS"
@@ -3681,6 +3730,7 @@
   },
   {
     "title_jp": "UFO",
+    "category": "cover",
     "jacket_url": "https://img.game8.jp/12818315/cde8c5bd0206dfbd50206cc8ae195c5d.webp/show",
     "members": [
       "Juufuutei Raden",
@@ -3695,6 +3745,7 @@
   },
   {
     "title_jp": "UNDEAD",
+    "category": "cover",
     "jacket_url": "https://img.game8.jp/12810899/bc535fce4f11af65277ea0d8da13d249.webp/show",
     "members": [
       "Shiranui Flare"
@@ -3708,6 +3759,8 @@
   },
   {
     "title_jp": "Watcha Gatcha!!!!!!!!",
+    "category": "original",
+    "jacket_url": "https://img.game8.jp/13041691/626f00a55961dea1763a4c883b4e6b7b.webp/show",
     "members": [
       "Yukihana Lamy",
       "Momosuzu Nene",
@@ -3727,6 +3780,7 @@
   },
   {
     "title_jp": "We are GAMERS !!!!",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12922992/1af35d64ba0187f48958afcbd7fc18d2.webp/show",
     "members": [
       "Shirakami Fubuki",
@@ -3758,6 +3812,7 @@
     "title_jp": "You＆合図",
     "title_en": "You & aIzu",
     "artist_en": "Otonose Kanade",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12810898/1329a185bb4130bcebbdb5a22b1d512b.webp/show",
     "members": [
       "Otonose Kanade"
@@ -3772,6 +3827,7 @@
   {
     "title_jp": "カミサマ・ネコサマ",
     "title_en": "KAMISAMA・NEKOSAMA",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12922990/bbfafef1642411ea821be1a1792467a4.webp/show",
     "members": [
       "Nekomata Okayu"
@@ -3786,6 +3842,8 @@
   {
     "title_jp": "きゃぴ",
     "title_en": "Kyapi",
+    "category": "original",
+    "jacket_url": "https://img.game8.jp/13041689/db9364db5a8c7e2fbb33c5d9d1c8d47e.webp/show",
     "members": [
       "Houshou Marine"
     ],
@@ -3799,6 +3857,7 @@
   {
     "title_jp": "きゅんきゅんみこきゅんきゅん♡",
     "title_en": "Kyun Kyun MIKO Kyun kyun♡",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12853066/ccc64fce6d1a6c736edbf14007640514.webp/show",
     "members": [
       "Sakura Miko"
@@ -3813,6 +3872,7 @@
   {
     "title_jp": "ころねの最凶天災☆わんだふぉー♡わーるど",
     "title_en": "SAIKYO TENSAI WANDERFUL WORLD of KORONE",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12922991/4dbdb558f1f08f36f078722951cef579.webp/show",
     "members": [
       "Inugami Korone"
@@ -3827,6 +3887,7 @@
   {
     "title_jp": "シミュラクル",
     "title_en": "Simulacre",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12953091/08fe298d45888a97a91d9c173a6ce798.webp/show",
     "members": [
       "Shishiro Botan"
@@ -3841,6 +3902,7 @@
   {
     "title_jp": "シュガーラッシュ",
     "title_en": "Sugar Rush",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12853067/513325cf8f4e0fb59a9a8c616804829a.webp/show",
     "members": [
       "Sakura Miko",
@@ -3856,6 +3918,7 @@
   {
     "title_jp": "ナイトループ",
     "title_en": "Night Loop",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12897155/39efa7335acbc2b9d42f7e95aa285ff3.webp/show",
     "members": [
       "Ookami Mio"
@@ -3870,6 +3933,8 @@
   {
     "title_jp": "プロポーズ",
     "title_en": "PROPOSE",
+    "category": "cover",
+    "jacket_url": "https://img.game8.jp/13041690/b9d227b8ded6996b7bf5e7073a2d5e30.webp/original",
     "members": [
       "Kobo Kanaeru"
     ],
@@ -3883,6 +3948,7 @@
   {
     "title_jp": "ホットダック！",
     "title_en": "HOT DUCK!",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12810903/a73bf323bfa98ca74beb07139a9a955b.webp/show",
     "members": [
       "Oozora Subaru"
@@ -3898,6 +3964,7 @@
     "title_jp": "ほめのび",
     "title_en": "homenobi",
     "artist_en": "Shirogane Noel",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12810902/4b3ae85fa8c11feb0b13f1d3828c722c.webp/show",
     "levels": {
       "EASY": 3,
@@ -3909,6 +3976,7 @@
   {
     "title_jp": "ホロホーク",
     "title_en": "HoloHawk",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12953596/afc8f239923b3d7087aee3e9ea22b7e1.webp/show",
     "members": [
       "Takane Lui"
@@ -3924,6 +3992,7 @@
     "title_jp": "めくるめくランデヴー",
     "title_en": "Mekurumeku Rendezvous",
     "artist_en": "FUWAMOCO",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12953598/0bfdc895de4879cb3a9787f0af10a350.webp/show",
     "members": [
       "Fuwawa Abyssgard",
@@ -3939,6 +4008,7 @@
   {
     "title_jp": "リーサルドーズ・パラノイド",
     "title_en": "Lethal Dose Paranoid",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/13018161/7e46d3fe98a6125bb4ee0dcc60bbfee2.webp/show",
     "members": [
       "La+ Darknesss"
@@ -3954,6 +4024,7 @@
     "title_jp": "万歳☆満開",
     "title_en": "BANZAI MANKAI",
     "artist_en": "Nakiri Ayame",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12891909/321aa89cfa99a7945fc36743ce5ffc62.webp/show",
     "members": [
       "Nakiri Ayame"
@@ -3969,6 +4040,7 @@
     "title_jp": "三位一体♡ラブシステム",
     "title_en": "Tri-Unity♡LoveSystem",
     "artist_en": "Takane Lui, Fuwawa Abyssgard, Mococo Abyssgard",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12953597/b033000d901889e910dc5243d68eb951.webp/show",
     "members": [
       "Takane Lui",
@@ -3985,6 +4057,7 @@
   {
     "title_jp": "夏宿り",
     "title_en": "Natsuyadori",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12807131/5c8c0f2b5e5e94746da8f9f1ef6cf0f6.webp/show",
     "members": [
       "Ookami Mio"
@@ -3999,6 +4072,7 @@
   {
     "title_jp": "夜光通信",
     "title_en": "Yakou Tsuushinn",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12922989/101ccaff142b08c15b6f76be7ef0f7df.webp/show",
     "members": [
       "Ookami Mio"
@@ -4013,6 +4087,7 @@
   {
     "title_jp": "天たこ観測",
     "title_en": "Takoyaki Gazing",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12891908/eb9cf177dfd413496062f051c4b84b12.webp/show",
     "members": [
       "Himemori Luna"
@@ -4027,6 +4102,7 @@
   {
     "title_jp": "幽霊船戦",
     "title_en": "Dead Ma'am's Chest",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12815391/2cfa3241c9fb3cf3c6f9527b3007656f.webp/show",
     "members": [
       "Houshou Marine"
@@ -4041,6 +4117,7 @@
   {
     "title_jp": "恋愛サーキュレーション",
     "title_en": "Renai Circulation",
+    "category": "cover",
     "jacket_url": "https://img.game8.jp/12810901/3127cca4f2546a5dedc147d0376cc8aa.webp/show",
     "members": [
       "Tsunomaki Watame"
@@ -4055,6 +4132,7 @@
   {
     "title_jp": "星屑カプセル",
     "title_en": "Stardust Capsule",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12891911/41e57bcd9ce7a62d434d89edbcb84ccc.webp/show",
     "members": [
       "Ninomae Ina'nis"
@@ -4069,6 +4147,7 @@
   {
     "title_jp": "毒の王子さま",
     "title_en": "Doku no Oujisama",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12812778/10d07b03bf3156171e80bbe2a65d4f70.webp/show",
     "members": [
       "Nekomata Okayu"
@@ -4083,6 +4162,7 @@
   {
     "title_jp": "気分上々↑↑",
     "title_en": "Kibun Joujou↑↑",
+    "category": "cover",
     "jacket_url": "https://img.game8.jp/12827697/4e6546608edc30d5bb06036cfb65b470.webp/show",
     "members": [
       "Kureiji Ollie",
@@ -4099,6 +4179,8 @@
   {
     "title_jp": "爆ラブ＋ケミストリー",
     "title_en": "BAKU LOVE CHEMISTRY",
+    "category": "original",
+    "jacket_url": "https://img.game8.jp/13041692/66e0889b359e301aa05ff3e90ba810a5.webp/show",
     "members": [
       "Hakui Koyori"
     ],
@@ -4112,6 +4194,7 @@
   {
     "title_jp": "爆夏！！トロピカバケーション",
     "title_en": "Boom! Boom! Tropica Vacation",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12810900/5a74b6042a296996aac0c496d1fc46ca.webp/original",
     "members": [
       "Oozora Subaru",
@@ -4130,6 +4213,7 @@
   {
     "title_jp": "美少女戦士まつりみっとZero",
     "title_en": "Pretty Guardian Matsulimit Zero",
+    "category": "original",
     "jacket_url": "https://img.game8.jp/12804529/918cf038b3bacc960fa6db3cf93368b8.webp/show",
     "members": [
       "Natsuiro Matsuri"
