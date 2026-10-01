@@ -5,7 +5,7 @@ import Layout from '@/layouts/Layout.astro';
   <a href="/settings" class="back-link">← Back to Settings</a>
   <h1>Edit Song Database — Hololive Dreams</h1>
   <p id="auth-warning" style="display:none; color: #ff8080;">
-    You're not logged in to Hololive Dreams — <a href="/login">log in</a> to remove songs.
+    You're not logged in to Hololive Dreams — <a href="/login">log in</a> to edit or remove songs.
   </p>
 
   <div class="hd-db-controls">
@@ -20,6 +20,7 @@ import Layout from '@/layouts/Layout.astro';
   </div>
   <p id="status" style="color: var(--text-dim);"></p>
   <ul id="song-list" class="hd-db-list"></ul>
+  <datalist id="member-names"></datalist>
   <p id="empty" style="color: var(--text-dim);" hidden></p>
 
   <style>
@@ -55,6 +56,25 @@ import Layout from '@/layouts/Layout.astro';
       font-size: 0.9rem;
     }
     .hd-db-remove { border-color: #8a3a3a; color: #ff9a9a; }
+    /* Inline fixes in the cleanup views, between the song and its actions. */
+    .hd-db-fix { display: flex; flex-direction: column; gap: 0.3rem; flex: 0 1 16rem; min-width: 12rem; margin-left: auto; }
+    .hd-db-fix + .hd-db-actions { margin-left: 0; }
+    .hd-db-fix-row { display: flex; gap: 0.4rem; }
+    .hd-db-fix-row input { flex: 1; min-width: 0; }
+    .hd-db-saved { margin: 0; font-size: 0.8rem; color: var(--text-dim); min-height: 1em; }
+    .hd-db-saved.error { color: #ff8080; }
+    .hd-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .hd-chips:empty { display: none; }
+    .hd-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.25rem 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .hd-chip button { border: none; background: none; padding: 0 0.3rem; color: var(--text-dim); font-size: 0.8rem; line-height: 1; }
     @media (hover: hover) {
       .hd-db-actions a:hover { background: #1f2430; }
       .hd-db-remove:hover { background: #3a1f1f; }
@@ -66,6 +86,7 @@ import Layout from '@/layouts/Layout.astro';
     import { GROUP_NAMES } from '../../../holodori';
     import { searchKey } from '@/lib/search';
     import { singleChoice } from '@/lib/choice';
+    import { initComboboxes } from '@/lib/combobox';
 
     type Song = {
       id: number; titleJp: string; titleEn: string | null; credit: string | null;
@@ -86,8 +107,8 @@ import Layout from '@/layouts/Layout.astro';
 
     const VIEW_NOTES: Record<View, string> = {
       all: '',
-      untyped: 'Songs with neither Original nor Cover set.',
-      nomember: 'Songs with no members added and no individual singer in the credit (only a group, or no credit). Some songs have none; edit the ones that should.',
+      untyped: 'Songs with neither Original nor Cover set. Pick one on the right to save it.',
+      nomember: 'Songs with no members added and no individual singer in the credit (only a group, or no credit). Some songs have none; add members on the right to the ones that should. Each change saves right away.',
     };
     const splitCredit = (s: string | null) => (s ? s.split(/\s*(?:,|、|&)\s*/).map((x) => x.trim()).filter(Boolean) : []);
     const VIEWS: Record<View, (s: Song) => boolean> = {
@@ -135,8 +156,141 @@ import Layout from '@/layouts/Layout.astro';
           search: searchKey([s.title_jp, s.title_en, s.artist_jp, s.artist_en, ...members].filter(Boolean).join(' ')),
         };
       });
+      // Member suggestions: every known individual, from credits (minus groups) and added members.
+      const known = new Set<string>();
+      for (const song of songs) for (const n of [...song.individuals, ...song.members]) known.add(n);
+      document.getElementById('member-names')!
+        .replaceChildren(...[...known].sort((a, b) => a.localeCompare(b)).map((n) => new Option(n)));
       status.textContent = '';
       render();
+    }
+
+    /** Saves fields on one song, reporting in note. Returns whether it saved. */
+    async function saveSong(song: Song, fields: Record<string, unknown>, note: HTMLElement) {
+      if (!supabase) return false;
+      note.classList.remove('error');
+      note.textContent = 'Saving...';
+      // RLS turns an update the account may not make into a silent no-op, so
+      // ask for the row back and treat none as a failure.
+      const { data, error } = await supabase.from('songs').update(fields).eq('id', song.id).select('id');
+      if (error || !data?.length) {
+        note.textContent = `Not saved: ${error?.message ?? 'log in first'}`;
+        note.classList.add('error');
+        return false;
+      }
+      await supabase.from('catalog_syncs').insert({});
+      note.textContent = 'Saved.';
+      return true;
+    }
+
+    /** Song type buttons for the No song type view; saves on click. */
+    function typeFix(song: Song) {
+      const wrap = document.createElement('div');
+      wrap.className = 'hd-db-fix';
+      const picker = document.createElement('fieldset');
+      picker.className = 'choice-picker';
+      picker.setAttribute('aria-label', `Song type for ${song.titleJp}`);
+      const inputs = (['original', 'cover'] as const).map((value) => {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.name = `type-${song.id}`;
+        input.value = value;
+        input.checked = song.category === value;
+        const text = document.createElement('span');
+        text.textContent = value === 'original' ? 'Original' : 'Cover';
+        label.append(input, text);
+        picker.append(label);
+        return input;
+      });
+      const choice = singleChoice(inputs);
+      const note = document.createElement('p');
+      note.className = 'hd-db-saved';
+      for (const input of inputs) {
+        input.addEventListener('change', async () => {
+          const previous = song.category ?? '';
+          // Song type is required: clicking the chosen one again keeps it.
+          if (!choice.value || choice.value === previous) {
+            choice.value = previous;
+            return;
+          }
+          const category = choice.value;
+          for (const i of inputs) i.disabled = true;
+          if (await saveSong(song, { category }, note)) {
+            song.category = category;
+            updateCounts();
+          } else {
+            choice.value = previous;
+          }
+          for (const i of inputs) i.disabled = false;
+        });
+      }
+      wrap.append(picker, note);
+      return wrap;
+    }
+
+    /** Member chips and an Add field for the No member view; saves on each change. */
+    function memberFix(song: Song) {
+      const wrap = document.createElement('div');
+      wrap.className = 'hd-db-fix';
+      const chips = document.createElement('div');
+      chips.className = 'hd-chips';
+      const fieldRow = document.createElement('div');
+      fieldRow.className = 'hd-db-fix-row';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.setAttribute('list', 'member-names');
+      input.autocomplete = 'off';
+      input.placeholder = 'Add a member...';
+      input.setAttribute('aria-label', `Add a member to ${song.titleJp}`);
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.textContent = 'Add';
+      fieldRow.append(input, add);
+      const note = document.createElement('p');
+      note.className = 'hd-db-saved';
+
+      async function setMembers(next: string[]) {
+        add.disabled = true;
+        if (await saveSong(song, { members: next.length ? next : null }, note)) {
+          song.members = next;
+          song.search = searchKey([song.titleJp, song.titleEn, song.credit, ...next].filter(Boolean).join(' '));
+          renderChips();
+          updateCounts();
+        }
+        add.disabled = false;
+      }
+      function renderChips() {
+        chips.replaceChildren(...song.members.map((name) => {
+          const chip = document.createElement('span');
+          chip.className = 'hd-chip';
+          chip.textContent = name;
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = '✕';
+          remove.setAttribute('aria-label', `Remove ${name}`);
+          remove.addEventListener('click', () => setMembers(song.members.filter((m) => m !== name)));
+          chip.append(remove);
+          return chip;
+        }));
+      }
+      function addMember() {
+        const name = input.value.trim();
+        input.value = '';
+        if (!name || song.members.some((m) => m.toLowerCase() === name.toLowerCase())) return;
+        setMembers([...song.members, name]);
+      }
+      add.addEventListener('click', addMember);
+      // Enter adds the member (the suggestion list picks on Enter first).
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addMember();
+        }
+      });
+      renderChips();
+      wrap.append(chips, fieldRow, note);
+      return wrap;
     }
 
     function row(song: Song) {
@@ -175,15 +329,28 @@ import Layout from '@/layouts/Layout.astro';
       remove.textContent = 'Remove';
       remove.addEventListener('click', () => removeSong(song, remove));
       actions.append(edit, remove);
-      li.append(info, actions);
+      // Fixed songs stay listed (not re-filtered) until the view or search
+      // changes, so a misclick can be put right in place.
+      const view = currentView();
+      const fix = view === 'untyped' ? typeFix(song) : view === 'nomember' && membersSupported ? memberFix(song) : null;
+      if (fix) {
+        li.append(info, fix, actions);
+        initComboboxes(fix);
+      } else {
+        li.append(info, actions);
+      }
       return li;
+    }
+
+    function updateCounts() {
+      for (const v of Object.keys(VIEWS) as View[]) {
+        document.querySelector(`[data-count="${v}"]`)!.textContent = `(${songs.filter(VIEWS[v]).length})`;
+      }
     }
 
     function render() {
       const view = currentView();
-      for (const v of Object.keys(VIEWS) as View[]) {
-        document.querySelector(`[data-count="${v}"]`)!.textContent = `(${songs.filter(VIEWS[v]).length})`;
-      }
+      updateCounts();
       viewNote.textContent = VIEW_NOTES[view];
       if (view === 'nomember' && !membersSupported) {
         viewNote.textContent += ' (Members aren\'t set up on this database yet: run migration 0002.)';
