@@ -136,10 +136,9 @@ game's tools:
 | IIDX | `/settings/iidx/new` | Search a song/chart, enter EX score, lamp and miss count |
 | IIDX | `/settings/iidx/import` | Paste a CSV of scores matched by title, preview, then import |
 | IIDX | `/settings/iidx/import-json` | Upload a native score export, matched exactly by song ID |
-| IIDX | `/settings/iidx/catalog-import` | Add or update songs and charts (titles, levels, BPM and more) |
 | Hololive Dreams | `/settings/holodori/new` | Pick a song and difficulty, enter score and clear |
 | Hololive Dreams | `/settings/holodori/song` | Add or edit a song, its levels, song type and members |
-| Hololive Dreams | `/settings/holodori/songs` | List every song, remove songs (with their scores), and find and fix songs missing a song type or member |
+| Hololive Dreams | `/settings/holodori/songs` | List every song, remove songs (with their scores), and find and fix songs missing a song type, member or jacket |
 
 These pages aren't access-controlled themselves; the RLS policies in the
 database are the only write guard, and they only accept the owner's UUID.

@@ -44,3 +44,19 @@ export const LAMP_LABELS: Record<ClearLamp, string> = {
   EX_HARD_CLEAR: 'EX Hard Clear',
   FULL_COMBO: 'Full Combo',
 };
+
+// In-game lamp colors. FULL_COMBO also has a rainbow fill (LAMP_FILLS), and
+// the light colors need dark text on top (LAMP_DARK_TEXT).
+export const LAMP_COLORS: Record<ClearLamp, string> = {
+  FAILED: '#E0565B',
+  ASSIST_CLEAR: '#A77BFF',
+  EASY_CLEAR: '#8EE05A',
+  CLEAR: '#4FA8FF',
+  HARD_CLEAR: '#F2F2F2',
+  EX_HARD_CLEAR: '#FFD84D',
+  FULL_COMBO: '#7FE8FF',
+};
+export const LAMP_FILLS: Partial<Record<ClearLamp, string>> = {
+  FULL_COMBO: 'linear-gradient(135deg, #FF8A8A 0%, #FFD36E 25%, #9BF59B 50%, #7FD8FF 75%, #C59BFF 100%)',
+};
+export const LAMP_DARK_TEXT = new Set<ClearLamp>(['EASY_CLEAR', 'HARD_CLEAR', 'EX_HARD_CLEAR', 'FULL_COMBO']);

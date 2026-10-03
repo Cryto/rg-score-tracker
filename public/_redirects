@@ -14,6 +14,9 @@ https://iidx.cryto.dev/*                https://rg.cryto.dev/:splat     301!
 /settings/new             /settings/iidx/new             301!
 /settings/import          /settings/iidx/import          301!
 /settings/import-json     /settings/iidx/import-json     301!
-/settings/catalog-import  /settings/iidx/catalog-import  301!
+/settings/catalog-import  /settings                      301!
 /settings/holodori-new    /settings/holodori/new         301!
 /settings/holodori-song   /settings/holodori/song        301!
+
+# Removed pages.
+/settings/iidx/catalog-import  /settings  301!

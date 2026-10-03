@@ -1,5 +1,12 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import { CLEAR_LAMPS, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, LAMP_DARK_TEXT } from '../../../grade';
+
+// Per-lamp button colors for the .choice-picker (see Layout.astro).
+const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
+  [`--choice:${LAMP_COLORS[l]}`, LAMP_FILLS[l] && `--choice-bg:${LAMP_FILLS[l]}`, LAMP_DARK_TEXT.has(l) && '--choice-on:#111']
+    .filter(Boolean)
+    .join(';');
 ---
 <Layout title="Add Score" showLogout={true} showHome={true} settingsMode={true}>
   <a href="/settings" class="back-link">← Back to Settings</a>
@@ -9,23 +16,25 @@ import Layout from '@/layouts/Layout.astro';
   </p>
 
   <form id="score-form" style="display:flex; flex-direction:column; gap:0.75rem; max-width:420px;">
-    <label>Song / Chart
-      <input id="chart-search" type="text" placeholder="Type a song title..." autocomplete="off" />
-      <select id="chart-select" size="6" style="display:none;"></select>
-    </label>
+    <div class="iidx-field">
+      <label for="chart-search">Song / Chart</label>
+      <div class="iidx-field-row">
+        <input id="chart-search" type="text" placeholder="Type a song title..." autocomplete="off" />
+        <button type="button" id="clear-chart" class="iidx-icon-btn" aria-label="Clear song/chart" title="Clear song/chart">✕</button>
+        <button type="button" id="clear-all">Clear all</button>
+      </div>
+      <select id="chart-select" size="6" style="display:none;" aria-label="Matching charts"></select>
+    </div>
     <label>EX Score <input id="ex-score" type="number" min="0" /></label>
-    <label>Clear Lamp
-      <select id="clear-lamp">
-        <option value="">— none —</option>
-        <option value="FAILED">Failed</option>
-        <option value="ASSIST_CLEAR">Assist Clear</option>
-        <option value="EASY_CLEAR">Easy Clear</option>
-        <option value="CLEAR">Clear</option>
-        <option value="HARD_CLEAR">Hard Clear</option>
-        <option value="EX_HARD_CLEAR">EX Hard Clear</option>
-        <option value="FULL_COMBO">Full Combo</option>
-      </select>
-    </label>
+    <fieldset class="choice-picker iidx-lamp-picker">
+      <legend>Clear Lamp <span class="iidx-optional">(optional — click again to unset)</span></legend>
+      {CLEAR_LAMPS.map((l) => (
+        <label style={lampStyle(l)}>
+          <input type="checkbox" name="clear-lamp" value={l} />
+          <span>{LAMP_LABELS[l]}</span>
+        </label>
+      ))}
+    </fieldset>
     <label>Miss Count (BP) <input id="miss-count" type="number" min="0" /></label>
     <button type="submit">Submit</button>
     <p id="status" style="color: var(--text-dim);"></p>
@@ -37,11 +46,34 @@ import Layout from '@/layouts/Layout.astro';
 
   <section id="score-manager" class="score-manager" hidden></section>
 
+  <style>
+    .iidx-field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .iidx-field-row { display: flex; gap: 0.4rem; }
+    .iidx-field-row input { flex: 1; min-width: 0; }
+    .iidx-field-row button { flex-shrink: 0; white-space: nowrap; }
+    .iidx-icon-btn { width: 2.2rem; padding: 0; border-color: var(--border); color: var(--text-dim); }
+    .iidx-optional { color: var(--text-dim); font-size: 0.85em; font-weight: normal; }
+    /* Seven lamps don't fit one row: 4 + 3, in game order. */
+    .iidx-lamp-picker { grid-auto-flow: row; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* Equal-height buttons whether or not a label wraps to two lines. */
+    .iidx-lamp-picker label { display: flex; }
+    .iidx-lamp-picker input + span {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .iidx-lamp-picker input:checked + span { text-shadow: none; }
+  </style>
+
   <script>
     import { requireSupabase } from '@/lib/supabase';
     import { searchKey } from '@/lib/search';
     import { scoreManager } from '@/lib/score-manager';
     import { LAMP_LABELS } from '../../../grade';
+    import { singleChoice } from '@/lib/choice';
 
     const supabase = requireSupabase('iidx');
 
@@ -50,6 +82,9 @@ import Layout from '@/layouts/Layout.astro';
     const searchInput = document.getElementById('chart-search') as HTMLInputElement;
     const chartSelect = document.getElementById('chart-select') as HTMLSelectElement;
     const status = document.getElementById('status')!;
+    const exScoreInput = document.getElementById('ex-score') as HTMLInputElement;
+    const missCountInput = document.getElementById('miss-count') as HTMLInputElement;
+    const clearLamp = singleChoice([...form.querySelectorAll<HTMLInputElement>('input[name="clear-lamp"]')]);
 
     let charts: { id: number; label: string; searchText: string }[] = [];
     let selectedChartId: number | null = null;
@@ -108,6 +143,28 @@ import Layout from '@/layouts/Layout.astro';
       chartSelect.style.display = matches.length ? '' : 'none';
     });
 
+    function clearChart() {
+      searchInput.value = '';
+      if (selectedChartId != null) manager.show(null);
+      selectedChartId = null;
+      chartSelect.style.display = 'none';
+      chartSelect.innerHTML = '';
+    }
+
+    document.getElementById('clear-chart')!.addEventListener('click', () => {
+      clearChart();
+      searchInput.focus();
+    });
+
+    document.getElementById('clear-all')!.addEventListener('click', () => {
+      clearChart();
+      exScoreInput.value = '';
+      missCountInput.value = '';
+      clearLamp.value = '';
+      status.textContent = '';
+      searchInput.focus();
+    });
+
     chartSelect.addEventListener('change', () => {
       selectedChartId = Number(chartSelect.value);
       searchInput.value = chartSelect.selectedOptions[0]?.textContent ?? '';
@@ -121,15 +178,15 @@ import Layout from '@/layouts/Layout.astro';
         status.textContent = 'Pick a song/chart from the dropdown first.';
         return;
       }
-      const exScoreVal = (document.getElementById('ex-score') as HTMLInputElement).value;
-      const missCountVal = (document.getElementById('miss-count') as HTMLInputElement).value;
-      const clearLamp = (document.getElementById('clear-lamp') as HTMLSelectElement).value || null;
+      const exScoreVal = exScoreInput.value;
+      const missCountVal = missCountInput.value;
+      const lamp = clearLamp.value || null;
 
       const { error } = await supabase.from('scores').upsert(
         {
           chart_id: selectedChartId,
           ex_score: exScoreVal ? Number(exScoreVal) : null,
-          clear_lamp: clearLamp,
+          clear_lamp: lamp,
           miss_count: missCountVal ? Number(missCountVal) : null,
         },
         { onConflict: 'chart_id' }
