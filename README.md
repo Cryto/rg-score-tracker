@@ -152,6 +152,31 @@ scripts below) can write them.
 
 ### beatmania IIDX
 
+The catalog's source of truth is the "Infinitas DB" Google Sheet (tab
+Master, one row per song and play style).
+[`db/iidx/import/import-sheet.mjs`](db/iidx/import/import-sheet.mjs) imports
+a CSV download of that tab. Run
+[`0010_sheet_catalog.sql`](db/iidx/migrations/0010_sheet_catalog.sql) once
+first.
+
+```sh
+node --env-file=.env db/iidx/import/import-sheet.mjs master.csv --dry-run
+node --env-file=.env db/iidx/import/import-sheet.mjs master.csv
+```
+
+- Songs keep their id through the sheet's "Supabase ID" column. Rows with a
+  blank ID are inserted as new songs, and their new ids are written to
+  `new-song-ids.csv` to paste back into the sheet.
+- Charts are matched on song, style and difficulty, so their ids (and the
+  scores on them) survive re-runs. BA columns become difficulty L with the
+  label "Black Another".
+- Sheet columns the script doesn't know land in `songs.extra`.
+- Songs and charts that aren't in the sheet are only listed, unless you pass
+  `--delete-missing`, which deletes them along with their scores.
+
+The older importer below loaded the catalog from iidx-db. Don't re-run it
+after switching to the sheet: it would overwrite sheet data.
+
 [`db/iidx/import/import-iidx-db.mjs`](db/iidx/import/import-iidx-db.mjs)
 imports the catalog from [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db)
 (MIT), whose data is extracted from IIDX Infinitas via

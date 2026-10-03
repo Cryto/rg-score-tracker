@@ -23,7 +23,11 @@ create table versions (
   id serial primary key,
   number integer not null unique,
   name text not null,
-  release_year integer
+  release_year integer,
+  -- arcade, cs, infinitas or mobile.
+  platform text not null default 'arcade',
+  -- How the catalog sheet's Release Version / Playable In columns spell it.
+  sheet_name text unique
 );
 
 create table songs (
@@ -37,7 +41,21 @@ create table songs (
   bpm_max integer,
   debut_version_id integer references versions(id),
   -- id from an external catalog source (e.g. iidx-db), for idempotent re-imports.
-  external_id text unique
+  external_id text unique,
+  composition text,
+  arrangement text,
+  production text,
+  lyrics text,
+  vocals text,
+  -- The catalog sheet's BPM and Length as written; bpm_min/bpm_max and
+  -- length_seconds are parsed from them.
+  bpm_text text,
+  length_text text,
+  length_seconds integer,
+  remywiki_url text,
+  notes text,
+  -- Catalog sheet columns with no column of their own yet, keyed by header.
+  extra jsonb not null default '{}'::jsonb
 );
 
 create table charts (
@@ -206,7 +224,8 @@ for each row execute function recompute_score_after_attempt_delete();
 -- alongside scores.updated_at ("scores last updated").
 create table catalog_syncs (
   id serial primary key,
-  synced_at timestamptz not null default now()
+  synced_at timestamptz not null default now(),
+  source text
 );
 
 -- Tracks which versions a chart was actually playable in (handles charts
