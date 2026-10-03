@@ -15,6 +15,7 @@ import Layout from '@/layouts/Layout.astro';
       <label><input type="checkbox" name="view" value="all" checked /><span>All <b data-count="all"></b></span></label>
       <label><input type="checkbox" name="view" value="untyped" /><span>No song type <b data-count="untyped"></b></span></label>
       <label><input type="checkbox" name="view" value="nomember" /><span>No member <b data-count="nomember"></b></span></label>
+      <label><input type="checkbox" name="view" value="nojacket" /><span>No jacket <b data-count="nojacket"></b></span></label>
     </fieldset>
     <p id="view-note" class="hd-db-note"></p>
   </div>
@@ -24,7 +25,7 @@ import Layout from '@/layouts/Layout.astro';
   <p id="empty" style="color: var(--text-dim);" hidden></p>
 
   <style>
-    .hd-db-controls { display: flex; flex-direction: column; gap: 0.6rem; max-width: 560px; margin-bottom: 0.75rem; }
+    .hd-db-controls { display: flex; flex-direction: column; gap: 0.6rem; max-width: 680px; margin-bottom: 0.75rem; }
     .hd-db-controls input[type="search"] { width: 100%; box-sizing: border-box; }
     .hd-db-controls b { font-weight: 400; opacity: 0.75; }
     .hd-db-note { margin: 0; font-size: 0.85rem; color: var(--text-dim); min-height: 1.2em; }
@@ -63,6 +64,17 @@ import Layout from '@/layouts/Layout.astro';
     .hd-db-fix-row input { flex: 1; min-width: 0; }
     .hd-db-saved { margin: 0; font-size: 0.8rem; color: var(--text-dim); min-height: 1em; }
     .hd-db-saved.error { color: #ff8080; }
+    .hd-jacket-row { display: flex; gap: 0.4rem; align-items: center; }
+    .hd-jacket-row input { flex: 1; min-width: 0; }
+    .hd-jacket-preview {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--border), var(--surface));
+    }
+    .hd-jacket-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .hd-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
     .hd-chips:empty { display: none; }
     .hd-chip {
@@ -83,17 +95,17 @@ import Layout from '@/layouts/Layout.astro';
 
   <script>
     import { getSupabase } from '@/lib/supabase';
-    import { GROUP_NAMES } from '../../../holodori';
+    import { GROUP_NAMES, jacketFromLink } from '../../../holodori';
     import { searchKey } from '@/lib/search';
     import { singleChoice } from '@/lib/choice';
     import { initComboboxes } from '@/lib/combobox';
 
     type Song = {
       id: number; titleJp: string; titleEn: string | null; credit: string | null;
-      category: string | null; members: string[]; individuals: string[];
+      category: string | null; members: string[]; individuals: string[]; jacketUrl: string | null;
       scores: number; attempts: number; search: string;
     };
-    type View = 'all' | 'untyped' | 'nomember';
+    type View = 'all' | 'untyped' | 'nomember' | 'nojacket';
 
     const supabase = getSupabase('holodori');
     const authWarning = document.getElementById('auth-warning')!;
@@ -109,12 +121,14 @@ import Layout from '@/layouts/Layout.astro';
       all: '',
       untyped: 'Songs with neither Original nor Cover set. Pick one on the right to save it.',
       nomember: 'Songs with no members added and no individual singer in the credit (only a group, or no credit). Some songs have none; add members on the right to the ones that should. Each change saves right away.',
+      nojacket: 'Songs with no jacket image. Paste a YouTube video link (its thumbnail is used) or an https image link on the right, check the preview, then Save. Afterwards, re-export catalog.json so forks get them.',
     };
     const splitCredit = (s: string | null) => (s ? s.split(/\s*(?:,|、|&)\s*/).map((x) => x.trim()).filter(Boolean) : []);
     const VIEWS: Record<View, (s: Song) => boolean> = {
       all: () => true,
       untyped: (s) => !s.category,
       nomember: (s) => !s.members.length && !s.individuals.length,
+      nojacket: (s) => !s.jacketUrl,
     };
 
     let songs: Song[] = [];
@@ -133,7 +147,7 @@ import Layout from '@/layouts/Layout.astro';
         if (!data.session) authWarning.style.display = '';
       });
       status.textContent = 'Loading...';
-      const cols = 'id, title_jp, title_en, artist_jp, artist_en, category, charts ( scores ( chart_id ), score_attempts ( id ) )';
+      const cols = 'id, title_jp, title_en, artist_jp, artist_en, category, jacket_url, charts ( scores ( chart_id ), score_attempts ( id ) )';
       let { data, error }: { data: any[] | null; error: { message: string } | null } =
         await supabase.from('songs').select(`${cols}, members`).order('title_jp');
       // Database without migration 0002: work without members.
@@ -149,7 +163,7 @@ import Layout from '@/layouts/Layout.astro';
         const credit = s.artist_en ?? s.artist_jp;
         const members: string[] = s.members ?? [];
         return {
-          id: s.id, titleJp: s.title_jp, titleEn: s.title_en, credit, category: s.category, members,
+          id: s.id, titleJp: s.title_jp, titleEn: s.title_en, credit, category: s.category, members, jacketUrl: s.jacket_url,
           individuals: splitCredit(credit).filter((n) => !GROUP_NAMES.has(n)),
           scores: (s.charts ?? []).reduce((n: number, c: any) => n + (c.scores?.length ?? 0), 0),
           attempts: (s.charts ?? []).reduce((n: number, c: any) => n + (c.score_attempts?.length ?? 0), 0),
@@ -293,6 +307,88 @@ import Layout from '@/layouts/Layout.astro';
       return wrap;
     }
 
+    /** Jacket link field with a preview for the No jacket view; saves on Save. */
+    function jacketFix(song: Song) {
+      const wrap = document.createElement('div');
+      wrap.className = 'hd-db-fix';
+      const fieldRow = document.createElement('div');
+      fieldRow.className = 'hd-jacket-row';
+      const preview = document.createElement('div');
+      preview.className = 'hd-jacket-preview';
+      preview.setAttribute('aria-hidden', 'true');
+      const img = document.createElement('img');
+      img.alt = '';
+      img.hidden = true;
+      preview.append(img);
+      const input = document.createElement('input');
+      input.type = 'url';
+      input.inputMode = 'url';
+      input.autocomplete = 'off';
+      input.placeholder = 'YouTube or image link...';
+      input.setAttribute('aria-label', `Jacket link for ${song.titleJp}`);
+      const save = document.createElement('button');
+      save.type = 'button';
+      save.textContent = 'Save';
+      save.disabled = true;
+      fieldRow.append(preview, input, save);
+      const note = document.createElement('p');
+      note.className = 'hd-db-saved';
+
+      // The image must load before Save is offered, same check as the song form.
+      let src: string | null = null;
+      input.addEventListener('input', () => {
+        note.classList.remove('error');
+        save.disabled = true;
+        const link = input.value.trim();
+        src = link ? jacketFromLink(link) : null;
+        img.hidden = !src;
+        if (!link) {
+          img.removeAttribute('src');
+          note.textContent = '';
+          return;
+        }
+        if (!src) {
+          img.removeAttribute('src');
+          note.textContent = 'That isn\'t an https:// link.';
+          note.classList.add('error');
+          return;
+        }
+        const checking = src;
+        note.textContent = 'Loading preview...';
+        img.onload = () => {
+          if (src !== checking) return;
+          note.textContent = src === link ? 'Image found.' : 'Video thumbnail found.';
+          save.disabled = false;
+        };
+        img.onerror = () => {
+          if (src !== checking) return;
+          img.hidden = true;
+          note.textContent = 'Couldn\'t load an image from that link.';
+          note.classList.add('error');
+        };
+        img.src = src;
+      });
+      async function saveJacket() {
+        if (!src || save.disabled) return;
+        save.disabled = true;
+        if (await saveSong(song, { jacket_url: src }, note)) {
+          song.jacketUrl = src;
+          updateCounts();
+        } else {
+          save.disabled = false;
+        }
+      }
+      save.addEventListener('click', saveJacket);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveJacket();
+        }
+      });
+      wrap.append(fieldRow, note);
+      return wrap;
+    }
+
     function row(song: Song) {
       const li = document.createElement('li');
       li.className = 'hd-db-row';
@@ -332,7 +428,10 @@ import Layout from '@/layouts/Layout.astro';
       // Fixed songs stay listed (not re-filtered) until the view or search
       // changes, so a misclick can be put right in place.
       const view = currentView();
-      const fix = view === 'untyped' ? typeFix(song) : view === 'nomember' && membersSupported ? memberFix(song) : null;
+      const fix = view === 'untyped' ? typeFix(song)
+        : view === 'nomember' && membersSupported ? memberFix(song)
+        : view === 'nojacket' ? jacketFix(song)
+        : null;
       if (fix) {
         li.append(info, fix, actions);
         initComboboxes(fix);

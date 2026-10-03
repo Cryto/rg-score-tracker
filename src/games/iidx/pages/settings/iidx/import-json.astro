@@ -13,6 +13,11 @@ import Layout from '@/layouts/Layout.astro';
     numeric song ID). Matched against the catalog via <code>songs.external_id</code> —
     songs not in the catalog are reported as unmatched, not inserted.
   </p>
+  <p style="color: var(--text-dim); max-width: 700px;">
+    Songs added from the Infinitas DB sheet don't have an INFINITAS ID yet. Unmatched IDs
+    are listed after Preview with the songs they could be (same debut version, note counts
+    that fit your scores): pick the right one and Link it, and its scores match from then on.
+  </p>
 
   <input id="json-file" type="file" accept="application/json,.json" />
   <div style="margin-top: 0.75rem; display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem;">
@@ -22,10 +27,40 @@ import Layout from '@/layouts/Layout.astro';
   </div>
 
   <div id="results" style="margin-top:1.5rem;"></div>
+  <section id="link-section" hidden>
+    <h2 style="font-size:1.05rem; margin: 1.5rem 0 0.25rem;">Link unmatched songs</h2>
+    <p style="color: var(--text-dim); max-width: 700px; margin-top: 0;">
+      The first two digits of an INFINITAS ID are the song's debut version. Suggestions are
+      songs from that version with no INFINITAS ID whose charts have enough notes for your
+      EX scores; search to pick any other song without one.
+    </p>
+    <ul id="link-list" class="link-list"></ul>
+  </section>
+
+  <!-- Global: the link rows are built from JS, which scoped styles can't reach. -->
+  <style is:global>
+    .link-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; max-width: 760px; }
+    .link-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding: 0.6rem 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .link-row small { color: var(--text-dim); }
+    .link-fields { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .link-fields input { flex: 1 1 10rem; min-width: 0; }
+    .link-fields select { flex: 2 1 16rem; min-width: 0; }
+    .link-note { margin: 0; font-size: 0.85rem; color: var(--text-dim); min-height: 1em; }
+    .link-note.error { color: #ff8080; }
+  </style>
 
   <script>
     import { requireSupabase } from '@/lib/supabase';
-    import { CLEAR_LAMPS } from '../../../grade';
+    import { CLEAR_LAMPS, LAMP_LABELS } from '../../../grade';
+    import { searchKey } from '@/lib/search';
 
     const supabase = requireSupabase('iidx');
 
@@ -35,6 +70,8 @@ import Layout from '@/layouts/Layout.astro';
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
     const submitStatus = document.getElementById('submit-status')!;
     const results = document.getElementById('results')!;
+    const linkSection = document.getElementById('link-section')!;
+    const linkList = document.getElementById('link-list')!;
 
     type ParsedScore = {
       chart_id: number;
@@ -46,6 +83,14 @@ import Layout from '@/layouts/Layout.astro';
     let fileContent: any = null;
     let matched: ParsedScore[] = [];
     let chartLookup = new Map<string, number>();
+
+    // Every song, for linking unmatched INFINITAS IDs to songs.
+    type CatalogSong = {
+      id: number; label: string; search: string; externalId: string | null;
+      versionNumber: number | null; versionName: string | null;
+      notes: Map<string, number | null>; // "SPA" -> note count
+    };
+    let catalog: CatalogSong[] = [];
 
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) authWarning.style.display = '';
@@ -74,6 +119,30 @@ import Layout from '@/layouts/Layout.astro';
       );
     }
 
+    async function loadCatalog() {
+      const pageSize = 1000;
+      let data: any[] = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data: page, error } = await supabase
+          .from('songs')
+          .select('id, title, title_english, external_id, versions ( number, name ), charts ( play_style, difficulty, note_count )')
+          .order('id')
+          .range(from, from + pageSize - 1);
+        if (error) return; // linking is optional; the import itself still works
+        data = data.concat(page ?? []);
+        if (!page || page.length < pageSize) break;
+      }
+      catalog = data.map((s: any) => ({
+        id: s.id,
+        label: s.title_english && s.title_english !== s.title ? `${s.title} (${s.title_english})` : s.title,
+        search: searchKey(`${s.title ?? ''} ${s.title_english ?? ''}`),
+        externalId: s.external_id,
+        versionNumber: s.versions?.number ?? null,
+        versionName: s.versions?.name ?? null,
+        notes: new Map((s.charts ?? []).map((c: any) => [`${c.play_style}${c.difficulty}`, c.note_count])),
+      }));
+    }
+
     fileInput.addEventListener('change', () => {
       const file = fileInput.files?.[0];
       previewBtn.disabled = !file;
@@ -98,6 +167,7 @@ import Layout from '@/layouts/Layout.astro';
 
       matched = [];
       const unmatched: string[] = [];
+      const unmatchedSongs = new Map<string, { code: string; score: any }[]>();
       let noPlayCount = 0;
 
       for (const [songId, chartMap] of Object.entries<any>(fileContent)) {
@@ -116,6 +186,8 @@ import Layout from '@/layouts/Layout.astro';
           }
           if (!chartId) {
             unmatched.push(`${songId} ${chartCode}`);
+            if (!unmatchedSongs.has(externalId)) unmatchedSongs.set(externalId, []);
+            unmatchedSongs.get(externalId)!.push({ code: chartCode.toUpperCase(), score });
             continue;
           }
           matched.push({
@@ -135,7 +207,93 @@ import Layout from '@/layouts/Layout.astro';
       `;
       submitStatus.innerHTML = '';
       submitBtn.style.display = matched.length ? '' : 'none';
+      renderLinks(unmatchedSongs);
     });
+
+    function escapeHtml(s: string) {
+      return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    }
+
+    // A song fits an unmatched ID when it debuted in the ID's version and
+    // every played chart exists with enough notes for its EX score (EX is at
+    // most 2 per note). Unknown note counts don't rule a song out.
+    function fits(song: CatalogSong, versionNumber: number, charts: { code: string; score: any }[]) {
+      if (song.externalId || song.versionNumber !== versionNumber) return false;
+      return charts.every(({ code, score }) => {
+        if (!song.notes.has(code)) return false;
+        const notes = song.notes.get(code);
+        return notes == null || !score.ex_score || score.ex_score <= notes * 2;
+      });
+    }
+
+    function renderLinks(unmatchedSongs: Map<string, { code: string; score: any }[]>) {
+      linkList.replaceChildren(...[...unmatchedSongs].map(([externalId, charts]) => linkRow(externalId, charts)));
+      linkSection.hidden = !unmatchedSongs.size;
+    }
+
+    function linkRow(externalId: string, charts: { code: string; score: any }[]) {
+      const versionNumber = Number(externalId.slice(0, 2));
+      const versionName = catalog.find((s) => s.versionNumber === versionNumber)?.versionName ?? `version ${versionNumber}`;
+      const played = charts
+        .map(({ code, score }) => [code, score.ex_score ? `EX ${score.ex_score}` : null, score.clear_type ? LAMP_LABELS[CLEAR_LAMPS[score.clear_type - 1]] : null].filter(Boolean).join(' '))
+        .join(' · ');
+      const suggestions = catalog.filter((s) => fits(s, versionNumber, charts)).sort((a, b) => a.label.localeCompare(b.label));
+
+      const li = document.createElement('li');
+      li.className = 'link-row';
+      li.innerHTML = `<div><strong>INFINITAS ID ${escapeHtml(externalId)}</strong> <small>debuted in ${escapeHtml(versionName)}</small></div>
+        <small>Your scores: ${escapeHtml(played)}</small>
+        <div class="link-fields">
+          <input type="search" placeholder="Search other songs..." autocomplete="off" aria-label="Search songs for ID ${escapeHtml(externalId)}" />
+          <select aria-label="Song for ID ${escapeHtml(externalId)}"></select>
+          <button type="button">Link</button>
+        </div>
+        <p class="link-note"></p>`;
+      const search = li.querySelector('input')!;
+      const select = li.querySelector('select')!;
+      const button = li.querySelector('button')!;
+      const note = li.querySelector<HTMLElement>('.link-note')!;
+
+      function fill(options: CatalogSong[], placeholder: string) {
+        select.replaceChildren(new Option(placeholder, ''), ...options.slice(0, 100).map((s) => new Option(s.label, String(s.id))));
+        button.disabled = true;
+      }
+      const showSuggestions = () => fill(suggestions, suggestions.length ? `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'}...` : 'No suggestions: search instead');
+      showSuggestions();
+      search.addEventListener('input', () => {
+        const q = searchKey(search.value.trim());
+        if (!q) return showSuggestions();
+        const hits = catalog.filter((s) => !s.externalId && s.search.includes(q)).sort((a, b) => a.label.localeCompare(b.label));
+        fill(hits, hits.length ? `${hits.length} match${hits.length === 1 ? '' : 'es'}...` : 'No songs without an INFINITAS ID match');
+      });
+      select.addEventListener('change', () => (button.disabled = !select.value));
+
+      button.addEventListener('click', async () => {
+        const song = catalog.find((s) => s.id === Number(select.value));
+        if (!song) return;
+        button.disabled = true;
+        note.classList.remove('error');
+        note.textContent = 'Linking...';
+        // RLS turns an update the account may not make into a silent no-op, so
+        // ask for the row back and treat none as a failure.
+        const { data, error } = await supabase.from('songs').update({ external_id: externalId }).eq('id', song.id).select('id');
+        if (error || !data?.length) {
+          note.textContent = `Not linked: ${error?.message ?? 'log in first'}`;
+          note.classList.add('error');
+          button.disabled = false;
+          return;
+        }
+        song.externalId = externalId;
+        note.textContent = `Linked to ${song.label}.`;
+        search.disabled = select.disabled = true;
+        // Re-match so this song's scores join the import on the next Preview.
+        await loadChartLookup();
+        submitBtn.style.display = 'none';
+        submitStatus.innerHTML = '<span style="color: var(--text-dim);">Song linked. Press Preview again to include its scores.</span>';
+      });
+      return li;
+    }
+
 
     submitBtn.addEventListener('click', async () => {
       submitBtn.disabled = true;
@@ -148,5 +306,6 @@ import Layout from '@/layouts/Layout.astro';
     });
 
     loadChartLookup();
+    loadCatalog();
   </script>
 </Layout>

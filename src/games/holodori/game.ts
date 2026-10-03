@@ -29,7 +29,7 @@ const game: GameDefinition = {
     {
       href: '/settings/holodori/songs',
       title: 'Edit Song Database',
-      description: 'Every song in the catalog: remove songs, and find and fix ones missing a song type or member.',
+      description: 'Every song in the catalog: remove songs, and find and fix ones missing a song type, member or jacket.',
     },
   ],
 };

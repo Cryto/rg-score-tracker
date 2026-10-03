@@ -25,11 +25,6 @@ const game: GameDefinition = {
       title: 'Import from JSON Export',
       description: 'Upload a native score-export file, matched exactly by song ID.',
     },
-    {
-      href: '/settings/iidx/catalog-import',
-      title: 'Catalog Import / Update (CSV)',
-      description: 'Add or update songs and charts themselves — titles, levels, BPM, and more.',
-    },
   ],
 };
 

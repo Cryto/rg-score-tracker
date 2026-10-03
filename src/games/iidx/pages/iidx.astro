@@ -57,6 +57,7 @@ import Layout from '@/layouts/Layout.astro';
           <label class="checkbox-row"><input type="checkbox" value="D" /> D</label>
           <label class="checkbox-row"><input type="checkbox" value="E" /> E</label>
           <label class="checkbox-row"><input type="checkbox" value="F" /> F</label>
+          <label class="checkbox-row"><input type="checkbox" value="—" /> No grade</label>
         </div>
       </div>
 
@@ -138,9 +139,30 @@ import Layout from '@/layouts/Layout.astro';
 
   <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
 
+  <!-- Global: the stats tables are built from JS, which scoped styles can't reach. -->
+  <style is:global>
+    /* Stats tables: every level column is the same fixed width (set by the
+       <colgroup> from JS), so a 3-digit count doesn't stretch its column. */
+    #stats-container .pivot-table { table-layout: fixed; }
+    #stats-container .pivot-table td,
+    #stats-container .pivot-table thead th:not(:first-child) { text-align: center; padding-left: 0; padding-right: 0; }
+    .iidx-count { color: inherit; text-decoration: none; display: block; border-radius: 4px; }
+    .iidx-count:focus-visible { outline: 2px solid var(--accent); }
+    @media (hover: hover) { .iidx-count:hover { background: var(--border); text-decoration: underline; } }
+    .iidx-lamp-dot {
+      display: inline-block;
+      width: 0.7rem;
+      height: 0.7rem;
+      margin-right: 0.3rem;
+      border-radius: 50%;
+      vertical-align: -0.05rem;
+      background: var(--lamp);
+    }
+  </style>
+
   <script>
     import { requireSupabase } from '@/lib/supabase';
-    import { computeGrade, LAMP_LABELS } from '../grade';
+    import { computeGrade, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, type ClearLamp } from '../grade';
     import { searchKey } from '@/lib/search';
     import { loadAttempts, historyHtml } from '@/lib/history';
 
@@ -156,6 +178,7 @@ import Layout from '@/layouts/Layout.astro';
     const LAMP_ROW_LABELS: Record<string, string> = { ...LAMP_LABELS, NONE: 'No score yet' };
 
     let viewMode: 'list' | 'stats' = 'list';
+    let loaded = false;
     const ROW_BATCH = 200;
     let listRows: Row[] = [];
     let renderedCount = 0;
@@ -327,7 +350,9 @@ import Layout from '@/layouts/Layout.astro';
       }
 
       statusEl.style.display = 'none';
-      tableEl.style.display = '';
+      loaded = true;
+      // Filters from the URL, now that every checkbox (incl. versions) exists.
+      applyParams(new URLSearchParams(location.search));
       pinTitleColumnWidth();
       render();
     }
@@ -364,7 +389,7 @@ import Layout from '@/layouts/Layout.astro';
 
     function currentFilters() {
       return {
-        search: searchKey((document.getElementById('f-search') as HTMLInputElement).value.trim()),
+        search: searchKey(searchEl.value.trim()),
         versions: checkedValues('version'),
         playableIn: checkedValues('playable-in'),
         styles: checkedValues('style'),
@@ -375,50 +400,91 @@ import Layout from '@/layouts/Layout.astro';
       };
     }
 
-    function pivotTable(title: string, rowLabels: string[], rowKeyOf: (label: string) => string, counts: Map<string, number[]>): string {
-      const colTotals = Array(12).fill(0);
-      let grandTotal = 0;
-      const bodyRows = rowLabels
-        .map((label) => {
-          const key = rowKeyOf(label);
-          const rowCounts = counts.get(key) ?? Array(12).fill(0);
-          const rowTotal = rowCounts.reduce((a, b) => a + b, 0);
-          if (rowTotal === 0) return '';
-          rowCounts.forEach((c, i) => (colTotals[i] += c));
-          grandTotal += rowTotal;
-          return `<tr><th>${escapeHtml(label)}</th>${rowCounts
-            .map((c) => `<td>${c || ''}</td>`)
-            .join('')}<td><strong>${rowTotal}</strong></td></tr>`;
-        })
-        .join('');
-      const headerCols = Array.from({ length: 12 }, (_, i) => `<th>${i + 1}</th>`).join('');
-      const totalRow = `<tr><th>Total</th>${colTotals.map((c) => `<td><strong>${c || ''}</strong></td>`).join('')}<td><strong>${grandTotal}</strong></td></tr>`;
-      return `<h2 style="font-size:1rem; margin: 1.5rem 0 0.5rem;">${escapeHtml(title)}</h2>
-        <div class="stats-scroll"><table class="pivot-table"><thead><tr><th></th>${headerCols}<th>Total</th></tr></thead><tbody>${bodyRows}${totalRow}</tbody></table></div>`;
+    // Filters and view mirror the URL (?view=stats&style=SP&diff=A&level=12
+    // &lamp=HARD_CLEAR&grade=AA&version=...&playable=...&q=...; multi-select
+    // groups repeat their key), so a filtered view can be linked, reloaded or
+    // gone back to.
+    const PARAM_GROUPS = {
+      style: 'style', diff: 'difficulty', level: 'level', grade: 'grade', lamp: 'lamp', version: 'version', playable: 'playable-in',
+    } as const;
+    const searchEl = document.getElementById('f-search') as HTMLInputElement;
+
+    function filterParams(): URLSearchParams {
+      const p = new URLSearchParams();
+      if (viewMode === 'stats') p.set('view', 'stats');
+      if (searchEl.value.trim()) p.set('q', searchEl.value.trim());
+      for (const [key, group] of Object.entries(PARAM_GROUPS)) for (const v of checkedValues(group)) p.append(key, v);
+      return p;
+    }
+
+    function applyParams(p: URLSearchParams) {
+      searchEl.value = p.get('q') ?? '';
+      for (const [key, group] of Object.entries(PARAM_GROUPS)) {
+        const values = new Set(p.getAll(key));
+        document.querySelectorAll<HTMLInputElement>(`.filter-group[data-group="${group}"] input[type="checkbox"]`).forEach((cb) => (cb.checked = values.has(cb.value)));
+        // Open the groups a link filters on, so the active filter is visible.
+        if (values.size) document.querySelector(`.filter-group[data-group="${group}"]`)?.classList.add('open');
+      }
+      setView(p.get('view') === 'stats' ? 'stats' : 'list');
+    }
+
+    function syncUrl() {
+      const qs = filterParams().toString();
+      if (qs !== location.search.slice(1)) history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+    }
+
+    // A count in the stats tables links to the list view with the current
+    // filters narrowed to that cell: its row (grade or lamp) and/or level.
+    function countLink(n: number, group: 'grade' | 'lamp', rowKey: string | null, level: number | null, bold = false): string {
+      if (!n) return '';
+      const p = filterParams();
+      p.delete('view');
+      if (rowKey != null) { p.delete(group); p.append(group, rowKey); }
+      if (level != null) { p.delete('level'); p.append('level', String(level)); }
+      const text = bold ? `<strong>${n}</strong>` : String(n);
+      return `<a class="iidx-count" href="?${escapeHtml(p.toString())}">${text}</a>`;
+    }
+
+    // Pivot of matching charts: rows = grade or lamp, columns = level.
+    function pivot(title: string, group: 'grade' | 'lamp', rowKeys: string[], rowLabel: (k: string) => string, keyOf: (r: Row) => string | null, charts: Row[]): string {
+      const levels = [...new Set(charts.map((r) => r.level).filter((l) => l != null))].sort((a, b) => a - b);
+      const counts = new Map(rowKeys.map((k) => [k, new Map<number, number>()]));
+      for (const r of charts) {
+        const m = counts.get(keyOf(r) ?? '');
+        if (m) m.set(r.level, (m.get(r.level) ?? 0) + 1);
+      }
+      const body = rowKeys.map((k) => {
+        const m = counts.get(k)!;
+        const total = [...m.values()].reduce((a, b) => a + b, 0);
+        if (!total) return '';
+        return `<tr><th>${rowLabel(k)}</th>${levels.map((l) => `<td>${countLink(m.get(l) ?? 0, group, k, l)}</td>`).join('')}<td>${countLink(total, group, k, null, true)}</td></tr>`;
+      }).join('');
+      const colTotals = levels.map((l) => rowKeys.reduce((a, k) => a + (counts.get(k)!.get(l) ?? 0), 0));
+      // Fixed column widths (table-layout: fixed), so the table's width is set to their sum.
+      const [labelW, cellW, totalW] = [10, 2.75, 3.75];
+      const width = labelW + levels.length * cellW + totalW;
+      return `<h2 style="font-size:1rem; margin: 1.5rem 0 0.5rem;">${title}</h2>
+        <div class="stats-scroll"><table class="pivot-table" style="width:${width}rem">
+        <colgroup><col style="width:${labelW}rem" />${levels.map(() => `<col style="width:${cellW}rem" />`).join('')}<col style="width:${totalW}rem" /></colgroup>
+        <thead><tr><th>Lv</th>${levels.map((l) => `<th>${l}</th>`).join('')}<th>Total</th></tr></thead>
+        <tbody>${body}<tr><th>Total</th>${colTotals.map((t, i) => `<td>${countLink(t, group, null, levels[i], true)}</td>`).join('')}<td>${countLink(colTotals.reduce((a, b) => a + b, 0), group, null, null, true)}</td></tr></tbody></table></div>`;
+    }
+
+    function lampRowLabel(l: string): string {
+      if (l === 'NONE') return LAMP_ROW_LABELS[l];
+      const lamp = l as ClearLamp;
+      return `<span class="iidx-lamp-dot" style="--lamp:${LAMP_FILLS[lamp] ?? LAMP_COLORS[lamp]}"></span>${LAMP_LABELS[lamp]}`;
     }
 
     function renderStats(filtered: Row[]) {
-      const gradeCounts = new Map<string, number[]>();
-      for (const g of GRADE_ORDER) gradeCounts.set(g, Array(12).fill(0));
-      for (const r of filtered) {
-        const g = computeGrade(r.exScore, r.noteCount);
-        if (g === '—') continue;
-        gradeCounts.get(g)![r.level - 1]++;
-      }
-
-      const lampCounts = new Map<string, number[]>();
-      for (const l of LAMP_ORDER) lampCounts.set(l, Array(12).fill(0));
-      for (const r of filtered) {
-        const key = r.lamp ?? 'NONE';
-        lampCounts.get(key)![r.level - 1]++;
-      }
-
       statsContainerEl.innerHTML =
-        pivotTable('Grade × Level', GRADE_ORDER, (g) => g, gradeCounts) +
-        pivotTable('Lamp × Level', LAMP_ORDER.map((l) => LAMP_ROW_LABELS[l]), (label) => LAMP_ORDER.find((l) => LAMP_ROW_LABELS[l] === label)!, lampCounts);
+        pivot('Grade × Level', 'grade', [...GRADE_ORDER, '—'], (g) => (g === '—' ? 'No grade' : g), (r) => computeGrade(r.exScore, r.noteCount), filtered) +
+        pivot('Lamp × Level', 'lamp', LAMP_ORDER, lampRowLabel, (r) => r.lamp ?? 'NONE', filtered);
     }
 
     function render() {
+      if (!loaded) return;
+      syncUrl();
       const f = currentFilters();
       const filtered = rows.filter((r) => {
         if (f.search && !r.searchText.includes(f.search)) return false;
@@ -542,17 +608,36 @@ import Layout from '@/layouts/Layout.astro';
       }
     }
 
+    function setView(mode: 'list' | 'stats') {
+      viewMode = mode;
+      document.querySelectorAll<HTMLElement>('.view-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === mode));
+      tableEl.style.display = viewMode === 'list' && loaded ? '' : 'none';
+      statsContainerEl.style.display = viewMode === 'stats' ? '' : 'none';
+    }
     document.querySelectorAll('.view-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        viewMode = (btn as HTMLElement).dataset.view as 'list' | 'stats';
-        document.querySelectorAll('.view-btn').forEach((b) => b.classList.toggle('active', b === btn));
-        tableEl.style.display = viewMode === 'list' ? '' : 'none';
-        statsContainerEl.style.display = viewMode === 'stats' ? '' : 'none';
+        setView((btn as HTMLElement).dataset.view as 'list' | 'stats');
         render();
       });
     });
 
-    document.getElementById('f-search')!.addEventListener('input', render);
+    // Clicking a count opens the filtered list in place (a new history entry,
+    // so Back returns to the stats); modified clicks open it in a new tab.
+    statsContainerEl.addEventListener('click', (e) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>('a.iidx-count');
+      if (!link || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      history.pushState(null, '', link.href);
+      applyParams(new URLSearchParams(link.search));
+      render();
+      window.scrollTo(0, 0);
+    });
+    window.addEventListener('popstate', () => {
+      applyParams(new URLSearchParams(location.search));
+      render();
+    });
+
+    searchEl.addEventListener('input', render);
 
     document.querySelectorAll('.filter-group').forEach((group) => {
       const header = group.querySelector('.filter-group-header')!;
