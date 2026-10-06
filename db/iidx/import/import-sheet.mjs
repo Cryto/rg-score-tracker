@@ -90,6 +90,9 @@ const HANDLED = new Set([
   ...Object.keys(SONG_COLUMNS),
   ...CHART_COLUMNS.flatMap((d) => [`${d} Level`, `${d} Notes`]),
   'Style', 'Release Version', 'Playable In', 'Notes', 'Supabase ID',
+  // Looked up in the sheet from songs.external_id and song_external_ids, so
+  // the database already holds them.
+  'INFINITAS ID', 'AC ID',
 ]);
 
 const [header, ...body] = parseCsv(readFileSync(csvPath, 'utf-8').replace(/^﻿/, ''));
