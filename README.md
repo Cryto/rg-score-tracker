@@ -157,7 +157,9 @@ Master, one row per song and play style).
 a CSV download of that tab. Run
 [`0010_sheet_catalog.sql`](db/iidx/migrations/0010_sheet_catalog.sql) and
 [`0011_quiet_unchanged_scores.sql`](db/iidx/migrations/0011_quiet_unchanged_scores.sql)
-once first.
+once first, and
+[`0012_song_external_ids.sql`](db/iidx/migrations/0012_song_external_ids.sql)
+before linking a second score-export ID to a song.
 
 ```sh
 node --env-file=.env db/iidx/import/import-sheet.mjs master.csv --dry-run
