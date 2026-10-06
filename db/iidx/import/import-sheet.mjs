@@ -221,12 +221,25 @@ async function selectAll(table, columns, orderBy = 'id') {
   }
 }
 
-const versions = await selectAll('versions', 'id, number, name, sheet_name');
+const versions = await selectAll('versions', 'id, number, name, sheet_name, platform');
 if (!versions.some((v) => v.sheet_name)) {
   console.error('versions.sheet_name is empty. Run db/iidx/migrations/0010_sheet_catalog.sql first.');
   process.exit(1);
 }
 const versionBySheetName = new Map(versions.filter((v) => v.sheet_name).map((v) => [v.sheet_name, v.id]));
+const versionById = new Map(versions.map((v) => [v.id, v]));
+// A song's Version is its first arcade release, then INFINITAS, then CS, then
+// ULTIMATE MOBILE. The sheet writes older songs' Release Version as their CS
+// release ("4th CS"), so the earliest arcade version in Playable In wins over
+// it; an arcade Release Version is kept as written (ZINRAI's preview songs
+// were playable in Sparkle Shower first but belong to ZINRAI).
+const PLATFORM_ORDER = ['arcade', 'infinitas', 'cs', 'mobile'];
+const versionPriority = (id) => {
+  const v = versionById.get(id);
+  const rank = PLATFORM_ORDER.indexOf(v.platform);
+  // substream (number 0) came out between 1st and 2nd style.
+  return (rank < 0 ? PLATFORM_ORDER.length : rank) * 1000 + (v.number === 0 ? 1.5 : v.number);
+};
 const SONG_FIELDS = [...new Set([...Object.values(SONG_COLUMNS), 'notes', 'bpm_min', 'bpm_max', 'length_seconds', 'extra', 'debut_version_id'])];
 const dbSongs = await selectAll('songs', `id, ${SONG_FIELDS.join(', ')}`);
 const dbSongById = new Map(dbSongs.map((s) => [s.id, s]));
@@ -243,8 +256,11 @@ const versionId = (name, song) => {
   return id ?? null;
 };
 for (const song of songs.values()) {
-  song.fields.debut_version_id = versionId(song.releaseVersion, song);
-  song.availability = [...new Set(song.playableIn.map((v) => versionId(v, song)).filter((id) => id !== null))];
+  const releaseId = versionId(song.releaseVersion, song);
+  song.availability = [...new Set([...song.playableIn.map((v) => versionId(v, song)), releaseId].filter((id) => id !== null))];
+  song.fields.debut_version_id = releaseId !== null && versionById.get(releaseId).platform === 'arcade'
+    ? releaseId
+    : [...song.availability].sort((a, b) => versionPriority(a) - versionPriority(b))[0] ?? null;
   if (song.id !== null && !dbSongById.has(song.id)) {
     problems.push(`Supabase ID ${song.id} (${song.fields.title}) isn't in the database; it will be inserted with that id`);
   }

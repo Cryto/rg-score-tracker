@@ -151,7 +151,7 @@ revoke all on function private.recompute_score from public, anon, authenticated;
 
 -- Each field only ever improves: uploading a new play never regresses your
 -- EX score PB, lamp PB, or miss-count PB, even if the other fields are worse
--- on that particular play.
+-- on that particular play. updated_at only moves when a field improves.
 -- Attempts are logged in two places so an upsert is logged exactly once:
 -- UPDATEs (incl. upsert conflicts) here, before NEW is ratcheted; INSERTs in
 -- an AFTER trigger below, which only fires if the row was actually inserted
@@ -184,6 +184,14 @@ begin
       when new.miss_count is null then old.miss_count
       else least(old.miss_count, new.miss_count)
     end;
+    -- A submission that doesn't improve anything (e.g. re-importing the same
+    -- export) keeps the old timestamp, so it isn't shown as a new update.
+    if new.ex_score is not distinct from old.ex_score
+      and new.clear_lamp is not distinct from old.clear_lamp
+      and new.miss_count is not distinct from old.miss_count then
+      new.updated_at := old.updated_at;
+      return new;
+    end if;
   end if;
   new.updated_at := now();
   return new;

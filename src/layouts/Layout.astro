@@ -175,6 +175,16 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
           overscroll-behavior: contain;
         }
       }
+      /* The sidebar's own scrollbar matches the slim one inside each filter
+         group, in a reserved gutter so it never covers the filters. */
+      .filters-sidebar {
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      .filters-sidebar::-webkit-scrollbar { width: 6px; }
+      .filters-sidebar::-webkit-scrollbar-track { background: transparent; }
+      .filters-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
       @media (max-width: 768px) {
         .filters-toggle-btn { display: inline-flex; }
         .filters-sidebar {
@@ -341,15 +351,6 @@ const showCrytoNav = import.meta.env.PUBLIC_SHOW_CRYTO_NAV === 'true';
         cursor: pointer;
       }
       @media (hover: hover) { .song-row:hover { background: var(--surface); } }
-      .song-row .expand-arrow {
-        display: inline-block;
-        color: var(--text-dim);
-        margin-right: 0.4rem;
-        transition: transform 0.15s;
-      }
-      .song-row.open .expand-arrow {
-        transform: rotate(90deg);
-      }
       .row-subtitle {
         color: var(--text-dim);
         font-size: 0.8em;

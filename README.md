@@ -45,9 +45,9 @@ Log your personal bests, see every past attempt, and share a read-only page of y
 
 | Game | Status | Score entry | Catalog source |
 | --- | --- | --- | --- |
-| **beatmania IIDX** | ✅ Live | Manual, CSV, JSON export | [vanHavel/iidx-db](https://github.com/vanHavel/iidx-db) (from Infinitas) |
-| **Hololive Dreams** | ✅ Live | Manual | Curated in the original site's database, exported to [`catalog.json`](db/holodori/catalog.json) |
-| **DJMAX Respect V** | 🚧 Coming soon | — | — |
+| **Hololive Dreams** | ✅ Ready to use | Manual | Curated in the original site's database, exported to [`catalog.json`](db/holodori/catalog.json) |
+| **beatmania IIDX** | 🚧 In development | Manual, CSV, JSON export | The "Infinitas DB" Google Sheet (see [Song data](#-song-data)) |
+| **DJMAX Respect V** | 📅 Planned | — | — |
 
 ## 🚀 Quick start
 
@@ -155,8 +155,9 @@ The catalog's source of truth is the "Infinitas DB" Google Sheet (tab
 Master, one row per song and play style).
 [`db/iidx/import/import-sheet.mjs`](db/iidx/import/import-sheet.mjs) imports
 a CSV download of that tab. Run
-[`0010_sheet_catalog.sql`](db/iidx/migrations/0010_sheet_catalog.sql) once
-first.
+[`0010_sheet_catalog.sql`](db/iidx/migrations/0010_sheet_catalog.sql) and
+[`0011_quiet_unchanged_scores.sql`](db/iidx/migrations/0011_quiet_unchanged_scores.sql)
+once first.
 
 ```sh
 node --env-file=.env db/iidx/import/import-sheet.mjs master.csv --dry-run
@@ -169,6 +170,10 @@ node --env-file=.env db/iidx/import/import-sheet.mjs master.csv
 - Charts are matched on song, style and difficulty, so their ids (and the
   scores on them) survive re-runs. BA columns become difficulty L with the
   label "Black Another".
+- A song's Version is its first arcade release, then INFINITAS, then CS, then
+  ULTIMATE MOBILE. An arcade Release Version is kept as written; a CS one
+  ("4th CS") gives way to the earliest arcade version in Playable In. Playable
+  In fills the site's "Playable In" filter.
 - Sheet columns the script doesn't know land in `songs.extra`.
 - Songs and charts that aren't in the sheet are only listed, unless you pass
   `--delete-missing`, which deletes them along with their scores.
