@@ -10,13 +10,16 @@ import Layout from '@/layouts/Layout.astro';
 
   <p style="color: var(--text-dim); max-width: 700px;">
     Upload a <code>scores.json</code> export (the native score-export format, keyed by
-    numeric song ID). Matched against the catalog via <code>songs.external_id</code> —
+    numeric song ID). Matched against the catalog via <code>songs.external_id</code> and
+    any extra IDs in <code>song_external_ids</code> —
     songs not in the catalog are reported as unmatched, not inserted.
   </p>
   <p style="color: var(--text-dim); max-width: 700px;">
     Songs added from the Infinitas DB sheet don't have an INFINITAS ID yet. Unmatched IDs
     are listed after Preview with the songs they could be (same debut version, note counts
     that fit your scores): pick the right one and Link it, and its scores match from then on.
+    A song that already has an ID (an INFINITAS original's 80xxx ID, say, when the
+    export uses its arcade ID) keeps it and gets the new one as an extra ID.
   </p>
 
   <input id="json-file" type="file" accept="application/json,.json" />
@@ -32,7 +35,7 @@ import Layout from '@/layouts/Layout.astro';
     <p style="color: var(--text-dim); max-width: 700px; margin-top: 0;">
       The first two digits of an INFINITAS ID are the song's debut version. Suggestions are
       songs from that version with no INFINITAS ID whose charts have enough notes for your
-      EX scores; search to pick any other song without one.
+      EX scores; search to pick any other song, including ones that already have an ID.
     </p>
     <ul id="link-list" class="link-list"></ul>
   </section>
@@ -86,7 +89,7 @@ import Layout from '@/layouts/Layout.astro';
 
     // Every song, for linking unmatched INFINITAS IDs to songs.
     type CatalogSong = {
-      id: number; label: string; search: string; externalId: string | null;
+      id: number; label: string; search: string; externalId: string | null; extraIds: string[];
       versionNumber: number | null; versionName: string | null;
       notes: Map<string, number | null>; // "SPA" -> note count
     };
@@ -103,7 +106,7 @@ import Layout from '@/layouts/Layout.astro';
       for (let from = 0; ; from += pageSize) {
         const { data: page, error } = await supabase
           .from('charts')
-          .select('id, play_style, difficulty, songs ( external_id )')
+          .select('id, song_id, play_style, difficulty, songs ( external_id )')
           .range(from, from + pageSize - 1);
         if (error) {
           results.innerHTML = `<p style="color:#ff8080;">Failed to load catalog: ${error.message}</p>`;
@@ -112,11 +115,19 @@ import Layout from '@/layouts/Layout.astro';
         data = data.concat(page ?? []);
         if (!page || page.length < pageSize) break;
       }
-      chartLookup = new Map(
-        (data ?? [])
-          .filter((c: any) => c.songs?.external_id)
-          .map((c: any) => [`${c.songs.external_id}|${c.play_style}|${c.difficulty}`, c.id])
-      );
+      // Extra IDs a song is also known by (migration 0012). Before that
+      // migration the table is missing; fall back to the main IDs alone.
+      const { data: extra } = await supabase.from('song_external_ids').select('external_id, song_id');
+      const idsBySong = new Map<number, string[]>();
+      for (const e of extra ?? []) {
+        if (!idsBySong.has(e.song_id)) idsBySong.set(e.song_id, []);
+        idsBySong.get(e.song_id)!.push(e.external_id);
+      }
+      chartLookup = new Map();
+      for (const c of data) {
+        const ids = [c.songs?.external_id, ...(idsBySong.get(c.song_id) ?? [])].filter(Boolean);
+        for (const id of ids) chartLookup.set(`${id}|${c.play_style}|${c.difficulty}`, c.id);
+      }
     }
 
     async function loadCatalog() {
@@ -132,11 +143,13 @@ import Layout from '@/layouts/Layout.astro';
         data = data.concat(page ?? []);
         if (!page || page.length < pageSize) break;
       }
+      const { data: extra } = await supabase.from('song_external_ids').select('external_id, song_id');
       catalog = data.map((s: any) => ({
         id: s.id,
         label: s.title_english && s.title_english !== s.title ? `${s.title} (${s.title_english})` : s.title,
         search: searchKey(`${s.title ?? ''} ${s.title_english ?? ''}`),
         externalId: s.external_id,
+        extraIds: (extra ?? []).filter((e: any) => e.song_id === s.id).map((e: any) => e.external_id),
         versionNumber: s.versions?.number ?? null,
         versionName: s.versions?.name ?? null,
         notes: new Map((s.charts ?? []).map((c: any) => [`${c.play_style}${c.difficulty}`, c.note_count])),
@@ -255,7 +268,11 @@ import Layout from '@/layouts/Layout.astro';
       const note = li.querySelector<HTMLElement>('.link-note')!;
 
       function fill(options: CatalogSong[], placeholder: string) {
-        select.replaceChildren(new Option(placeholder, ''), ...options.slice(0, 100).map((s) => new Option(s.label, String(s.id))));
+        const optionLabel = (s: CatalogSong) => {
+          const ids = [s.externalId, ...s.extraIds].filter(Boolean);
+          return ids.length ? `${s.label} [has ID ${ids.join(', ')}]` : s.label;
+        };
+        select.replaceChildren(new Option(placeholder, ''), ...options.slice(0, 100).map((s) => new Option(optionLabel(s), String(s.id))));
         button.disabled = true;
       }
       const showSuggestions = () => fill(suggestions, suggestions.length ? `${suggestions.length} suggestion${suggestions.length === 1 ? '' : 's'}...` : 'No suggestions: search instead');
@@ -263,8 +280,11 @@ import Layout from '@/layouts/Layout.astro';
       search.addEventListener('input', () => {
         const q = searchKey(search.value.trim());
         if (!q) return showSuggestions();
-        const hits = catalog.filter((s) => !s.externalId && s.search.includes(q)).sort((a, b) => a.label.localeCompare(b.label));
-        fill(hits, hits.length ? `${hits.length} match${hits.length === 1 ? '' : 'es'}...` : 'No songs without an INFINITAS ID match');
+        // Songs without an ID first: they are the likelier match.
+        const hits = catalog
+          .filter((s) => s.search.includes(q))
+          .sort((a, b) => Number(!!a.externalId) - Number(!!b.externalId) || a.label.localeCompare(b.label));
+        fill(hits, hits.length ? `${hits.length} match${hits.length === 1 ? '' : 'es'}...` : 'No songs match');
       });
       select.addEventListener('change', () => (button.disabled = !select.value));
 
@@ -274,16 +294,21 @@ import Layout from '@/layouts/Layout.astro';
         button.disabled = true;
         note.classList.remove('error');
         note.textContent = 'Linking...';
-        // RLS turns an update the account may not make into a silent no-op, so
-        // ask for the row back and treat none as a failure.
-        const { data, error } = await supabase.from('songs').update({ external_id: externalId }).eq('id', song.id).select('id');
+        // A song with no ID takes this one as its main ID; a song that has one
+        // keeps it and gets this one as an extra ID. RLS turns a write the
+        // account may not make into a silent no-op, so ask for the row back
+        // and treat none as a failure.
+        const { data, error } = song.externalId
+          ? await supabase.from('song_external_ids').insert({ external_id: externalId, song_id: song.id }).select('song_id')
+          : await supabase.from('songs').update({ external_id: externalId }).eq('id', song.id).select('id');
         if (error || !data?.length) {
           note.textContent = `Not linked: ${error?.message ?? 'log in first'}`;
           note.classList.add('error');
           button.disabled = false;
           return;
         }
-        song.externalId = externalId;
+        if (song.externalId) song.extraIds.push(externalId);
+        else song.externalId = externalId;
         note.textContent = `Linked to ${song.label}.`;
         search.disabled = select.disabled = true;
         // Re-match so this song's scores join the import on the next Preview.

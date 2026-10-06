@@ -245,6 +245,35 @@ create table chart_availability (
   primary key (chart_id, version_id)
 );
 
+-- Extra score-export IDs for a song, beyond songs.external_id. INFINITAS
+-- originals that later went to arcade have both an 80xxx INFINITAS ID and an
+-- arcade ID (GRAVITON is 80011 and 29002); the JSON score import matches
+-- either. An ID can only point at one song, whichever table holds it.
+create table song_external_ids (
+  external_id text primary key,
+  song_id integer not null references songs(id) on delete cascade
+);
+create index song_external_ids_song_id on song_external_ids (song_id);
+
+create function check_song_external_id() returns trigger as $$
+begin
+  if TG_TABLE_NAME = 'song_external_ids' then
+    if exists (select 1 from songs where external_id = new.external_id) then
+      raise exception 'external id % is already the main ID of another song', new.external_id;
+    end if;
+  elsif new.external_id is not null
+    and exists (select 1 from song_external_ids where external_id = new.external_id and song_id <> new.id) then
+    raise exception 'external id % is already an extra ID of another song', new.external_id;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger check_song_external_id before insert or update on song_external_ids
+  for each row execute function check_song_external_id();
+create trigger check_song_external_id before insert or update of external_id on songs
+  for each row execute function check_song_external_id();
+
 -- Row Level Security: anyone can read, only the owner account can write.
 alter table versions enable row level security;
 alter table songs enable row level security;
@@ -253,6 +282,7 @@ alter table scores enable row level security;
 alter table catalog_syncs enable row level security;
 alter table chart_availability enable row level security;
 alter table score_attempts enable row level security;
+alter table song_external_ids enable row level security;
 
 create policy "public read versions" on versions for select using (true);
 create policy "public read songs" on songs for select using (true);
@@ -261,6 +291,7 @@ create policy "public read scores" on scores for select using (true);
 create policy "public read catalog_syncs" on catalog_syncs for select using (true);
 create policy "public read chart_availability" on chart_availability for select using (true);
 create policy "public read score_attempts" on score_attempts for select using (true);
+create policy "public read song_external_ids" on song_external_ids for select using (true);
 
 create policy "owner write scores" on scores
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
@@ -282,6 +313,10 @@ create policy "owner write songs" on songs
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
 create policy "owner update songs" on songs
   for update using (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner write song_external_ids" on song_external_ids
+  for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
+create policy "owner delete song_external_ids" on song_external_ids
+  for delete using (auth.uid() = '<OWNER_UUID>'::uuid);
 
 create policy "owner write charts" on charts
   for insert with check (auth.uid() = '<OWNER_UUID>'::uuid);
