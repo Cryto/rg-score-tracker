@@ -158,6 +158,51 @@ import Layout from '@/layouts/Layout.astro';
       vertical-align: -0.05rem;
       background: var(--lamp);
     }
+
+    /* Song-select clear lamp: a bar down the left edge of each record, with
+       the in-game colours and flashing. */
+    #chart-table .title-cell { position: relative; padding-left: calc(0.6rem + 9px); }
+    .iidx-lamp {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      bottom: 3px;
+      width: 6px;
+      border-radius: 2px;
+      background: #3a3a40;
+    }
+    .iidx-lamp[data-lamp="FAILED"] { animation: iidx-lamp-failed 0.5s infinite; }
+    .iidx-lamp[data-lamp="ASSIST_CLEAR"] { background: #b26bff; box-shadow: 0 0 5px #b26bff99; }
+    .iidx-lamp[data-lamp="EASY_CLEAR"] { background: #7cff4a; box-shadow: 0 0 5px #7cff4a99; }
+    .iidx-lamp[data-lamp="CLEAR"] { background: #2b8fff; box-shadow: 0 0 5px #2b8fff99; }
+    .iidx-lamp[data-lamp="HARD_CLEAR"] { background: #ffffff; box-shadow: 0 0 5px #ffffffaa; }
+    .iidx-lamp[data-lamp="EX_HARD_CLEAR"] { animation: iidx-lamp-exhard 0.3s infinite; }
+    .iidx-lamp[data-lamp="FULL_COMBO"] {
+      background: linear-gradient(180deg, #ff3b3b, #ffb13b, #fff23b, #4dff6a, #3be8ff, #4a6bff, #c64dff, #ff3b3b);
+      box-shadow: 0 0 5px #ffffff88;
+      animation: iidx-lamp-rainbow 1s linear infinite;
+    }
+    /* Failed blinks red on and off. */
+    @keyframes iidx-lamp-failed {
+      0%, 49% { background: #ff2b2b; box-shadow: 0 0 6px #ff2b2bcc; }
+      50%, 100% { background: #4a1014; box-shadow: none; }
+    }
+    /* EX Hard Clear cycles red, orange and yellow. */
+    @keyframes iidx-lamp-exhard {
+      0%, 32% { background: #ff2b2b; box-shadow: 0 0 6px #ff2b2bcc; }
+      33%, 65% { background: #ff8a1c; box-shadow: 0 0 6px #ff8a1ccc; }
+      66%, 100% { background: #ffe23b; box-shadow: 0 0 6px #ffe23bcc; }
+    }
+    /* Full Combo cycles through the rainbow. */
+    @keyframes iidx-lamp-rainbow {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .iidx-lamp { animation: none !important; }
+      .iidx-lamp[data-lamp="FAILED"] { background: #ff2b2b; }
+      .iidx-lamp[data-lamp="EX_HARD_CLEAR"] { background: linear-gradient(180deg, #ff2b2b, #ff8a1c, #ffe23b); }
+    }
   </style>
 
   <script>
@@ -186,7 +231,7 @@ import Layout from '@/layouts/Layout.astro';
     type Row = {
       chartId: number;
       version: string;
-      versionNumber: number | null;
+      versionKey: number;
       title: string;
       titleEnglish: string;
       artist: string;
@@ -251,6 +296,14 @@ import Layout from '@/layouts/Layout.astro';
 
     // substream (number 0) sits chronologically between 1st and 2nd style, not before 1st.
     const versionSortKey = (n: number) => (n === 0 ? 1.5 : n);
+    // Version lists put arcade first, then INFINITAS, then CS and ULTIMATE
+    // MOBILE (the same priority the catalog import uses to pick a song's
+    // Version), chronological within each.
+    const PLATFORM_ORDER = ['arcade', 'infinitas', 'cs', 'mobile'];
+    function versionListKey(v: { number: number; platform: string | null }): number {
+      const rank = PLATFORM_ORDER.indexOf(v.platform ?? 'arcade');
+      return (rank < 0 ? PLATFORM_ORDER.length : rank) * 1000 + versionSortKey(v.number);
+    }
 
     async function load() {
       // Supabase caps a single select at 1000 rows - page through until exhausted.
@@ -261,9 +314,9 @@ import Layout from '@/layouts/Layout.astro';
           .from('charts')
           .select(`
             id, play_style, difficulty, level, note_count, chart_label,
-            songs ( title, title_english, artist, bpm_min, bpm_max, versions ( number, name ) ),
+            songs ( title, title_english, artist, bpm_min, bpm_max, versions ( number, name, platform ) ),
             scores ( ex_score, clear_lamp, miss_count, updated_at ),
-            chart_availability ( versions ( name ) )
+            chart_availability ( versions ( number, name, platform ) )
           `)
           .range(from, from + pageSize - 1);
 
@@ -278,7 +331,7 @@ import Layout from '@/layouts/Layout.astro';
       rows = (data ?? []).map((c: any) => ({
         chartId: c.id,
         version: c.songs?.versions?.name ?? 'Unknown',
-        versionNumber: c.songs?.versions?.number ?? null,
+        versionKey: c.songs?.versions ? versionListKey(c.songs.versions) : 1e9,
         title: c.songs?.title ?? '(unknown)',
         titleEnglish: c.songs?.title_english ?? '',
         artist: c.songs?.artist ?? '',
@@ -309,9 +362,7 @@ import Layout from '@/layouts/Layout.astro';
         if (aScored && bScored && a.scoreUpdatedAt !== b.scoreUpdatedAt) {
           return a.scoreUpdatedAt! > b.scoreUpdatedAt! ? -1 : 1;
         }
-        const av = versionSortKey(a.versionNumber ?? -1);
-        const bv = versionSortKey(b.versionNumber ?? -1);
-        if (av !== bv) return av - bv;
+        if (a.versionKey !== b.versionKey) return a.versionKey - b.versionKey;
         if (a.title !== b.title) return a.title.localeCompare(b.title);
         if (a.style !== b.style) return a.style.localeCompare(b.style);
         const ad = DIFF_ORDER.indexOf(a.difficulty);
@@ -320,24 +371,20 @@ import Layout from '@/layouts/Layout.astro';
         return a.level - b.level;
       });
 
-      const versionMap = new Map<string, number>();
-      for (const r of rows) {
-        if (!versionMap.has(r.version)) versionMap.set(r.version, r.versionNumber ?? -1);
+      // Version lists every version a song debuted in; Playable In lists every
+      // version any chart is playable in (which includes versions no song
+      // debuted in, like ULTIMATE MOBILE), so each is built from its own data.
+      const debutKeys = new Map<string, number>();
+      const playableKeys = new Map<string, number>();
+      for (const c of data) {
+        const v = c.songs?.versions;
+        debutKeys.set(v?.name ?? 'Unknown', v ? versionListKey(v) : 1e9);
+        for (const a of c.chart_availability ?? []) {
+          if (a.versions?.name) playableKeys.set(a.versions.name, versionListKey(a.versions));
+        }
       }
-      const versions = [...versionMap.keys()].sort(
-        (a, b) => versionSortKey(versionMap.get(a)!) - versionSortKey(versionMap.get(b)!)
-      );
-      for (const v of versions) {
-        const label = document.createElement('label');
-        label.className = 'checkbox-row';
-        label.innerHTML = `<input type="checkbox" value="${escapeHtml(v)}" /> ${escapeHtml(v)}`;
-        versionListEl.appendChild(label);
-
-        const playableLabel = document.createElement('label');
-        playableLabel.className = 'checkbox-row';
-        playableLabel.innerHTML = `<input type="checkbox" value="${escapeHtml(v)}" /> ${escapeHtml(v)}`;
-        playableInListEl.appendChild(playableLabel);
-      }
+      fillVersionList(versionListEl, debutKeys);
+      fillVersionList(playableInListEl, playableKeys);
       versionListEl.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
         cb.addEventListener('input', render);
       });
@@ -355,6 +402,15 @@ import Layout from '@/layouts/Layout.astro';
       applyParams(new URLSearchParams(location.search));
       pinTitleColumnWidth();
       render();
+    }
+
+    function fillVersionList(listEl: HTMLElement, keys: Map<string, number>) {
+      for (const v of [...keys.keys()].sort((a, b) => keys.get(a)! - keys.get(b)!)) {
+        const label = document.createElement('label');
+        label.className = 'checkbox-row';
+        label.innerHTML = `<input type="checkbox" value="${escapeHtml(v)}" /> ${escapeHtml(v)}`;
+        listEl.appendChild(label);
+      }
     }
 
     // With table-layout: fixed, the title column has no explicit width so it
@@ -546,7 +602,7 @@ import Layout from '@/layouts/Layout.astro';
       const diffLabel = DIFF_LABELS[r.difficulty] ?? r.difficulty;
       const diffWithChartLabel = r.chartLabel ? `${diffLabel} (${escapeHtml(r.chartLabel)})` : diffLabel;
       return `<tr class="song-row" data-expand="expand-${i}">
-        <td class="title-cell"><span class="expand-arrow">▸</span>${escapeHtml(r.title)}
+        <td class="title-cell"><span class="iidx-lamp" data-lamp="${r.lamp ?? 'NO_PLAY'}" title="${r.lamp ? lampLabel : 'No Play'}"></span>${escapeHtml(r.title)}
           <div class="row-subtitle">${escapeHtml(r.artist)}</div>${
         r.titleEnglish && r.titleEnglish !== r.title
           ? `<div class="row-subtitle">${escapeHtml(r.titleEnglish)}</div>`
