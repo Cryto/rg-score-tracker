@@ -20,14 +20,14 @@ const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
       <label for="chart-search">Song / Chart</label>
       <div class="iidx-field-row">
         <input id="chart-search" type="text" placeholder="Type a song title..." autocomplete="off" />
-        <button type="button" id="clear-chart" class="iidx-icon-btn" aria-label="Clear song/chart" title="Clear song/chart">✕</button>
+        <button type="button" id="clear-chart" class="iidx-icon-btn" aria-label="Clear song/chart, EX score and BP" title="Clear song/chart, EX score and BP">✕</button>
         <button type="button" id="clear-all">Clear all</button>
       </div>
       <select id="chart-select" size="6" style="display:none;" aria-label="Matching charts"></select>
     </div>
     <label>EX Score <input id="ex-score" type="number" min="0" /></label>
     <fieldset class="choice-picker iidx-lamp-picker">
-      <legend>Clear Lamp <span class="iidx-optional">(optional — click again to unset)</span></legend>
+      <legend>Clear Lamp <span class="iidx-required">(required)</span></legend>
       {CLEAR_LAMPS.map((l) => (
         <label style={lampStyle(l)}>
           <input type="checkbox" name="clear-lamp" value={l} />
@@ -52,7 +52,7 @@ const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
     .iidx-field-row input { flex: 1; min-width: 0; }
     .iidx-field-row button { flex-shrink: 0; white-space: nowrap; }
     .iidx-icon-btn { width: 2.2rem; padding: 0; border-color: var(--border); color: var(--text-dim); }
-    .iidx-optional { color: var(--text-dim); font-size: 0.85em; font-weight: normal; }
+    .iidx-required { color: var(--text-dim); font-size: 0.85em; font-weight: normal; }
     /* Seven lamps don't fit one row: 4 + 3, in game order. */
     .iidx-lamp-picker { grid-auto-flow: row; grid-template-columns: repeat(4, minmax(0, 1fr)); }
     /* Equal-height buttons whether or not a label wraps to two lines. */
@@ -151,8 +151,11 @@ const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
       chartSelect.innerHTML = '';
     }
 
+    // The ✕ also clears the numbers typed for that song (the lamp stays).
     document.getElementById('clear-chart')!.addEventListener('click', () => {
       clearChart();
+      exScoreInput.value = '';
+      missCountInput.value = '';
       searchInput.focus();
     });
 
@@ -180,7 +183,11 @@ const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
       }
       const exScoreVal = exScoreInput.value;
       const missCountVal = missCountInput.value;
-      const lamp = clearLamp.value || null;
+      const lamp = clearLamp.value;
+      if (!lamp) {
+        status.textContent = 'Pick a clear lamp.';
+        return;
+      }
 
       const { error } = await supabase.from('scores').upsert(
         {
