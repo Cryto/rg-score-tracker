@@ -115,7 +115,7 @@ import Layout from '@/layouts/Layout.astro';
             <col class="col-chart" />
             <col class="col-ex hide-mobile" />
             <col class="col-grade" />
-            <col class="col-lamp" />
+            <col class="col-lamp hide-mobile" />
             <col class="col-bp hide-mobile" />
           </colgroup>
           <thead>
@@ -124,7 +124,7 @@ import Layout from '@/layouts/Layout.astro';
               <th>Chart</th>
               <th class="hide-mobile">EX Score</th>
               <th>Grade</th>
-              <th>Lamp</th>
+              <th class="hide-mobile">Lamp</th>
               <th class="hide-mobile">BP</th>
             </tr>
           </thead>
@@ -149,6 +149,18 @@ import Layout from '@/layouts/Layout.astro';
     .iidx-count { color: inherit; text-decoration: none; display: block; border-radius: 4px; }
     .iidx-count:focus-visible { outline: 2px solid var(--accent); }
     @media (hover: hover) { .iidx-count:hover { background: var(--border); text-decoration: underline; } }
+    /* RemyWiki link at the end of the expanded record. */
+    .expand-row .wiki-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .expand-row .wiki-link svg { width: 14px; height: 14px; }
+    .expand-row .wiki-link:hover { text-decoration: underline; }
     .iidx-lamp-dot {
       display: inline-block;
       width: 0.7rem;
@@ -235,6 +247,7 @@ import Layout from '@/layouts/Layout.astro';
       title: string;
       titleEnglish: string;
       artist: string;
+      wikiUrl: string | null;
       style: string;
       difficulty: string;
       level: number;
@@ -314,7 +327,7 @@ import Layout from '@/layouts/Layout.astro';
           .from('charts')
           .select(`
             id, play_style, difficulty, level, note_count, chart_label,
-            songs ( title, title_english, artist, bpm_min, bpm_max, versions ( number, name, platform ) ),
+            songs ( title, title_english, artist, remywiki_url, bpm_min, bpm_max, versions ( number, name, platform ) ),
             scores ( ex_score, clear_lamp, miss_count, updated_at ),
             chart_availability ( versions ( number, name, platform ) )
           `)
@@ -335,6 +348,7 @@ import Layout from '@/layouts/Layout.astro';
         title: c.songs?.title ?? '(unknown)',
         titleEnglish: c.songs?.title_english ?? '',
         artist: c.songs?.artist ?? '',
+        wikiUrl: c.songs?.remywiki_url ?? null,
         style: c.play_style,
         difficulty: c.difficulty,
         level: c.level,
@@ -422,7 +436,7 @@ import Layout from '@/layouts/Layout.astro';
     // These sums must match the col-chart/col-ex/col-grade/col-lamp/col-bp
     // widths in Layout.astro (desktop and the <=768px breakpoint).
     const OTHER_COLS_WIDTH_DESKTOP = 90 + 90 + 70 + 140 + 60;
-    const OTHER_COLS_WIDTH_MOBILE = 64 + 60 + 92;
+    const OTHER_COLS_WIDTH_MOBILE = 64 + 60;
     const mobileMedia = window.matchMedia('(max-width: 768px)');
     const colTitleEl = tableEl.querySelector('col.col-title') as HTMLTableColElement;
     const tableScrollEl = tableEl.parentElement as HTMLElement;
@@ -611,7 +625,7 @@ import Layout from '@/layouts/Layout.astro';
         <td class="chart-code">${chartCode}</td>
         <td class="hide-mobile">${r.exScore ?? '—'}</td>
         <td>${grade}</td>
-        <td>${lampLabel}</td>
+        <td class="hide-mobile">${lampLabel}</td>
         <td class="hide-mobile">${r.missCount ?? '—'}</td>
       </tr>
       <tr class="expand-row" id="expand-${i}" style="display:none;">
@@ -624,9 +638,20 @@ import Layout from '@/layouts/Layout.astro';
           <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
           <span class="show-mobile"><strong>EX Score:</strong> ${r.exScore ?? '—'}</span>
           <span class="show-mobile"><strong>BP:</strong> ${r.missCount ?? '—'}</span>
+          <span class="show-mobile"><strong>Lamp:</strong> ${lampLabel}</span>${
+        wikiUrl(r.wikiUrl)
+          ? `<a class="wiki-link" href="${escapeHtml(wikiUrl(r.wikiUrl)!)}" target="_blank" rel="noopener noreferrer" title="Open on RemyWiki" aria-label="Open ${escapeHtml(r.title)} on RemyWiki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>Wiki</a>`
+          : ''
+      }
           <div class="history" data-chart-id="${r.chartId}"></div>
         </td>
       </tr>`;
+    }
+
+    // Only http(s) links from the catalog become clickable.
+    function wikiUrl(url: string | null): string | null {
+      const u = url?.trim();
+      return u && /^https?:\/\//i.test(u) ? u : null;
     }
 
     function escapeHtml(s: string) {
