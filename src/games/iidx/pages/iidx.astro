@@ -240,8 +240,9 @@ import Layout from '@/layouts/Layout.astro';
       from { filter: hue-rotate(0deg); }
       to { filter: hue-rotate(360deg); }
     }
-    /* View switcher as a 2×2 grid, so Song sits under List. */
-    .iidx-view-toggle { display: grid; grid-template-columns: 1fr 1fr; }
+    /* View switcher as a 2×2 grid, so Song sits under List. Two classes so it
+       beats the shared .view-toggle flex rule, whose stylesheet loads later. */
+    .view-toggle.iidx-view-toggle { display: grid; grid-template-columns: 1fr 1fr; }
     /* Play style toggle buttons (checkboxes underneath; neither on = both). */
     .style-toggle { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
     .style-btn {
