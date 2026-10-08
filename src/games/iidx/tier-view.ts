@@ -139,24 +139,32 @@ export class TierView {
 
   private state: TierViewState = { lamp: 'CLEAR', table: '' };
 
-  /** Lamps that have tier data. */
-  get lamps(): TargetLamp[] {
-    return TARGET_LAMPS.filter((l) => this.data.lamps[l]?.length);
+  /** Every table with a list for any lamp, in sidebar order (SP by level, CPI after its level, then DP). */
+  get tables(): TierTable[] {
+    const byId = new Map<string, TierTable>();
+    for (const l of TARGET_LAMPS) for (const t of this.data.lamps[l] ?? []) if (!byId.has(t.id)) byId.set(t.id, t);
+    const order = (t: TierTable) => (t.style === 'SP' ? 0 : 1000) + (t.level ?? parseFloat(t.label)) + (t.style === 'SP' && t.id.includes('-') ? 0.5 : 0);
+    return [...byId.values()].sort((a, b) => order(a) - order(b));
   }
 
-  /** Falls back to the first lamp/table with data when a link names one that doesn't exist. */
+  /** Lamps that have a list for this table: the table decides which Clear buttons show. */
+  lampsFor(tableId: string): TargetLamp[] {
+    return TARGET_LAMPS.filter((l) => this.data.lamps[l]?.some((t) => t.id === tableId));
+  }
+
+  /** Falls back to the first table, and to Normal (or the table's first lamp), when a link names one that doesn't exist. */
   resolve(state: Partial<TierViewState>): TierViewState {
-    const lamp = state.lamp && this.lamps.includes(state.lamp) ? state.lamp : this.lamps.includes('CLEAR') ? 'CLEAR' : this.lamps[0];
-    const tables = this.data.lamps[lamp] ?? [];
+    const tables = this.tables;
     const table = tables.some((t) => t.id === state.table) ? state.table! : tables[0]?.id ?? '';
+    const lamps = this.lampsFor(table);
+    const lamp = state.lamp && lamps.includes(state.lamp) ? state.lamp : lamps.includes('CLEAR') ? 'CLEAR' : lamps[0] ?? 'CLEAR';
     return { lamp, table };
   }
 
   render(state: TierViewState, search: string) {
     this.state = state;
-    const tables = this.data.lamps[state.lamp] ?? [];
-    const table = tables.find((t) => t.id === state.table);
-    this.renderSidebar(tables);
+    const table = this.data.lamps[state.lamp]?.find((t) => t.id === state.table);
+    this.renderSidebar(this.tables);
     if (!table) {
       this.els.main.innerHTML = '<p class="tier-empty">No tier lists yet.</p>';
       this.els.tiers.innerHTML = '';
@@ -222,11 +230,14 @@ export class TierView {
   }
 
   private renderSidebar(tables: TierTable[]) {
-    const lamps = this.lamps;
-    this.els.lamps.innerHTML = lamps
-      .map((l) => `<button type="button" class="tier-pick${l === this.state.lamp ? ' active' : ''}" data-lamp="${l}">${TARGET_LABELS[l]}</button>`)
+    // Only the selected lamp's button takes the lamp's color.
+    this.els.lamps.innerHTML = this.lampsFor(this.state.table)
+      .map((l) => {
+        const on = l === this.state.lamp;
+        const style = on ? ` style="--lamp-fill:${lampFill(l)};--lamp-text:${LAMP_DARK_TEXT.has(l) ? '#111' : '#fff'}"` : '';
+        return `<button type="button" class="tier-pick tier-lamp-pick${on ? ' active' : ''}" data-lamp="${l}" aria-pressed="${on}"${style}>${TARGET_LABELS[l]}</button>`;
+      })
       .join('');
-    this.els.lamps.closest<HTMLElement>('.tier-side-group')!.hidden = lamps.length < 2;
     const active = tables.find((t) => t.id === this.state.table);
     const groups = (['SP', 'DP'] as const)
       .map((style) => {
@@ -235,7 +246,7 @@ export class TierView {
         // Collapsible per play style; the active table's group starts open.
         const open = this.openGroups.get(style) ?? active?.style === style;
         const rows = list
-          .map((t) => `<button type="button" class="tier-side-row tier-table-row${t.id === this.state.table ? ' active' : ''}" data-table="${esc(t.id)}"${t.id === this.state.table ? ' aria-current="true"' : ''}><span>${esc(t.label)}</span><span class="tier-side-count">${this.chartCount(t)}</span></button>`)
+          .map((t) => `<button type="button" class="tier-side-row tier-table-row${t.id === this.state.table ? ' active' : ''}" data-table="${esc(t.id)}"${t.id === this.state.table ? ' aria-current="true"' : ''}><span>${esc(t.label)}</span><span class="tier-side-count">${this.chartCount(this.data.lamps[this.state.lamp]?.find((x) => x.id === t.id) ?? t)}</span></button>`)
           .join('');
         return `<details class="tier-table-group" data-style="${style}"${open ? ' open' : ''}><summary>${style === 'SP' ? 'Single Play' : 'Double Play'}<span class="tier-side-count">${list.length}</span></summary><div class="tier-side-tiers">${rows}</div></details>`;
       })

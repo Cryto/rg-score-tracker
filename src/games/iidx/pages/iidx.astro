@@ -30,15 +30,15 @@ import Layout from '@/layouts/Layout.astro';
         </button>
       </div>
 
-      <!-- Tier view sidebar: which lamp's list, which table, and a jump list of its tiers. -->
+      <!-- Tier view sidebar: which table, which of its lamps' lists, and a jump list of its tiers. -->
       <div id="tier-sidebar" hidden>
-        <div class="tier-side-group">
-          <div class="filters-heading">Clear</div>
-          <div id="tier-lamps" class="tier-pick-list"></div>
-        </div>
         <div class="tier-side-group">
           <div class="filters-heading">Tables</div>
           <div id="tier-tables" class="tier-table-groups"></div>
+        </div>
+        <div class="tier-side-group">
+          <div class="filters-heading">Clear</div>
+          <div id="tier-lamps" class="tier-pick-list"></div>
         </div>
         <div class="tier-side-group">
           <div class="filters-heading">Tiers</div>
@@ -384,6 +384,7 @@ import Layout from '@/layouts/Layout.astro';
       border-radius: 6px;
     }
     .tier-pick.active { color: var(--text); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+    .tier-lamp-pick.active { color: var(--lamp-text); font-weight: 600; border-color: transparent; background: var(--lamp-fill); }
     .tier-side-tiers { display: flex; flex-direction: column; margin-bottom: 1.25rem; }
     .tier-table-groups { margin-bottom: 1.25rem; }
     .tier-table-group summary {
