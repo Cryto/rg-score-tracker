@@ -20,8 +20,29 @@ import Layout from '@/layouts/Layout.astro';
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
           Statistics
         </button>
+        <button type="button" class="view-btn" data-view="tier">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          Tier
+        </button>
       </div>
 
+      <!-- Tier view sidebar: which lamp's list, which table, and a jump list of its tiers. -->
+      <div id="tier-sidebar" hidden>
+        <div class="tier-side-group">
+          <div class="filters-heading">Clear</div>
+          <div id="tier-lamps" class="tier-pick-list"></div>
+        </div>
+        <div class="tier-side-group">
+          <div class="filters-heading">Tables</div>
+          <div id="tier-tables" class="tier-pick-list"></div>
+        </div>
+        <div class="tier-side-group">
+          <div class="filters-heading">Tiers</div>
+          <div id="tier-tiers" class="tier-side-tiers"></div>
+        </div>
+      </div>
+
+      <div id="filters-section">
       <div class="filters-heading">Filters</div>
       <button type="button" id="reset-filters-btn" class="reset-filters-btn">Reset filters</button>
 
@@ -93,6 +114,7 @@ import Layout from '@/layouts/Layout.astro';
         <button type="button" class="filter-group-header">Playable In<span class="arrow">▸</span></button>
         <div class="filter-group-content" id="f-playable-in-list"></div>
       </div>
+      </div>
     </aside>
 
     <div class="table-container">
@@ -134,6 +156,7 @@ import Layout from '@/layouts/Layout.astro';
       </div>
 
       <div id="stats-container" style="display:none;"></div>
+      <div id="tier-container" style="display:none;"></div>
     </div>
   </div>
 
@@ -210,6 +233,147 @@ import Layout from '@/layouts/Layout.astro';
       from { filter: hue-rotate(0deg); }
       to { filter: hue-rotate(360deg); }
     }
+    /* ---- Tier view ---- */
+    .tier-pick-list { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.25rem; }
+    .tier-side-sub { width: 100%; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin: 0.4rem 0 0.1rem; }
+    .tier-pick {
+      padding: 0.35rem 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .tier-pick.active { color: var(--text); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+    .tier-side-tiers { display: flex; flex-direction: column; margin-bottom: 1.25rem; }
+    .tier-side-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.3rem 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      background: none;
+      border: none;
+      border-radius: 4px;
+      text-align: left;
+    }
+    @media (hover: hover) { .tier-side-row:hover { background: var(--surface); } }
+    .tier-side-count { font-size: 0.75rem; color: var(--text-dim); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 0 0.4rem; min-width: 2rem; text-align: center; }
+
+    #tier-container { min-width: 0; }
+    .tier-empty { color: var(--text-dim); }
+    .tier-dim { color: var(--text-dim); }
+    .tier-summary { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 0.75rem 1.5rem; margin-bottom: 1rem; }
+    .tier-summary-title h2 { font-size: 1.2rem; margin: 0; }
+    .tier-summary-lamp { font-size: 0.8rem; color: var(--text-dim); }
+    .tier-stats { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+    .tier-stats > div { display: flex; flex-direction: column; }
+    .tier-stat-label { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); }
+    .tier-stat-value { font-size: 1.15rem; font-weight: 700; color: #f2c14e; }
+    .tier-stat-value small { font-size: 0.8rem; font-weight: 500; }
+
+    /* Overview graph: one stacked bar per tier; click jumps to its section. */
+    .tier-graph {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .tier-graph-row {
+      display: grid;
+      grid-template-columns: 5.5rem 1fr 4.5rem;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 2px 0.25rem;
+      font: inherit;
+      color: var(--text);
+      background: none;
+      border: none;
+      border-radius: 4px;
+      text-align: left;
+      cursor: pointer;
+    }
+    @media (hover: hover) { .tier-graph-row:hover { background: var(--border); } }
+    .tier-graph-row:focus-visible { outline: 2px solid var(--accent); }
+    .tier-graph-label { font-size: 0.8rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tier-graph-bar { display: flex; height: 14px; border-radius: 3px; overflow: hidden; background: #3a3d46; }
+    .tier-seg { height: 100%; }
+    .tier-seg + .tier-seg { box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.35); }
+    .tier-graph-value { font-size: 0.75rem; color: var(--text-dim); text-align: right; font-variant-numeric: tabular-nums; }
+    .tier-legend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.9rem; margin: 0.6rem 0 1.5rem; font-size: 0.75rem; color: var(--text-dim); }
+    .tier-legend i { display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 2px; margin-right: 0.3rem; vertical-align: -0.1rem; }
+    .tier-tooltip {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 300;
+      pointer-events: none;
+      min-width: 12rem;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.78rem;
+      color: var(--text);
+      background: #0b0d11ee;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    }
+    .tier-tooltip-title { font-weight: 700; margin-bottom: 0.3rem; }
+    .tier-tooltip-title span { font-weight: 400; color: var(--text-dim); margin-left: 0.4rem; }
+    .tier-tooltip-row { display: grid; grid-template-columns: 0.8rem 1fr auto 3.2rem; gap: 0.4rem; align-items: center; }
+    .tier-tooltip-row.zero { color: var(--text-dim); }
+    .tier-tooltip-row i { width: 0.7rem; height: 0.7rem; border-radius: 2px; }
+    .tier-tooltip-row span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Tier sections and chart cards. */
+    .tier-section { margin-bottom: 1.25rem; scroll-margin-top: calc(var(--header-sticky-height, 0px) + var(--toolbar-height, 0px) + 0.5rem); }
+    .tier-section-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .tier-section-head h3 { margin: 0; font-size: 1.05rem; color: #f2c14e; }
+    .tier-badge { font-size: 0.75rem; font-weight: 700; color: #f2c14e; background: #3a2f12; border-radius: 999px; padding: 0.2rem 0.6rem; white-space: nowrap; }
+    .tier-badge.done { color: #9bf59b; background: #17361c; }
+    .tier-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 0.4rem; }
+    .tier-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 0.45rem 0.55rem 0.45rem 0.75rem;
+      background: color-mix(in srgb, var(--lamp) 13%, var(--surface));
+      border: 1px solid color-mix(in srgb, var(--lamp) 30%, var(--border));
+      border-radius: 6px;
+      cursor: pointer;
+      min-width: 0;
+    }
+    .tier-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 6px 0 0 6px; background: var(--lamp); }
+    .tier-card[data-lamp="FULL_COMBO"]::before { background: linear-gradient(180deg, #FF8A8A, #FFD36E, #9BF59B, #7FD8FF, #C59BFF); }
+    .tier-card[data-lamp="NO_PLAY"] { background: var(--surface); border-color: var(--border); }
+    .tier-card:focus-visible { outline: 2px solid var(--accent); }
+    @media (hover: hover) { .tier-card:hover { border-color: var(--lamp); } }
+    .tier-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.4rem; }
+    .tier-card-title { font-size: 0.85rem; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+    .tier-card-title small { font-weight: 400; color: var(--text-dim); }
+    .tier-card-meta { display: flex; justify-content: space-between; gap: 0.4rem; font-size: 0.72rem; color: var(--text-dim); }
+    .tier-card-lamp { font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--lamp); }
+    .tier-card[data-lamp="NO_PLAY"] .tier-card-lamp { color: var(--text-dim); font-weight: 400; }
+    .tier-card-score { display: none; flex-wrap: wrap; gap: 0.2rem 0.75rem; padding-top: 0.3rem; border-top: 1px solid var(--border); font-size: 0.78rem; }
+    .tier-card-score b { font-weight: 600; color: var(--text-dim); margin-right: 0.2rem; }
+    .tier-card-score small { color: var(--text-dim); }
+    .tier-card.open .tier-card-score { display: flex; }
+    .tier-chip { flex-shrink: 0; font-size: 0.68rem; font-weight: 700; padding: 0.05rem 0.35rem; border-radius: 4px; color: #fff; }
+    .tier-chip.chip-B { background: #3f8f3a; }
+    .tier-chip.chip-N { background: #2f6fc4; }
+    .tier-chip.chip-H { background: #b8860b; }
+    .tier-chip.chip-A { background: #c0392b; }
+    .tier-chip.chip-L { background: #7b3fc4; }
+    @media (max-width: 768px) {
+      .tier-graph { padding: 0.5rem; }
+      .tier-graph-row { grid-template-columns: 4.5rem 1fr 3.75rem; gap: 0.4rem; }
+      .tier-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .iidx-lamp { animation: none !important; }
       .iidx-lamp[data-lamp="FAILED"] { background: #ff2b2b; }
@@ -222,6 +386,7 @@ import Layout from '@/layouts/Layout.astro';
     import { computeGrade, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, type ClearLamp } from '../grade';
     import { searchKey } from '@/lib/search';
     import { loadAttempts, historyHtml } from '@/lib/history';
+    import { TierView, type TierData, type TierViewState, type TargetLamp } from '../tier-view';
 
     const supabase = requireSupabase('iidx');
 
@@ -234,7 +399,11 @@ import Layout from '@/layouts/Layout.astro';
     const LAMP_ORDER = ['FULL_COMBO', 'EX_HARD_CLEAR', 'HARD_CLEAR', 'CLEAR', 'EASY_CLEAR', 'ASSIST_CLEAR', 'FAILED', 'NONE'];
     const LAMP_ROW_LABELS: Record<string, string> = { ...LAMP_LABELS, NONE: 'No score yet' };
 
-    let viewMode: 'list' | 'stats' = 'list';
+    type ViewMode = 'list' | 'stats' | 'tier';
+    let viewMode: ViewMode = 'list';
+    // Built the first time the Tier view opens (its data is loaded on demand).
+    let tierView: TierView | null = null;
+    let tierState: Partial<TierViewState> = {};
     let loaded = false;
     const ROW_BATCH = 200;
     let listRows: Row[] = [];
@@ -269,6 +438,9 @@ import Layout from '@/layouts/Layout.astro';
     const tableEl = document.getElementById('chart-table')!;
     const tbody = tableEl.querySelector('tbody')!;
     const statsContainerEl = document.getElementById('stats-container')!;
+    const tierContainerEl = document.getElementById('tier-container')!;
+    const tierSidebarEl = document.getElementById('tier-sidebar')!;
+    const filtersSectionEl = document.getElementById('filters-section')!;
     const versionListEl = document.getElementById('f-version-list')!;
     const playableInListEl = document.getElementById('f-playable-in-list')!;
     const lastUpdatedEl = document.getElementById('last-updated')!;
@@ -481,7 +653,11 @@ import Layout from '@/layouts/Layout.astro';
 
     function filterParams(): URLSearchParams {
       const p = new URLSearchParams();
-      if (viewMode === 'stats') p.set('view', 'stats');
+      if (viewMode !== 'list') p.set('view', viewMode);
+      if (viewMode === 'tier') {
+        if (tierState.lamp) p.set('tlamp', tierState.lamp);
+        if (tierState.table) p.set('table', tierState.table);
+      }
       if (searchEl.value.trim()) p.set('q', searchEl.value.trim());
       for (const [key, group] of Object.entries(PARAM_GROUPS)) for (const v of checkedValues(group)) p.append(key, v);
       return p;
@@ -495,7 +671,9 @@ import Layout from '@/layouts/Layout.astro';
         // Open the groups a link filters on, so the active filter is visible.
         if (values.size) document.querySelector(`.filter-group[data-group="${group}"]`)?.classList.add('open');
       }
-      setView(p.get('view') === 'stats' ? 'stats' : 'list');
+      tierState = { lamp: (p.get('tlamp') ?? undefined) as TargetLamp | undefined, table: p.get('table') ?? undefined };
+      const view = p.get('view');
+      setView(view === 'stats' || view === 'tier' ? view : 'list');
     }
 
     function syncUrl() {
@@ -554,6 +732,10 @@ import Layout from '@/layouts/Layout.astro';
 
     function render() {
       if (!loaded) return;
+      if (viewMode === 'tier') {
+        renderTier();
+        return;
+      }
       syncUrl();
       const f = currentFilters();
       const filtered = rows.filter((r) => {
@@ -580,6 +762,28 @@ import Layout from '@/layouts/Layout.astro';
       renderedCount = Math.min(ROW_BATCH, listRows.length);
       tbody.innerHTML = listRows.slice(0, renderedCount).map(rowHtml).join('');
       fillViewport();
+    }
+
+    async function renderTier() {
+      if (!tierView) {
+        tierContainerEl.innerHTML = '<p class="tier-empty">Loading tier lists…</p>';
+        const data = (await import('../tiers.json')).default as TierData;
+        tierView ??= new TierView(
+          data,
+          rows,
+          { main: tierContainerEl, lamps: document.getElementById('tier-lamps')!, tables: document.getElementById('tier-tables')!, tiers: document.getElementById('tier-tiers')! },
+          (state) => {
+            tierState = state;
+            render();
+            window.scrollTo(0, 0);
+          },
+          () => setSidebarOpen(false),
+        );
+      }
+      if (viewMode !== 'tier') return;
+      tierState = tierView.resolve(tierState);
+      syncUrl();
+      tierView.render(tierState as TierViewState, searchKey(searchEl.value.trim()));
     }
 
     // Rendering all ~12k rows at once makes a 12k-row DOM that's slow on
@@ -689,15 +893,19 @@ import Layout from '@/layouts/Layout.astro';
       }
     }
 
-    function setView(mode: 'list' | 'stats') {
+    function setView(mode: ViewMode) {
       viewMode = mode;
       document.querySelectorAll<HTMLElement>('.view-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === mode));
       tableEl.style.display = viewMode === 'list' && loaded ? '' : 'none';
       statsContainerEl.style.display = viewMode === 'stats' ? '' : 'none';
+      tierContainerEl.style.display = viewMode === 'tier' ? '' : 'none';
+      // The Tier view picks charts by table, so the filters give way to its own sidebar.
+      tierSidebarEl.hidden = viewMode !== 'tier';
+      filtersSectionEl.hidden = viewMode === 'tier';
     }
     document.querySelectorAll('.view-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        setView((btn as HTMLElement).dataset.view as 'list' | 'stats');
+        setView((btn as HTMLElement).dataset.view as ViewMode);
         render();
       });
     });
