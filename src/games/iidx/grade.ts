@@ -24,6 +24,11 @@ export function computeGrade(exScore: number | null, noteCount: number | null): 
   return 'F';
 }
 
+/** A grade as HTML, with MAX-'s minus drawn large so it doesn't read as MAX. */
+export function gradeHtml(grade: string): string {
+  return grade.endsWith('-') ? `${grade.slice(0, -1)}<span class="grade-minus" aria-label="minus">−</span>` : grade;
+}
+
 export const CLEAR_LAMPS = [
   'FAILED',
   'ASSIST_CLEAR',

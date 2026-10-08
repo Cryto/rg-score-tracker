@@ -3,7 +3,7 @@
 // chart is matched to the catalog by title, play style and difficulty, so no
 // database table is involved.
 
-import { computeGrade, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, LAMP_DARK_TEXT, type ClearLamp } from './grade';
+import { computeGrade, gradeHtml, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, LAMP_DARK_TEXT, type ClearLamp } from './grade';
 import { searchKey } from '@/lib/search';
 
 /** The parts of a list-view row the tier view needs. */
@@ -281,7 +281,7 @@ export class TierView {
         <div class="tier-card-meta"><span>Lv ${r.level}${level != null && level !== r.level ? ` <span class="tier-dim" title="Level in the tier list">(list: ${level})</span>` : ''}</span><span class="tier-card-lamp${dark ? ' light' : ''}">${lampLabel(lamp)}</span></div>
         <div class="tier-card-score">
           <span><b>EX</b> ${r.exScore != null ? r.exScore.toLocaleString() : '—'}</span>
-          <span><b>Grade</b> ${grade}${percent ? ` <small>${percent}</small>` : ''}</span>
+          <span><b>Grade</b> ${gradeHtml(grade)}${percent ? ` <small>${percent}</small>` : ''}</span>
           <span><b>BP</b> ${r.missCount ?? '—'}</span>
         </div>
       </div>`;

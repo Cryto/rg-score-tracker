@@ -2,7 +2,7 @@
 // records), with a cell per difficulty, like the Holodori list. A difficulty
 // cell opens that chart's history; the song title opens its song info.
 
-import { computeGrade, LAMP_LABELS, type ClearLamp } from './grade';
+import { computeGrade, gradeHtml, LAMP_LABELS, type ClearLamp } from './grade';
 
 /** The parts of a list-view row the song view needs. */
 export type SongViewRow = {
@@ -63,7 +63,7 @@ function chartCell(r: SongViewRow, dim: boolean, showPct: boolean): string {
       <span class="sv-diff-name">${esc(name)}</span>
       <span class="sv-level">${r.level}</span>
       <span class="sv-ex">${r.exScore != null ? r.exScore.toLocaleString('en-US') : '—'}</span>
-      <span class="sv-grade">${grade === '—' ? '' : grade}${pct ? `<small>${pct}</small>` : ''}</span>
+      <span class="sv-grade">${grade === '—' ? '' : gradeHtml(grade)}${pct ? `<small>${pct}</small>` : ''}</span>
       <span class="iidx-lamp" data-lamp="${r.lamp ?? 'NO_PLAY'}" aria-label="${lampLabel}"></span>
     </div>`;
 }
