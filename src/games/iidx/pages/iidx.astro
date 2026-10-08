@@ -389,23 +389,7 @@ import Layout from '@/layouts/Layout.astro';
     .tier-lamp-pick.active { color: var(--lamp-text); font-weight: 600; border-color: transparent; background: var(--lamp-fill); }
     .tier-side-tiers { display: flex; flex-direction: column; margin-bottom: 1.25rem; }
     .tier-table-groups { margin-bottom: 1.25rem; }
-    .tier-table-group summary {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.4rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      border-radius: 4px;
-      cursor: pointer;
-      list-style: none;
-    }
-    .tier-table-group summary::-webkit-details-marker { display: none; }
-    .tier-table-group summary::before { content: '▸'; font-size: 0.75rem; transition: transform 0.15s; }
-    .tier-table-group[open] summary::before { transform: rotate(90deg); }
-    @media (hover: hover) { .tier-table-group summary:hover { color: var(--text); background: var(--surface); } }
-    .tier-table-group .tier-side-tiers { margin: 0 0 0.4rem 0.9rem; }
+    .tier-table-group .filter-group-content { gap: 0; max-height: none; padding-bottom: 0.5rem; }
     .tier-table-row.active { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); box-shadow: inset 2px 0 0 var(--accent); }
     .tier-side-row {
       display: flex;
