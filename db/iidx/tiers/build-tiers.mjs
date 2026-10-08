@@ -4,15 +4,18 @@
 //
 // The workbook has one tab per table, three columns each (header row first):
 //   SP lv9 .. SP lv12   Tier ("地力A+", "個人差B", ...), Song Name, Chart ("SPA", "SPL", "SP黒")
-//   SP lv12 CPI         CPI Range ("適正CPI 2000 ~ 2050"), Song Name, Chart
+//   SP lv12 CPI         CPI Range ("2000 ~ 2050"), Song Name, Chart
 //   DP 5.0-5.9 ..       Rating (12.7), Song Name, Chart with level ("DPA 12")
+// "lv" is optional ("SP 11"). A tab name can end with the lamp its list is
+// for: Easy, Normal, Hard (or HC), EX Hard (or EXH), Full Combo (or FC), as
+// in "SP 12 HC" or "SP 12 CPI EX Hard". Tabs without one use --lamp.
 // Tiers keep the order they first appear in on each tab.
 //
 // Usage:
 //   node db/iidx/tiers/build-tiers.mjs <tiers.xlsx> [--lamp CLEAR]
-// --lamp is the clear lamp the lists are for (EASY_CLEAR, CLEAR, HARD_CLEAR,
-// EX_HARD_CLEAR or FULL_COMBO; default CLEAR). Only that lamp's lists are
-// replaced, so lists for other lamps can come from other workbooks.
+// --lamp is EASY_CLEAR, CLEAR (Normal, the default), HARD_CLEAR,
+// EX_HARD_CLEAR or FULL_COMBO. Only the tables in the workbook are replaced;
+// every other lamp's and table's list in tiers.json is kept.
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { inflateRawSync } from 'node:zlib';
@@ -97,9 +100,18 @@ function readWorkbook(path) {
 
 // --- Tabs to tables. ---
 
+// Lamp suffixes on tab names, longest first so "EX Hard" isn't read as "Hard".
+const LAMP_SUFFIXES = [
+  [/\s+(EX\s*Hard|EXH|EXHC)$/i, 'EX_HARD_CLEAR'],
+  [/\s+(Full\s*Combo|FC)$/i, 'FULL_COMBO'],
+  [/\s+(Hard|HC)$/i, 'HARD_CLEAR'],
+  [/\s+(Normal|NC)$/i, 'CLEAR'],
+  [/\s+(Easy|EC)$/i, 'EASY_CLEAR'],
+];
+
 // "SP lv12 CPI" -> SP table ☆12 CPI; "DP 10.0-10.7" -> DP table 10.0 - 10.7.
 function tableFor(tabName) {
-  const sp = tabName.match(/^SP\s*lv\s*(\d+)\s*(.*)$/i);
+  const sp = tabName.match(/^SP\s*(?:lv)?\s*(\d+)\s*(.*)$/i);
   if (sp) {
     const extra = sp[2].trim();
     return { id: `sp${sp[1]}${extra ? '-' + extra.toLowerCase() : ''}`, style: 'SP', label: `☆${sp[1]}${extra ? ' ' + extra : ''}`, level: Number(sp[1]) };
@@ -117,16 +129,29 @@ const ALIASES = {
   '†渚の小悪魔ラヴリィ～レイディオ†(IIDX EDIT)': '†渚の小悪魔ラヴリィ～レイディオ†',
 };
 
-// DP ratings come through as numbers (11.8, or 11 for 11.0).
+// DP ratings come through as numbers (11.8, or 11 for 11.0). CPI ranges are
+// written "2000-2050", "2000 ~ 2050" or "適正CPI 2000 ~ 2050"; all become "2000 ~ 2050".
 function tierName(v, isRating) {
   const s = String(v ?? '').trim();
-  return isRating && /^\d+(\.\d+)?$/.test(s) ? Number(s).toFixed(1) : s;
+  if (isRating && /^\d+(\.\d+)?$/.test(s)) return Number(s).toFixed(1);
+  const range = s.match(/^(?:適正CPI\s*)?(\d+)\s*[~\-–]\s*(\d+)$/);
+  return range ? `${range[1]} ~ ${range[2]}` : s;
 }
 
-const tables = [];
+// Tables per lamp, in the order the sidebar lists them.
+const byLamp = new Map();
 let skipped = 0;
 for (const sheet of readWorkbook(xlsxPath)) {
-  const table = tableFor(sheet.name);
+  let tabName = sheet.name.trim();
+  let tabLamp = lamp;
+  for (const [re, l] of LAMP_SUFFIXES) {
+    if (re.test(tabName)) {
+      tabName = tabName.replace(re, '');
+      tabLamp = l;
+      break;
+    }
+  }
+  const table = tableFor(tabName);
   if (!table) {
     console.warn(`Skipping tab "${sheet.name}" (name isn't "SP lv<n>[ ...]" or "DP <a>-<b>")`);
     continue;
@@ -150,13 +175,22 @@ for (const sheet of readWorkbook(xlsxPath)) {
     // [title, difficulty (BA = Black Another), level]
     tiers.get(name).push([title, m[2], level]);
   }
-  tables.push({ ...table, tiers: [...tiers].map(([name, charts]) => ({ name, charts })) });
+  if (!byLamp.has(tabLamp)) byLamp.set(tabLamp, []);
+  byLamp.get(tabLamp).push({ ...table, tiers: [...tiers].map(([name, charts]) => ({ name, charts })) });
 }
 
-const data = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : { lamps: {} };
-data.lamps[lamp] = tables;
-writeFileSync(OUT, JSON.stringify(data, null, 0).replace(/\],\[/g, '],\n[') + '\n');
+// SP before DP; by level (CPI after its level's tier list), DP by range start.
+const tableOrder = (t) => (t.style === 'SP' ? 0 : 1000) + (t.level ?? parseFloat(t.label)) + (t.id.includes('-') && t.style === 'SP' ? 0.5 : 0);
 
-const total = tables.reduce((n, t) => n + t.tiers.reduce((m, tier) => m + tier.charts.length, 0), 0);
-console.log(`${lamp}: ${tables.length} tables, ${total} charts${skipped ? `, ${skipped} rows skipped` : ''} -> src/games/iidx/tiers.json`);
-for (const t of tables) console.log(`  ${t.style} ${t.label}: ${t.tiers.length} tiers`);
+const data = existsSync(OUT) ? JSON.parse(readFileSync(OUT, 'utf8')) : { lamps: {} };
+for (const [l, tables] of byLamp) {
+  const ids = new Set(tables.map((t) => t.id));
+  data.lamps[l] = [...(data.lamps[l] ?? []).filter((t) => !ids.has(t.id)), ...tables].sort((a, b) => tableOrder(a) - tableOrder(b));
+  const total = tables.reduce((n, t) => n + t.tiers.reduce((m, tier) => m + tier.charts.length, 0), 0);
+  console.log(`${l}: ${tables.length} tables, ${total} charts`);
+  for (const t of tables) console.log(`  ${t.style} ${t.label}: ${t.tiers.length} tiers`);
+}
+// Lamps in sidebar order.
+data.lamps = Object.fromEntries(LAMPS.filter((l) => data.lamps[l]).map((l) => [l, data.lamps[l]]));
+writeFileSync(OUT, JSON.stringify(data, null, 0).replace(/\],\[/g, '],\n[') + '\n');
+console.log(`${skipped ? `${skipped} rows skipped. ` : ''}Wrote src/games/iidx/tiers.json`);
