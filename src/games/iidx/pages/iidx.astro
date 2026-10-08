@@ -11,7 +11,7 @@ import Layout from '@/layouts/Layout.astro';
     <aside class="filters-sidebar" id="filters-sidebar">
       <button type="button" id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Close filters">✕</button>
       <div class="filters-heading">View</div>
-      <div class="view-toggle">
+      <div class="view-toggle iidx-view-toggle">
         <button type="button" class="view-btn active" data-view="list">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           List
@@ -19,6 +19,10 @@ import Layout from '@/layouts/Layout.astro';
         <button type="button" class="view-btn" data-view="stats">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
           Statistics
+        </button>
+        <button type="button" class="view-btn" data-view="song">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+          Song
         </button>
         <button type="button" class="view-btn" data-view="tier">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
@@ -43,16 +47,15 @@ import Layout from '@/layouts/Layout.astro';
       </div>
 
       <div id="filters-section">
+      <!-- Play style sits above the filters as two toggle buttons; neither on means both. -->
+      <div class="filters-heading">Play Style</div>
+      <div class="style-toggle" data-group="style">
+        <label class="style-btn"><input type="checkbox" value="SP" /> Single</label>
+        <label class="style-btn"><input type="checkbox" value="DP" /> Double</label>
+      </div>
+
       <div class="filters-heading">Filters</div>
       <button type="button" id="reset-filters-btn" class="reset-filters-btn">Reset filters</button>
-
-      <div class="filter-group" data-group="style">
-        <button type="button" class="filter-group-header">Play Style<span class="arrow">▸</span></button>
-        <div class="filter-group-content">
-          <label class="checkbox-row"><input type="checkbox" value="SP" /> Single Play</label>
-          <label class="checkbox-row"><input type="checkbox" value="DP" /> Double Play</label>
-        </div>
-      </div>
 
       <div class="filter-group" data-group="difficulty">
         <button type="button" class="filter-group-header">Difficulty<span class="arrow">▸</span></button>
@@ -114,6 +117,9 @@ import Layout from '@/layouts/Layout.astro';
         <button type="button" class="filter-group-header">Playable In<span class="arrow">▸</span></button>
         <div class="filter-group-content" id="f-playable-in-list"></div>
       </div>
+
+      <div class="filters-heading options-heading">Options</div>
+      <label class="checkbox-row"><input type="checkbox" id="opt-show-pct" /> Show %</label>
       </div>
     </aside>
 
@@ -155,6 +161,7 @@ import Layout from '@/layouts/Layout.astro';
         <div id="table-sentinel"></div>
       </div>
 
+      <div id="song-container" style="display:none;"></div>
       <div id="stats-container" style="display:none;"></div>
       <div id="tier-container" style="display:none;"></div>
     </div>
@@ -233,6 +240,138 @@ import Layout from '@/layouts/Layout.astro';
       from { filter: hue-rotate(0deg); }
       to { filter: hue-rotate(360deg); }
     }
+    /* View switcher as a 2×2 grid, so Song sits under List. */
+    .iidx-view-toggle { display: grid; grid-template-columns: 1fr 1fr; }
+    /* Play style toggle buttons (checkboxes underneath; neither on = both). */
+    .style-toggle { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+    .style-btn {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0.45rem 0.3rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .style-btn input { position: absolute; opacity: 0; pointer-events: none; }
+    .style-btn:has(input:checked) { color: var(--text); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+    .style-btn:has(input:focus-visible) { outline: 2px solid var(--accent); }
+    @media (hover: hover) { .style-btn:hover { color: var(--text); } }
+    .options-heading { margin-top: 1.25rem; }
+
+    /* ---- Song view ---- */
+    .sv-header, .sv-song {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(5, 124px);
+      gap: 0.45rem;
+      align-items: stretch;
+    }
+    .sv-header {
+      position: sticky;
+      top: calc(var(--header-sticky-height, 0px) + var(--toolbar-height, 0px));
+      z-index: 10;
+      background: var(--bg);
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .sv-song { padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--border); }
+    .sv-head { display: flex; align-items: center; gap: 0.6rem; min-width: 0; cursor: pointer; border-radius: 6px; padding: 0.2rem; }
+    .sv-head:focus-visible, .sv-head[aria-expanded="true"] { outline: 2px solid var(--accent); }
+    @media (hover: hover) { .sv-head:hover .sv-title-main { color: var(--accent); } }
+    .sv-title { min-width: 0; }
+    .sv-title-main { font-weight: 600; overflow-wrap: anywhere; }
+    .sv-style { flex-shrink: 0; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.35rem; border-radius: 4px; color: #fff; }
+    .sv-style-SP { background: #2f6fc4; }
+    .sv-style-DP { background: #c0392b; }
+    .sv-charts { display: contents; }
+    /* A difficulty cell, colored like the in-game difficulty label. */
+    .sv-chart {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas: "level ex" "level grade";
+      column-gap: 0.45rem;
+      align-items: center;
+      padding: 0.35rem 0.45rem 0.6rem;
+      min-height: 50px;
+      min-width: 0;
+      border-radius: 6px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--diff) 26%, var(--surface)), var(--surface) 75%);
+      border: 1px solid color-mix(in srgb, var(--diff) 45%, var(--border));
+      cursor: pointer;
+    }
+    .sv-chart.unplayed { background: var(--surface); border-color: color-mix(in srgb, var(--diff) 25%, var(--border)); }
+    .sv-chart.dim { opacity: 0.3; }
+    .sv-chart:focus-visible, .sv-chart[aria-expanded="true"] { outline: 2px solid var(--diff); outline-offset: 1px; }
+    @media (hover: hover) { .sv-chart[data-chart-id]:hover { border-color: var(--diff); } }
+    .sv-none { background: none; border: 1px dashed var(--border); cursor: default; }
+    .sv-diff-name { display: none; }
+    .sv-level {
+      grid-area: level;
+      min-width: 1.9rem;
+      padding: 0.15rem 0.3rem;
+      border-radius: 5px;
+      background: var(--diff);
+      color: #fff;
+      font-weight: 900;
+      text-align: center;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    }
+    .sv-ex { grid-area: ex; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sv-grade small { margin-left: 0.35rem; color: var(--text-dim); font-size: 0.7rem; font-weight: 500; }
+    .sv-chart.unplayed .sv-ex { color: var(--text-dim); }
+    .sv-grade { grid-area: grade; font-size: 0.8rem; font-weight: 800; }
+    /* The song-select lamp, as a strip along the cell's bottom edge. */
+    .sv-chart .iidx-lamp { top: auto; left: 6px; right: 6px; bottom: 3px; width: auto; height: 4px; }
+    .sv-panel {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background: var(--surface);
+      border-left: 3px solid var(--diff, var(--accent));
+      font-size: 0.85rem;
+    }
+    .sv-info { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 1.5rem; color: var(--text-dim); }
+    .sv-info strong { color: var(--text); font-weight: 500; }
+    .sv-info .wiki-link { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent); text-decoration: none; }
+    .sv-info .wiki-link svg { width: 14px; height: 14px; }
+    .sv-notes { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; }
+    .sv-note { border-left: 3px solid var(--diff); padding-left: 0.35rem; }
+    .sv-count { color: var(--text-dim); font-size: 0.8rem; }
+    /* Narrow: the title takes its own line and the cells wrap underneath. */
+    @media (max-width: 1100px) {
+      .sv-header { display: none; }
+      .sv-song { grid-template-columns: minmax(0, 1fr); gap: 0.4rem; padding: 0.6rem 0.15rem; container-type: inline-size; }
+      .sv-charts { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 0.35rem; }
+      @container (min-width: 600px) {
+        .sv-charts { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+      }
+      .sv-none { display: none; }
+      .sv-diff-name {
+        display: block;
+        grid-area: name;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--diff);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sv-chart { grid-template-areas: "name name" "level ex" "level grade"; }
+    }
+
     /* ---- Tier view ---- */
     .tier-pick-list { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.25rem; }
     .tier-side-sub { width: 100%; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin: 0.4rem 0 0.1rem; }
@@ -387,6 +526,7 @@ import Layout from '@/layouts/Layout.astro';
     import { searchKey } from '@/lib/search';
     import { loadAttempts, historyHtml } from '@/lib/history';
     import { TierView, type TierData, type TierViewState, type TargetLamp } from '../tier-view';
+    import { songRecords, songRecordHtml, songInfoHtml, exPercent, DIFF_COLORS, DIFF_NAMES, type SongRecord } from '../song-view';
 
     const supabase = requireSupabase('iidx');
 
@@ -399,7 +539,7 @@ import Layout from '@/layouts/Layout.astro';
     const LAMP_ORDER = ['FULL_COMBO', 'EX_HARD_CLEAR', 'HARD_CLEAR', 'CLEAR', 'EASY_CLEAR', 'ASSIST_CLEAR', 'FAILED', 'NONE'];
     const LAMP_ROW_LABELS: Record<string, string> = { ...LAMP_LABELS, NONE: 'No score yet' };
 
-    type ViewMode = 'list' | 'stats' | 'tier';
+    type ViewMode = 'list' | 'song' | 'stats' | 'tier';
     let viewMode: ViewMode = 'list';
     // Built the first time the Tier view opens (its data is loaded on demand).
     let tierView: TierView | null = null;
@@ -408,9 +548,28 @@ import Layout from '@/layouts/Layout.astro';
     const ROW_BATCH = 200;
     let listRows: Row[] = [];
     let renderedCount = 0;
+    // Song view: records are rendered in batches like the list.
+    const SONG_BATCH = 100;
+    let songRecs: SongRecord<Row>[] = [];
+    let songInFilter = new Set<number>();
+    let songRenderedCount = 0;
+
+    // "Show %" (Options) is a viewer preference, so it's remembered per browser.
+    const showPctEl = document.getElementById('opt-show-pct') as HTMLInputElement;
+    try { showPctEl.checked = localStorage.getItem('iidx-show-pct') === '1'; } catch {}
+    showPctEl.addEventListener('input', () => {
+      try { localStorage.setItem('iidx-show-pct', showPctEl.checked ? '1' : '0'); } catch {}
+      render();
+    });
+    // EX score with its % of max underneath when Show % is on.
+    function exHtml(exScore: number | null, noteCount: number | null): string {
+      const pct = showPctEl.checked ? exPercent(exScore, noteCount) : null;
+      return `${exScore ?? '—'}${pct ? `<div class="row-subtitle">${pct}</div>` : ''}`;
+    }
 
     type Row = {
       chartId: number;
+      songId: number;
       version: string;
       versionKey: number;
       title: string;
@@ -438,6 +597,7 @@ import Layout from '@/layouts/Layout.astro';
     const tableEl = document.getElementById('chart-table')!;
     const tbody = tableEl.querySelector('tbody')!;
     const statsContainerEl = document.getElementById('stats-container')!;
+    const songContainerEl = document.getElementById('song-container')!;
     const tierContainerEl = document.getElementById('tier-container')!;
     const tierSidebarEl = document.getElementById('tier-sidebar')!;
     const filtersSectionEl = document.getElementById('filters-section')!;
@@ -460,7 +620,7 @@ import Layout from '@/layouts/Layout.astro';
 
     // Clears every sidebar filter (not the main search box).
     document.getElementById('reset-filters-btn')!.addEventListener('click', () => {
-      filtersSidebarEl.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+      filtersSidebarEl.querySelectorAll<HTMLInputElement>('[data-group] input[type="checkbox"]').forEach((cb) => (cb.checked = false));
       render();
     });
 
@@ -498,7 +658,7 @@ import Layout from '@/layouts/Layout.astro';
         const { data: page, error } = await supabase
           .from('charts')
           .select(`
-            id, play_style, difficulty, level, note_count, chart_label,
+            id, song_id, play_style, difficulty, level, note_count, chart_label,
             songs ( title, title_english, artist, remywiki_url, bpm_min, bpm_max, versions ( number, name, platform ) ),
             scores ( ex_score, clear_lamp, miss_count, updated_at ),
             chart_availability ( versions ( number, name, platform ) )
@@ -515,6 +675,7 @@ import Layout from '@/layouts/Layout.astro';
 
       rows = (data ?? []).map((c: any) => ({
         chartId: c.id,
+        songId: c.song_id,
         version: c.songs?.versions?.name ?? 'Unknown',
         versionKey: c.songs?.versions ? versionListKey(c.songs.versions) : 1e9,
         title: c.songs?.title ?? '(unknown)',
@@ -624,7 +785,7 @@ import Layout from '@/layouts/Layout.astro';
     mobileMedia.addEventListener('change', pinTitleColumnWidth);
 
     function checkedValues(groupName: string): Set<string> {
-      const group = document.querySelector(`.filter-group[data-group="${groupName}"]`)!;
+      const group = document.querySelector(`[data-group="${groupName}"]`)!;
       const checked = group.querySelectorAll('input[type="checkbox"]:checked');
       return new Set([...checked].map((el) => (el as HTMLInputElement).value));
     }
@@ -667,13 +828,13 @@ import Layout from '@/layouts/Layout.astro';
       searchEl.value = p.get('q') ?? '';
       for (const [key, group] of Object.entries(PARAM_GROUPS)) {
         const values = new Set(p.getAll(key));
-        document.querySelectorAll<HTMLInputElement>(`.filter-group[data-group="${group}"] input[type="checkbox"]`).forEach((cb) => (cb.checked = values.has(cb.value)));
+        document.querySelectorAll<HTMLInputElement>(`[data-group="${group}"] input[type="checkbox"]`).forEach((cb) => (cb.checked = values.has(cb.value)));
         // Open the groups a link filters on, so the active filter is visible.
         if (values.size) document.querySelector(`.filter-group[data-group="${group}"]`)?.classList.add('open');
       }
       tierState = { lamp: (p.get('tlamp') ?? undefined) as TargetLamp | undefined, table: p.get('table') ?? undefined };
       const view = p.get('view');
-      setView(view === 'stats' || view === 'tier' ? view : 'list');
+      setView(view === 'song' || view === 'stats' || view === 'tier' ? view : 'list');
     }
 
     function syncUrl() {
@@ -757,6 +918,10 @@ import Layout from '@/layouts/Layout.astro';
         renderStats(filtered);
         return;
       }
+      if (viewMode === 'song') {
+        renderSongs(filtered);
+        return;
+      }
 
       listRows = filtered;
       renderedCount = Math.min(ROW_BATCH, listRows.length);
@@ -789,7 +954,32 @@ import Layout from '@/layouts/Layout.astro';
     // Rendering all ~12k rows at once makes a 12k-row DOM that's slow on
     // phones, so the list renders in batches as the sentinel below the table
     // scrolls into view.
+    // Song records keep the list's order: a song sits where its first chart would.
+    function renderSongs(filtered: Row[]) {
+      songInFilter = new Set(filtered.map((r) => r.chartId));
+      const keys = new Set(filtered.map((r) => `${r.songId}|${r.style}`));
+      // Records hold every chart of the song, so filtered-out charts show dimmed.
+      songRecs = songRecords(rows).filter((rec) => keys.has(rec.key));
+      const order = new Map<string, number>();
+      filtered.forEach((r, i) => { const k = `${r.songId}|${r.style}`; if (!order.has(k)) order.set(k, i); });
+      songRecs.sort((a, b) => order.get(a.key)! - order.get(b.key)!);
+      songRenderedCount = Math.min(SONG_BATCH, songRecs.length);
+      songContainerEl.innerHTML =
+        `<div class="sv-header" aria-hidden="true"><span>Song</span>${(['B', 'N', 'H', 'A', 'L'] as const).map((d) => `<span style="color:${DIFF_COLORS[d]}">${DIFF_NAMES[d]}</span>`).join('')}</div>` +
+        `<div class="sv-list">${songRecs.slice(0, songRenderedCount).map((rec) => songRecordHtml(rec, songInFilter, showPctEl.checked)).join('')}</div>` +
+        `<p class="sv-count">${songRecs.length} songs</p>`;
+      fillViewport();
+    }
+
     function appendMoreRows() {
+      if (viewMode === 'song') {
+        if (songRenderedCount >= songRecs.length) return;
+        const next = Math.min(songRenderedCount + SONG_BATCH, songRecs.length);
+        songContainerEl.querySelector('.sv-list')!.insertAdjacentHTML('beforeend', songRecs.slice(songRenderedCount, next).map((rec) => songRecordHtml(rec, songInFilter, showPctEl.checked)).join(''));
+        songRenderedCount = next;
+        fillViewport();
+        return;
+      }
       if (viewMode !== 'list' || renderedCount >= listRows.length) return;
       const next = Math.min(renderedCount + ROW_BATCH, listRows.length);
       tbody.insertAdjacentHTML('beforeend', listRows.slice(renderedCount, next).map((r, j) => rowHtml(r, renderedCount + j)).join(''));
@@ -827,7 +1017,7 @@ import Layout from '@/layouts/Layout.astro';
           : ''
       }</td>
         <td class="chart-code">${chartCode}</td>
-        <td class="hide-mobile">${r.exScore ?? '—'}</td>
+        <td class="hide-mobile">${exHtml(r.exScore, r.noteCount)}</td>
         <td>${grade}</td>
         <td class="hide-mobile">${lampLabel}</td>
         <td class="hide-mobile">${r.missCount ?? '—'}</td>
@@ -840,7 +1030,7 @@ import Layout from '@/layouts/Layout.astro';
           <span><strong>Level:</strong> ${r.level}</span>
           <span><strong>BPM:</strong> ${bpm}</span>
           <span><strong>Notes:</strong> ${r.noteCount ?? '—'}</span>
-          <span class="show-mobile"><strong>EX Score:</strong> ${r.exScore ?? '—'}</span>
+          <span class="show-mobile"><strong>EX Score:</strong> ${r.exScore ?? '—'}${showPctEl.checked && exPercent(r.exScore, r.noteCount) ? ` (${exPercent(r.exScore, r.noteCount)})` : ''}</span>
           <span class="show-mobile"><strong>BP:</strong> ${r.missCount ?? '—'}</span>
           <span class="show-mobile"><strong>Lamp:</strong> ${lampLabel}</span>${
         wikiUrl(r.wikiUrl)
@@ -874,10 +1064,10 @@ import Layout from '@/layouts/Layout.astro';
     });
 
     // Filled the first time a row is expanded (and again after a re-render).
-    async function showHistory(el: HTMLElement) {
+    async function showHistory(el: HTMLElement, title = 'History') {
       if (el.dataset.loaded) return;
       el.dataset.loaded = '1';
-      el.innerHTML = '<div class="history-title">History</div><p class="history-empty">Loading…</p>';
+      el.innerHTML = `<div class="history-title">${escapeHtml(title)}</div><p class="history-empty">Loading…</p>`;
       try {
         const attempts = await loadAttempts(supabase, 'iidx', Number(el.dataset.chartId), 'ex_score, clear_lamp, miss_count');
         el.querySelector('.history-empty')!.outerHTML = historyHtml(attempts.map((a) => ({
@@ -897,6 +1087,10 @@ import Layout from '@/layouts/Layout.astro';
       viewMode = mode;
       document.querySelectorAll<HTMLElement>('.view-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === mode));
       tableEl.style.display = viewMode === 'list' && loaded ? '' : 'none';
+      songContainerEl.style.display = viewMode === 'song' ? '' : 'none';
+      // The batch-loading sentinel follows whichever list is showing.
+      if (viewMode === 'song') songContainerEl.after(tableSentinelEl);
+      else tableScrollEl.appendChild(tableSentinelEl);
       statsContainerEl.style.display = viewMode === 'stats' ? '' : 'none';
       tierContainerEl.style.display = viewMode === 'tier' ? '' : 'none';
       // The Tier view picks charts by table, so the filters give way to its own sidebar.
@@ -927,6 +1121,45 @@ import Layout from '@/layouts/Layout.astro';
     });
 
     searchEl.addEventListener('input', render);
+    document.querySelectorAll('.style-toggle input[type="checkbox"]').forEach((cb) => cb.addEventListener('input', render));
+
+    // Song view: the title opens song info, a difficulty opens its history.
+    // One panel per record; opening the open one again closes it.
+    function toggleSongPanel(trigger: HTMLElement) {
+      const song = trigger.closest<HTMLElement>('.sv-song')!;
+      const rec = songRecs.find((r) => r.key === song.dataset.key);
+      if (!rec) return;
+      const id = trigger.dataset.chartId ?? 'info';
+      const open = song.querySelector<HTMLElement>('.sv-panel');
+      song.querySelectorAll('[aria-expanded="true"]').forEach((el) => el.setAttribute('aria-expanded', 'false'));
+      open?.remove();
+      if (open?.dataset.for === id) return;
+      trigger.setAttribute('aria-expanded', 'true');
+      if (id === 'info') {
+        song.insertAdjacentHTML('beforeend', songInfoHtml(rec));
+        song.querySelector<HTMLElement>('.sv-panel')!.dataset.for = 'info';
+        return;
+      }
+      const chart = rec.charts.find((c) => String(c.chartId) === id)!;
+      const panel = document.createElement('div');
+      panel.className = 'sv-panel history';
+      panel.dataset.for = id;
+      panel.dataset.chartId = id;
+      panel.style.setProperty('--diff', DIFF_COLORS[chart.difficulty]);
+      song.appendChild(panel);
+      showHistory(panel, `${chart.chartLabel ?? DIFF_NAMES[chart.difficulty]} ${chart.level} history`);
+    }
+    songContainerEl.addEventListener('click', (e) => {
+      const trigger = (e.target as HTMLElement).closest<HTMLElement>('.sv-head, .sv-chart[data-chart-id]');
+      if (trigger && !(e.target as HTMLElement).closest('a')) toggleSongPanel(trigger);
+    });
+    songContainerEl.addEventListener('keydown', (e) => {
+      const trigger = (e.target as HTMLElement).closest<HTMLElement>('.sv-head, .sv-chart[data-chart-id]');
+      if (trigger && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        toggleSongPanel(trigger);
+      }
+    });
 
     document.querySelectorAll('.filter-group').forEach((group) => {
       const header = group.querySelector('.filter-group-header')!;
