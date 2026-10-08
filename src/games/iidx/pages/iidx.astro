@@ -72,7 +72,7 @@ import Layout from '@/layouts/Layout.astro';
         <button type="button" class="filter-group-header">Grade<span class="arrow">▸</span></button>
         <div class="filter-group-content">
           <label class="checkbox-row"><input type="checkbox" value="MAX" /> MAX</label>
-          <label class="checkbox-row"><input type="checkbox" value="MAX-" /> MAX-</label>
+          <label class="checkbox-row"><input type="checkbox" value="MAX-" /> MAX<span class="grade-minus" aria-label="minus">−</span></label>
           <label class="checkbox-row"><input type="checkbox" value="AAA" /> AAA</label>
           <label class="checkbox-row"><input type="checkbox" value="AA" /> AA</label>
           <label class="checkbox-row"><input type="checkbox" value="A" /> A</label>
@@ -171,6 +171,8 @@ import Layout from '@/layouts/Layout.astro';
 
   <!-- Global: the stats tables are built from JS, which scoped styles can't reach. -->
   <style is:global>
+    /* MAX-'s minus, drawn bigger and bolder so it can't be missed. */
+    .grade-minus { display: inline-block; margin-left: 0.08em; font-size: 1.3em; font-weight: 900; line-height: 0; vertical-align: -0.04em; }
     /* Stats tables: every level column is the same fixed width (set by the
        <colgroup> from JS), so a 3-digit count doesn't stretch its column. */
     #stats-container .pivot-table { table-layout: fixed; }
@@ -402,7 +404,6 @@ import Layout from '@/layouts/Layout.astro';
     .tier-table-group summary::-webkit-details-marker { display: none; }
     .tier-table-group summary::before { content: '▸'; font-size: 0.75rem; transition: transform 0.15s; }
     .tier-table-group[open] summary::before { transform: rotate(90deg); }
-    .tier-table-group summary .tier-side-count { margin-left: auto; }
     @media (hover: hover) { .tier-table-group summary:hover { color: var(--text); background: var(--surface); } }
     .tier-table-group .tier-side-tiers { margin: 0 0 0.4rem 0.9rem; }
     .tier-table-row.active { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); box-shadow: inset 2px 0 0 var(--accent); }
@@ -543,7 +544,7 @@ import Layout from '@/layouts/Layout.astro';
 
   <script>
     import { requireSupabase } from '@/lib/supabase';
-    import { computeGrade, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, type ClearLamp } from '../grade';
+    import { computeGrade, gradeHtml, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, type ClearLamp } from '../grade';
     import { searchKey } from '@/lib/search';
     import { loadAttempts, historyHtml } from '@/lib/history';
     import { TierView, type TierData, type TierViewState, type TargetLamp } from '../tier-view';
@@ -908,7 +909,7 @@ import Layout from '@/layouts/Layout.astro';
 
     function renderStats(filtered: Row[]) {
       statsContainerEl.innerHTML =
-        pivot('Grade × Level', 'grade', [...GRADE_ORDER, '—'], (g) => (g === '—' ? 'No grade' : g), (r) => computeGrade(r.exScore, r.noteCount), filtered) +
+        pivot('Grade × Level', 'grade', [...GRADE_ORDER, '—'], (g) => (g === '—' ? 'No grade' : gradeHtml(g)), (r) => computeGrade(r.exScore, r.noteCount), filtered) +
         pivot('Lamp × Level', 'lamp', LAMP_ORDER, lampRowLabel, (r) => r.lamp ?? 'NONE', filtered);
     }
 
@@ -1039,7 +1040,7 @@ import Layout from '@/layouts/Layout.astro';
       }</td>
         <td class="chart-code">${chartCode}</td>
         <td class="hide-mobile">${exHtml(r.exScore, r.noteCount)}</td>
-        <td>${grade}</td>
+        <td>${gradeHtml(grade)}</td>
         <td class="hide-mobile">${lampLabel}</td>
         <td class="hide-mobile">${r.missCount ?? '—'}</td>
       </tr>

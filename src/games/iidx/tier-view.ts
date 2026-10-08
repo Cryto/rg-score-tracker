@@ -3,7 +3,7 @@
 // chart is matched to the catalog by title, play style and difficulty, so no
 // database table is involved.
 
-import { computeGrade, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, LAMP_DARK_TEXT, type ClearLamp } from './grade';
+import { computeGrade, gradeHtml, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, LAMP_DARK_TEXT, type ClearLamp } from './grade';
 import { searchKey } from '@/lib/search';
 
 /** The parts of a list-view row the tier view needs. */
@@ -248,7 +248,7 @@ export class TierView {
         const rows = list
           .map((t) => `<button type="button" class="tier-side-row tier-table-row${t.id === this.state.table ? ' active' : ''}" data-table="${esc(t.id)}"${t.id === this.state.table ? ' aria-current="true"' : ''}><span>${esc(t.label)}</span><span class="tier-side-count">${this.chartCount(this.data.lamps[this.state.lamp]?.find((x) => x.id === t.id) ?? t)}</span></button>`)
           .join('');
-        return `<details class="tier-table-group" data-style="${style}"${open ? ' open' : ''}><summary>${style === 'SP' ? 'Single Play' : 'Double Play'}<span class="tier-side-count">${list.length}</span></summary><div class="tier-side-tiers">${rows}</div></details>`;
+        return `<details class="tier-table-group" data-style="${style}"${open ? ' open' : ''}><summary>${style === 'SP' ? 'Single Play' : 'Double Play'}</summary><div class="tier-side-tiers">${rows}</div></details>`;
       })
       .join('');
     this.els.tables.innerHTML = groups;
@@ -281,7 +281,7 @@ export class TierView {
         <div class="tier-card-meta"><span>Lv ${r.level}${level != null && level !== r.level ? ` <span class="tier-dim" title="Level in the tier list">(list: ${level})</span>` : ''}</span><span class="tier-card-lamp${dark ? ' light' : ''}">${lampLabel(lamp)}</span></div>
         <div class="tier-card-score">
           <span><b>EX</b> ${r.exScore != null ? r.exScore.toLocaleString() : '—'}</span>
-          <span><b>Grade</b> ${grade}${percent ? ` <small>${percent}</small>` : ''}</span>
+          <span><b>Grade</b> ${gradeHtml(grade)}${percent ? ` <small>${percent}</small>` : ''}</span>
           <span><b>BP</b> ${r.missCount ?? '—'}</span>
         </div>
       </div>`;
