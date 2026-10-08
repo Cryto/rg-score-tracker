@@ -248,7 +248,7 @@ export class TierView {
         const rows = list
           .map((t) => `<button type="button" class="tier-side-row tier-table-row${t.id === this.state.table ? ' active' : ''}" data-table="${esc(t.id)}"${t.id === this.state.table ? ' aria-current="true"' : ''}><span>${esc(t.label)}</span><span class="tier-side-count">${this.chartCount(this.data.lamps[this.state.lamp]?.find((x) => x.id === t.id) ?? t)}</span></button>`)
           .join('');
-        return `<details class="tier-table-group" data-style="${style}"${open ? ' open' : ''}><summary>${style === 'SP' ? 'Single Play' : 'Double Play'}<span class="tier-side-count">${list.length}</span></summary><div class="tier-side-tiers">${rows}</div></details>`;
+        return `<details class="tier-table-group" data-style="${style}"${open ? ' open' : ''}><summary>${style === 'SP' ? 'Single Play' : 'Double Play'}</summary><div class="tier-side-tiers">${rows}</div></details>`;
       })
       .join('');
     this.els.tables.innerHTML = groups;
