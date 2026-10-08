@@ -65,6 +65,9 @@ export type TierViewState = { lamp: TargetLamp; table: string };
 export class TierView {
   private index = new Map<string, TierRow[]>();
   private openCard: string | null = null;
+  // Play style groups in the Tables list the owner opened or closed.
+  private openGroups = new Map<string, boolean>();
+  private counts = new Map<TierTable, number>();
 
   constructor(
     private data: TierData,
@@ -116,7 +119,22 @@ export class TierView {
         if (btn.dataset.table) this.onJump();
       });
     }
+    // <details> toggle events don't bubble, so listen in the capture phase.
+    els.tables.addEventListener('toggle', (e) => {
+      const group = e.target as HTMLDetailsElement;
+      if (group.dataset.style) this.openGroups.set(group.dataset.style, group.open);
+    }, true);
     this.initGraphTooltip();
+  }
+
+  /** Charts in a table that are in the catalog (the ones the view shows). */
+  private chartCount(table: TierTable): number {
+    let n = this.counts.get(table);
+    if (n == null) {
+      n = table.tiers.reduce((sum, tier) => sum + tier.charts.filter((c) => this.match(c, table.style).row).length, 0);
+      this.counts.set(table, n);
+    }
+    return n;
   }
 
   private state: TierViewState = { lamp: 'CLEAR', table: '' };
@@ -209,13 +227,17 @@ export class TierView {
       .map((l) => `<button type="button" class="tier-pick${l === this.state.lamp ? ' active' : ''}" data-lamp="${l}">${TARGET_LABELS[l]}</button>`)
       .join('');
     this.els.lamps.closest<HTMLElement>('.tier-side-group')!.hidden = lamps.length < 2;
+    const active = tables.find((t) => t.id === this.state.table);
     const groups = (['SP', 'DP'] as const)
       .map((style) => {
         const list = tables.filter((t) => t.style === style);
         if (!list.length) return '';
-        return `<div class="tier-side-sub">${style === 'SP' ? 'Single Play' : 'Double Play'}</div>${list
-          .map((t) => `<button type="button" class="tier-pick${t.id === this.state.table ? ' active' : ''}" data-table="${esc(t.id)}">${esc(t.label)}</button>`)
-          .join('')}`;
+        // Collapsible per play style; the active table's group starts open.
+        const open = this.openGroups.get(style) ?? active?.style === style;
+        const rows = list
+          .map((t) => `<button type="button" class="tier-side-row tier-table-row${t.id === this.state.table ? ' active' : ''}" data-table="${esc(t.id)}"${t.id === this.state.table ? ' aria-current="true"' : ''}><span>${esc(t.label)}</span><span class="tier-side-count">${this.chartCount(t)}</span></button>`)
+          .join('');
+        return `<details class="tier-table-group" data-style="${style}"${open ? ' open' : ''}><summary>${style === 'SP' ? 'Single Play' : 'Double Play'}<span class="tier-side-count">${list.length}</span></summary><div class="tier-side-tiers">${rows}</div></details>`;
       })
       .join('');
     this.els.tables.innerHTML = groups;

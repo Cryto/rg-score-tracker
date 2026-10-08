@@ -38,7 +38,7 @@ import Layout from '@/layouts/Layout.astro';
         </div>
         <div class="tier-side-group">
           <div class="filters-heading">Tables</div>
-          <div id="tier-tables" class="tier-pick-list"></div>
+          <div id="tier-tables" class="tier-table-groups"></div>
         </div>
         <div class="tier-side-group">
           <div class="filters-heading">Tiers</div>
@@ -375,7 +375,6 @@ import Layout from '@/layouts/Layout.astro';
 
     /* ---- Tier view ---- */
     .tier-pick-list { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.25rem; }
-    .tier-side-sub { width: 100%; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin: 0.4rem 0 0.1rem; }
     .tier-pick {
       padding: 0.35rem 0.6rem;
       font-size: 0.8rem;
@@ -386,6 +385,26 @@ import Layout from '@/layouts/Layout.astro';
     }
     .tier-pick.active { color: var(--text); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
     .tier-side-tiers { display: flex; flex-direction: column; margin-bottom: 1.25rem; }
+    .tier-table-groups { margin-bottom: 1.25rem; }
+    .tier-table-group summary {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      border-radius: 4px;
+      cursor: pointer;
+      list-style: none;
+    }
+    .tier-table-group summary::-webkit-details-marker { display: none; }
+    .tier-table-group summary::before { content: '▸'; font-size: 0.75rem; transition: transform 0.15s; }
+    .tier-table-group[open] summary::before { transform: rotate(90deg); }
+    .tier-table-group summary .tier-side-count { margin-left: auto; }
+    @media (hover: hover) { .tier-table-group summary:hover { color: var(--text); background: var(--surface); } }
+    .tier-table-group .tier-side-tiers { margin: 0 0 0.4rem 0.9rem; }
+    .tier-table-row.active { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); box-shadow: inset 2px 0 0 var(--accent); }
     .tier-side-row {
       display: flex;
       justify-content: space-between;
