@@ -45,25 +45,26 @@ export const CLEAR_LAMP_LABELS: Record<ClearLamp, string> = {
 };
 
 // The game doesn't publish grade cutoffs; these are the owner's approximations
-// (same for every chart). Scores have no maximum, so S+N continues upward in
-// the same +250,000 steps observed from S to S+2. Edit here to correct them --
-// grades are derived at display time, never stored.
+// (same for every chart). S+ starts at 1,250,000, S+2 at 1,500,000 and S+3 at
+// 2,000,000. Scores have no maximum, so above S+3 S+N continues in the same
+// +500,000 steps. Edit here to correct them -- grades are derived at display
+// time, never stored.
 const GRADE_CUTOFFS: [number, string][] = [
+  [2_000_000, 'S+3'],
+  [1_500_000, 'S+2'],
+  [1_250_000, 'S+'],
   [1_000_000, 'S'],
   [650_000, 'A'],
   [400_000, 'B'],
   [150_000, 'C'],
   [100_000, 'D'],
 ];
-const S_PLUS_STEP = 250_000;
+const S_PLUS_STEP = 500_000;
 
 /** Grade for a score ("S+2", "A", ...), or null below the lowest cutoff / no score. */
 export function computeGrade(score: number | null | undefined): string | null {
   if (score == null) return null;
-  if (score >= 1_000_000) {
-    const plus = Math.floor((score - 1_000_000) / S_PLUS_STEP);
-    return plus === 0 ? 'S' : plus === 1 ? 'S+' : `S+${plus}`;
-  }
+  if (score >= 2_000_000) return `S+${3 + Math.floor((score - 2_000_000) / S_PLUS_STEP)}`;
   return GRADE_CUTOFFS.find(([min]) => score >= min)?.[1] ?? null;
 }
 
