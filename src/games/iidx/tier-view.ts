@@ -10,6 +10,7 @@ import { searchKey } from '@/lib/search';
 export type TierRow = {
   chartId: number;
   title: string;
+  titleEnglish: string;
   artist: string;
   style: string;
   difficulty: string;
@@ -164,7 +165,9 @@ export class TierView {
     return { lamp, table };
   }
 
-  render(state: TierViewState, search: string) {
+  // search.title matches the song title (Japanese or English), search.artist
+  // the artist; both are searchKey()-folded and must both match.
+  render(state: TierViewState, search: { title: string; artist: string }) {
     this.state = state;
     const table = this.data.lamps[state.lamp]?.find((t) => t.id === state.table);
     this.renderSidebar(this.tables);
@@ -217,8 +220,9 @@ export class TierView {
       <div class="tier-legend">${LAMP_ORDER.map((k) => `<span><i style="background:${lampFill(k)}"></i>${lampLabel(k)}</span>`).join('')}</div>`;
 
     const sections = tiers.map((t) => {
-      const cards = t.items.filter((it) => !search || searchKey(`${it.row!.title} ${it.row!.artist}`).includes(search));
-      if (search && !cards.length) return '';
+      const cards = t.items.filter((it) => (!search.title || searchKey(`${it.row!.title} ${it.row!.titleEnglish}`).includes(search.title))
+        && (!search.artist || searchKey(it.row!.artist).includes(search.artist)));
+      if ((search.title || search.artist) && !cards.length) return '';
       const n = reached(t.items);
       return `<section class="tier-section" id="${t.id}">
           <header class="tier-section-head">

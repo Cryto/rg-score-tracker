@@ -132,6 +132,9 @@ import Layout from '@/layouts/Layout.astro';
         <label class="search-row">Search
           <input id="f-search" type="text" placeholder="Song title..." />
         </label>
+        <label class="search-row">Artist
+          <input id="f-artist" type="text" placeholder="Artist..." />
+        </label>
       </div>
 
       <p id="status" style="color: var(--text-dim);">Loading...</p>
@@ -519,6 +522,15 @@ import Layout from '@/layouts/Layout.astro';
       .tier-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
     }
 
+    /* Title and artist searches share the toolbar; on phones they split the
+       row beside the Filters button. Layout CSS loads after this in prod, so
+       these need more specificity than its .search-row rule. */
+    .table-toolbar .search-row { flex: 0 1 240px; min-width: 0; }
+    .table-toolbar .search-row input { width: 100%; box-sizing: border-box; }
+    @media (max-width: 768px) {
+      .table-toolbar .search-row { flex: 1 1 0; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .iidx-lamp { animation: none !important; }
       .iidx-lamp[data-lamp="FAILED"] { background: #ff2b2b; }
@@ -595,6 +607,7 @@ import Layout from '@/layouts/Layout.astro';
       scoreUpdatedAt: string | null;
       playableIn: string[];
       searchText: string;
+      artistSearchText: string;
     };
 
     let rows: Row[] = [];
@@ -701,6 +714,7 @@ import Layout from '@/layouts/Layout.astro';
         missCount: c.scores?.miss_count ?? null,
         scoreUpdatedAt: c.scores?.updated_at ?? null,
         searchText: searchKey(`${c.songs?.title ?? ''} ${c.songs?.title_english ?? ''}`),
+        artistSearchText: searchKey(c.songs?.artist ?? ''),
       }));
 
       // Charts with a score sort by most-recently-updated first, surfacing
@@ -799,6 +813,7 @@ import Layout from '@/layouts/Layout.astro';
     function currentFilters() {
       return {
         search: searchKey(searchEl.value.trim()),
+        artist: searchKey(artistEl.value.trim()),
         versions: checkedValues('version'),
         playableIn: checkedValues('playable-in'),
         styles: checkedValues('style'),
@@ -810,13 +825,14 @@ import Layout from '@/layouts/Layout.astro';
     }
 
     // Filters and view mirror the URL (?view=stats&style=SP&diff=A&level=12
-    // &lamp=HARD_CLEAR&grade=AA&version=...&playable=...&q=...; multi-select
+    // &lamp=HARD_CLEAR&grade=AA&version=...&playable=...&q=...&artist=...; multi-select
     // groups repeat their key), so a filtered view can be linked, reloaded or
     // gone back to.
     const PARAM_GROUPS = {
       style: 'style', diff: 'difficulty', level: 'level', grade: 'grade', lamp: 'lamp', version: 'version', playable: 'playable-in',
     } as const;
     const searchEl = document.getElementById('f-search') as HTMLInputElement;
+    const artistEl = document.getElementById('f-artist') as HTMLInputElement;
 
     function filterParams(): URLSearchParams {
       const p = new URLSearchParams();
@@ -826,12 +842,14 @@ import Layout from '@/layouts/Layout.astro';
         if (tierState.table) p.set('table', tierState.table);
       }
       if (searchEl.value.trim()) p.set('q', searchEl.value.trim());
+      if (artistEl.value.trim()) p.set('artist', artistEl.value.trim());
       for (const [key, group] of Object.entries(PARAM_GROUPS)) for (const v of checkedValues(group)) p.append(key, v);
       return p;
     }
 
     function applyParams(p: URLSearchParams) {
       searchEl.value = p.get('q') ?? '';
+      artistEl.value = p.get('artist') ?? '';
       for (const [key, group] of Object.entries(PARAM_GROUPS)) {
         const values = new Set(p.getAll(key));
         document.querySelectorAll<HTMLInputElement>(`[data-group="${group}"] input[type="checkbox"]`).forEach((cb) => (cb.checked = values.has(cb.value)));
@@ -907,6 +925,7 @@ import Layout from '@/layouts/Layout.astro';
       const f = currentFilters();
       const filtered = rows.filter((r) => {
         if (f.search && !r.searchText.includes(f.search)) return false;
+        if (f.artist && !r.artistSearchText.includes(f.artist)) return false;
         if (f.versions.size && !f.versions.has(r.version)) return false;
         if (f.playableIn.size && !r.playableIn.some((v) => f.playableIn.has(v))) return false;
         if (f.styles.size && !f.styles.has(r.style)) return false;
@@ -954,7 +973,7 @@ import Layout from '@/layouts/Layout.astro';
       if (viewMode !== 'tier') return;
       tierState = tierView.resolve(tierState);
       syncUrl();
-      tierView.render(tierState as TierViewState, searchKey(searchEl.value.trim()));
+      tierView.render(tierState as TierViewState, { title: searchKey(searchEl.value.trim()), artist: searchKey(artistEl.value.trim()) });
     }
 
     // Rendering all ~12k rows at once makes a 12k-row DOM that's slow on
@@ -1127,6 +1146,7 @@ import Layout from '@/layouts/Layout.astro';
     });
 
     searchEl.addEventListener('input', render);
+    artistEl.addEventListener('input', render);
     document.querySelectorAll('.style-toggle input[type="checkbox"]').forEach((cb) => cb.addEventListener('input', render));
 
     // Song view: the title opens song info, a difficulty opens its history.
