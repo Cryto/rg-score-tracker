@@ -1,0 +1,81 @@
+# Weekly import of your best scores from fervidex.net (db/iidx/fervidex/sync.mjs).
+# Runs Mondays at 1am New York time, or any time from Actions > IIDX Fervidex sync > Run workflow.
+#
+# Needs these repository secrets (Settings > Secrets and variables > Actions):
+#   FERVIDEX_USERNAME, FERVIDEX_PASSWORD        fervidex.net login
+#   IIDX_OWNER_EMAIL, IIDX_OWNER_PASSWORD       your rg-score-tracker login
+#   PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY  same values as on Netlify
+name: IIDX Fervidex sync
+
+on:
+  schedule:
+    # Cron is UTC only: 05:00 UTC is 1am EDT, 06:00 UTC is 1am EST. The
+    # first step skips whichever one isn't 1am this week.
+    - cron: '0 5 * * 1'
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Report what would be imported, write nothing
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: iidx-fervidex-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Pick the 1am New York run
+        id: gate
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          # Decided by the UTC offset, not the clock, so a late-starting run still goes.
+          offset=$(TZ=America/New_York date +%z)
+          if [ -z "$SCHEDULE" ] \
+            || { [ "$offset" = "-0400" ] && [ "$SCHEDULE" = "0 5 * * 1" ]; } \
+            || { [ "$offset" = "-0500" ] && [ "$SCHEDULE" = "0 6 * * 1" ]; }; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Not 1am in New York for this run ($offset); skipping."
+          fi
+
+      - uses: actions/checkout@v6
+        if: steps.gate.outputs.run == 'true'
+
+      - uses: actions/setup-node@v6
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          npm ci
+          npx playwright install --with-deps --only-shell chromium
+
+      - name: Sync scores
+        if: steps.gate.outputs.run == 'true'
+        env:
+          FERVIDEX_USERNAME: ${{ secrets.FERVIDEX_USERNAME }}
+          FERVIDEX_PASSWORD: ${{ secrets.FERVIDEX_PASSWORD }}
+          IIDX_OWNER_EMAIL: ${{ secrets.IIDX_OWNER_EMAIL }}
+          IIDX_OWNER_PASSWORD: ${{ secrets.IIDX_OWNER_PASSWORD }}
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+        run: node db/iidx/fervidex/sync.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Keep unmatched charts
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: fervidex-unmatched
+          path: fervidex-export/unmatched-*.csv
+          if-no-files-found: ignore
