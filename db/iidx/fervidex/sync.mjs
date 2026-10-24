@@ -92,8 +92,9 @@ async function downloadExports() {
       throw new Error('Login failed: no Logout link after logging in. Check FERVIDEX_USERNAME / FERVIDEX_PASSWORD.');
     }
 
-    await page.getByRole('link', { name: 'Settings', exact: true }).click();
-    await page.getByRole('link', { name: 'Score export', exact: true }).click();
+    // Matched by text, not link role: fervidex's nav items aren't all plain links.
+    await page.getByText('Settings', { exact: true }).first().click();
+    await page.getByText('Score export', { exact: true }).first().click();
     await page.getByRole('button', { name: 'Download' }).waitFor();
 
     const files = [];
