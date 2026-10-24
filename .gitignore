@@ -27,3 +27,6 @@ db/iidx/import/validation_*.json
 
 # jetbrains setting folder
 .idea/
+
+# fervidex sync downloads (db/iidx/fervidex/sync.mjs)
+fervidex-export/

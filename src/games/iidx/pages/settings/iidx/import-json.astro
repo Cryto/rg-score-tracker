@@ -64,6 +64,7 @@ import Layout from '@/layouts/Layout.astro';
     import { requireSupabase } from '@/lib/supabase';
     import { CLEAR_LAMPS, LAMP_LABELS } from '../../../grade';
     import { searchKey } from '@/lib/search';
+    import { loadChartLookup as fetchChartLookup, matchScores, type ParsedScore, type UnmatchedChart } from '../../../score-export';
 
     const supabase = requireSupabase('iidx');
 
@@ -75,13 +76,6 @@ import Layout from '@/layouts/Layout.astro';
     const results = document.getElementById('results')!;
     const linkSection = document.getElementById('link-section')!;
     const linkList = document.getElementById('link-list')!;
-
-    type ParsedScore = {
-      chart_id: number;
-      ex_score: number | null;
-      clear_lamp: string | null;
-      miss_count: number | null;
-    };
 
     let fileContent: any = null;
     let matched: ParsedScore[] = [];
@@ -100,33 +94,10 @@ import Layout from '@/layouts/Layout.astro';
     });
 
     async function loadChartLookup() {
-      // Supabase caps a single select at 1000 rows - page through until exhausted.
-      const pageSize = 1000;
-      let data: any[] = [];
-      for (let from = 0; ; from += pageSize) {
-        const { data: page, error } = await supabase
-          .from('charts')
-          .select('id, song_id, play_style, difficulty, songs ( external_id )')
-          .range(from, from + pageSize - 1);
-        if (error) {
-          results.innerHTML = `<p style="color:#ff8080;">Failed to load catalog: ${error.message}</p>`;
-          return;
-        }
-        data = data.concat(page ?? []);
-        if (!page || page.length < pageSize) break;
-      }
-      // Extra IDs a song is also known by (migration 0012). Before that
-      // migration the table is missing; fall back to the main IDs alone.
-      const { data: extra } = await supabase.from('song_external_ids').select('external_id, song_id');
-      const idsBySong = new Map<number, string[]>();
-      for (const e of extra ?? []) {
-        if (!idsBySong.has(e.song_id)) idsBySong.set(e.song_id, []);
-        idsBySong.get(e.song_id)!.push(e.external_id);
-      }
-      chartLookup = new Map();
-      for (const c of data) {
-        const ids = [c.songs?.external_id, ...(idsBySong.get(c.song_id) ?? [])].filter(Boolean);
-        for (const id of ids) chartLookup.set(`${id}|${c.play_style}|${c.difficulty}`, c.id);
+      try {
+        chartLookup = await fetchChartLookup(supabase);
+      } catch (err: any) {
+        results.innerHTML = `<p style="color:#ff8080;">${escapeHtml(err.message)}</p>`;
       }
     }
 
@@ -178,40 +149,9 @@ import Layout from '@/layouts/Layout.astro';
     previewBtn.addEventListener('click', () => {
       if (!fileContent) return;
 
-      matched = [];
-      const unmatched: string[] = [];
-      const unmatchedSongs = new Map<string, { code: string; score: any }[]>();
-      let noPlayCount = 0;
-
-      for (const [songId, chartMap] of Object.entries<any>(fileContent)) {
-        if (songId === '__meta') continue;
-        const externalId = songId.padStart(5, '0');
-
-        for (const [chartCode, score] of Object.entries<any>(chartMap)) {
-          const playStyle = chartCode.slice(0, 2).toUpperCase();
-          const difficulty = chartCode.slice(2).toUpperCase();
-          const key = `${externalId}|${playStyle}|${difficulty}`;
-          const chartId = chartLookup.get(key);
-
-          if (score.clear_type === 0) {
-            noPlayCount++;
-            continue;
-          }
-          if (!chartId) {
-            unmatched.push(`${songId} ${chartCode}`);
-            if (!unmatchedSongs.has(externalId)) unmatchedSongs.set(externalId, []);
-            unmatchedSongs.get(externalId)!.push({ code: chartCode.toUpperCase(), score });
-            continue;
-          }
-          matched.push({
-            chart_id: chartId,
-            ex_score: score.ex_score ?? null,
-            clear_lamp: score.clear_type ? CLEAR_LAMPS[score.clear_type - 1] : null,
-            // -1 means no miss count was recorded (e.g. a failed play).
-            miss_count: score.miss_count >= 0 ? score.miss_count : null,
-          });
-        }
-      }
+      const result = matchScores(fileContent, chartLookup);
+      matched = result.matched;
+      const { unmatched, unmatchedSongs, noPlayCount } = result;
 
       results.innerHTML = `
         <p><strong>${matched.length}</strong> chart score(s) matched and ready to import.</p>
@@ -230,7 +170,7 @@ import Layout from '@/layouts/Layout.astro';
     // A song fits an unmatched ID when it debuted in the ID's version and
     // every played chart exists with enough notes for its EX score (EX is at
     // most 2 per note). Unknown note counts don't rule a song out.
-    function fits(song: CatalogSong, versionNumber: number, charts: { code: string; score: any }[]) {
+    function fits(song: CatalogSong, versionNumber: number, charts: UnmatchedChart[]) {
       if (song.externalId || song.versionNumber !== versionNumber) return false;
       return charts.every(({ code, score }) => {
         if (!song.notes.has(code)) return false;
@@ -239,12 +179,12 @@ import Layout from '@/layouts/Layout.astro';
       });
     }
 
-    function renderLinks(unmatchedSongs: Map<string, { code: string; score: any }[]>) {
+    function renderLinks(unmatchedSongs: Map<string, UnmatchedChart[]>) {
       linkList.replaceChildren(...[...unmatchedSongs].map(([externalId, charts]) => linkRow(externalId, charts)));
       linkSection.hidden = !unmatchedSongs.size;
     }
 
-    function linkRow(externalId: string, charts: { code: string; score: any }[]) {
+    function linkRow(externalId: string, charts: UnmatchedChart[]) {
       const versionNumber = Number(externalId.slice(0, 2));
       const versionName = catalog.find((s) => s.versionNumber === versionNumber)?.versionName ?? `version ${versionNumber}`;
       const played = charts
