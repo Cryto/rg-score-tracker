@@ -54,12 +54,19 @@ const styles = (option('--styles') ?? 'ZINRAI,INFINITAS').split(',').map((s) => 
 const zipPaths = args.flatMap((a, i) => (a === '--zip' ? [args[i + 1]] : []));
 
 function requireEnv(...names) {
-  const missing = names.filter((n) => !process.env[n]);
+  // Pasted secrets often carry a trailing newline, which breaks HTTP headers.
+  const values = names.map((n) => process.env[n]?.trim());
+  const missing = names.filter((n, i) => !values[i]);
   if (missing.length) {
     console.error(`Missing env: ${missing.join(', ')}`);
     process.exit(1);
   }
-  return names.map((n) => process.env[n]);
+  const multiline = names.filter((n, i) => values[i].includes('\n'));
+  if (multiline.length) {
+    console.error(`These secrets hold more than one line; each should be a single value: ${multiline.join(', ')}`);
+    process.exit(1);
+  }
+  return values;
 }
 
 const summary = [];
