@@ -70,6 +70,7 @@ const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
 
   <script>
     import { requireSupabase } from '@/lib/supabase';
+    import { selectAll } from '@/lib/select-all';
     import { searchKey } from '@/lib/search';
     import { scoreManager } from '@/lib/score-manager';
     import { LAMP_LABELS } from '../../../grade';
@@ -105,20 +106,12 @@ const lampStyle = (l: (typeof CLEAR_LAMPS)[number]) =>
     });
 
     async function loadCharts() {
-      // Supabase caps a single select at 1000 rows - page through until exhausted.
-      const pageSize = 1000;
-      let data: any[] = [];
-      for (let from = 0; ; from += pageSize) {
-        const { data: page, error } = await supabase
-          .from('charts')
-          .select('id, play_style, difficulty, level, songs ( title, title_english )')
-          .range(from, from + pageSize - 1);
-        if (error) {
-          status.textContent = `Failed to load songs: ${error.message}`;
-          return;
-        }
-        data = data.concat(page ?? []);
-        if (!page || page.length < pageSize) break;
+      let data: any[];
+      try {
+        data = await selectAll(supabase, 'charts', 'id, play_style, difficulty, level, songs ( title, title_english )');
+      } catch (error: any) {
+        status.textContent = `Failed to load songs: ${error.message}`;
+        return;
       }
       charts = (data ?? []).map((c: any) => ({
         id: c.id,

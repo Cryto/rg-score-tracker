@@ -540,6 +540,7 @@ import Layout from '@/layouts/Layout.astro';
 
   <script>
     import { requireSupabase } from '@/lib/supabase';
+    import { selectAll } from '@/lib/select-all';
     import { computeGrade, gradeHtml, LAMP_LABELS, LAMP_COLORS, LAMP_FILLS, type ClearLamp } from '../grade';
     import { searchKey } from '@/lib/search';
     import { loadAttempts, historyHtml } from '@/lib/history';
@@ -670,26 +671,29 @@ import Layout from '@/layouts/Layout.astro';
     }
 
     async function load() {
-      // Supabase caps a single select at 1000 rows - page through until exhausted.
-      const pageSize = 1000;
-      let data: any[] = [];
-      for (let from = 0; ; from += pageSize) {
-        const { data: page, error } = await supabase
-          .from('charts')
-          .select(`
+      // Songs and versions load once and are looked up per chart, rather than
+      // embedded in every chart (each song has ~6 charts, each chart ~9
+      // Playable In versions), which keeps the payload and query cost down.
+      let data: any[], songList: any[], versionList: any[];
+      try {
+        [data, songList, versionList] = await Promise.all([
+          selectAll(supabase, 'charts', `
             id, song_id, play_style, difficulty, level, note_count, chart_label,
-            songs ( title, title_english, artist, remywiki_url, bpm_min, bpm_max, versions ( number, name, platform ) ),
             scores ( ex_score, clear_lamp, miss_count, updated_at ),
-            chart_availability ( versions ( number, name, platform ) )
-          `)
-          .range(from, from + pageSize - 1);
-
-        if (error) {
-          statusEl.textContent = `Failed to load: ${error.message}`;
-          return;
-        }
-        data = data.concat(page ?? []);
-        if (!page || page.length < pageSize) break;
+            chart_availability ( version_id )
+          `),
+          selectAll(supabase, 'songs', 'id, title, title_english, artist, remywiki_url, bpm_min, bpm_max, debut_version_id'),
+          selectAll(supabase, 'versions', 'id, number, name, platform'),
+        ]);
+      } catch (error: any) {
+        statusEl.textContent = `Failed to load: ${error.message}`;
+        return;
+      }
+      const versionsById = new Map(versionList.map((v) => [v.id, v]));
+      const songsById = new Map(songList.map((s) => [s.id, { ...s, versions: versionsById.get(s.debut_version_id) ?? null }]));
+      for (const c of data) {
+        c.songs = songsById.get(c.song_id) ?? null;
+        c.chart_availability = (c.chart_availability ?? []).map((a: any) => ({ versions: versionsById.get(a.version_id) ?? null }));
       }
 
       rows = (data ?? []).map((c: any) => ({
