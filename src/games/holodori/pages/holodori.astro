@@ -317,6 +317,7 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
 
   <script>
     import { getSupabase } from '@/lib/supabase';
+    import { selectAll } from '@/lib/select-all';
     import { searchKey } from '@/lib/search';
     import { loadAttempts, historyHtml } from '@/lib/history';
     import {
@@ -411,29 +412,20 @@ import { DIFFICULTIES, DIFFICULTY_LABELS, DIFFICULTY_COLORS, CLEAR_LAMPS, CLEAR_
         statusEl.textContent = 'Hololive Dreams isn\'t configured on this deployment (missing PUBLIC_SUPABASE_URL_HOLODORI / PUBLIC_SUPABASE_ANON_KEY_HOLODORI).';
         return;
       }
-      // Supabase caps a single select at 1000 rows - page through until exhausted.
-      const pageSize = 1000;
-      let data: any[] = [];
       // `members` comes from migration 0002; fall back to loading without it
       // on a database that doesn't have the column yet.
-      let withMembers = true;
-      for (let from = 0; ; from += pageSize) {
-        const { data: page, error } = await supabase
-          .from('songs')
-          .select(`id, title_jp, title_en, artist_jp, artist_en,${withMembers ? ' members,' : ''} category, official_order, jacket_url, charts ( id, difficulty, level, scores ( score, clear_lamp, updated_at ) )`)
-          .range(from, from + pageSize - 1);
-        if (error && withMembers && /members/.test(error.message)) {
-          withMembers = false;
-          data = [];
-          from = -pageSize;
-          continue;
-        }
-        if (error) {
-          statusEl.textContent = `Failed to load: ${error.message}`;
-          return;
-        }
-        data = data.concat(page ?? []);
-        if (!page || page.length < pageSize) break;
+      const columns = (withMembers: boolean) =>
+        `id, title_jp, title_en, artist_jp, artist_en,${withMembers ? ' members,' : ''} category, official_order, jacket_url, charts ( id, difficulty, level, scores ( score, clear_lamp, updated_at ) )`;
+      const client = supabase;
+      let data: any[];
+      try {
+        data = await selectAll(client, 'songs', columns(true)).catch((error) => {
+          if (/members/.test(error.message)) return selectAll(client, 'songs', columns(false));
+          throw error;
+        });
+      } catch (error: any) {
+        statusEl.textContent = `Failed to load: ${error.message}`;
+        return;
       }
 
       songs = data.map((s: any) => {
