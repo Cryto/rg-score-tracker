@@ -62,6 +62,7 @@ import Layout from '@/layouts/Layout.astro';
 
   <script>
     import { requireSupabase } from '@/lib/supabase';
+    import { selectAll } from '@/lib/select-all';
     import { CLEAR_LAMPS, LAMP_LABELS } from '../../../grade';
     import { searchKey } from '@/lib/search';
     import { loadChartLookup as fetchChartLookup, matchScores, type ParsedScore, type UnmatchedChart } from '../../../score-export';
@@ -102,17 +103,11 @@ import Layout from '@/layouts/Layout.astro';
     }
 
     async function loadCatalog() {
-      const pageSize = 1000;
-      let data: any[] = [];
-      for (let from = 0; ; from += pageSize) {
-        const { data: page, error } = await supabase
-          .from('songs')
-          .select('id, title, title_english, external_id, versions ( number, name ), charts ( play_style, difficulty, note_count )')
-          .order('id')
-          .range(from, from + pageSize - 1);
-        if (error) return; // linking is optional; the import itself still works
-        data = data.concat(page ?? []);
-        if (!page || page.length < pageSize) break;
+      let data: any[];
+      try {
+        data = await selectAll(supabase, 'songs', 'id, title, title_english, external_id, versions ( number, name ), charts ( play_style, difficulty, note_count )');
+      } catch {
+        return; // linking is optional; the import itself still works
       }
       const { data: extra } = await supabase.from('song_external_ids').select('external_id, song_id');
       catalog = data.map((s: any) => ({

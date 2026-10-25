@@ -7,6 +7,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { CLEAR_LAMPS } from './grade.ts';
+import { selectAll } from '../../lib/select-all.ts';
 
 export type ParsedScore = {
   chart_id: number;
@@ -30,17 +31,11 @@ export type MatchResult = {
 // "<external id>|<play style>|<difficulty>" -> chart id, over each song's main
 // external_id and any extra IDs in song_external_ids.
 export async function loadChartLookup(supabase: SupabaseClient): Promise<Map<string, number>> {
-  // Supabase caps a single select at 1000 rows - page through until exhausted.
-  const pageSize = 1000;
-  let data: any[] = [];
-  for (let from = 0; ; from += pageSize) {
-    const { data: page, error } = await supabase
-      .from('charts')
-      .select('id, song_id, play_style, difficulty, songs ( external_id )')
-      .range(from, from + pageSize - 1);
-    if (error) throw new Error(`Failed to load catalog: ${error.message}`);
-    data = data.concat(page ?? []);
-    if (!page || page.length < pageSize) break;
+  let data: any[];
+  try {
+    data = await selectAll(supabase, 'charts', 'id, song_id, play_style, difficulty, songs ( external_id )');
+  } catch (error: any) {
+    throw new Error(`Failed to load catalog: ${error.message}`);
   }
   // Extra IDs a song is also known by (migration 0012). Before that
   // migration the table is missing; fall back to the main IDs alone.
