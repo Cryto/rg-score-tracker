@@ -130,10 +130,24 @@ async function downloadExports() {
 }
 
 // The Style dropdown: a native <select> or a styled one, depending on the page.
+// fervidex sometimes keeps the native <select> in the DOM but hidden (behind a
+// styled widget), which made selectOption time out; set it directly then.
 async function pickStyle(page, style) {
-  const select = page.locator('select');
+  const select = page.locator('select').first();
+  await select.waitFor({ state: 'attached', timeout: 10_000 }).catch(() => {});
   if (await select.count()) {
-    await select.first().selectOption({ label: style });
+    if (await select.isVisible()) {
+      await select.selectOption({ label: style });
+      return;
+    }
+    await select.evaluate((el, label) => {
+      const option = [...el.options].find((o) => o.label.trim() === label || o.text.trim() === label);
+      if (!option) throw new Error(`No "${label}" in the Style dropdown (has ${[...el.options].map((o) => o.text.trim()).join(', ')})`);
+      el.value = option.value;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }, style);
+    console.log(`Style dropdown was hidden; set ${style} directly.`);
     return;
   }
   await page.getByRole('combobox').first().click();
