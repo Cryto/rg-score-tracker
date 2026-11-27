@@ -143,11 +143,11 @@ game's tools:
 These pages aren't access-controlled themselves; the RLS policies in the
 database are the only write guard, and they only accept the owner's UUID.
 
-### Weekly fervidex sync (IIDX)
+### Daily fervidex sync (IIDX)
 
 [`.github/workflows/iidx-fervidex-sync.yml`](.github/workflows/iidx-fervidex-sync.yml)
-runs [`db/iidx/fervidex/sync.mjs`](db/iidx/fervidex/sync.mjs) every Monday at
-1am New York time. It logs in to fervidex.net, downloads the ZINRAI and
+runs [`db/iidx/fervidex/sync.mjs`](db/iidx/fervidex/sync.mjs) every day at
+2am New York time. It logs in to fervidex.net, downloads the ZINRAI and
 INFINITAS score exports, checks each `scores.json` against fervidex's
 signature, and imports the scores signed in as the owner, matching charts the
 same way as `/settings/iidx/import-json`. Charts it can't match are listed in

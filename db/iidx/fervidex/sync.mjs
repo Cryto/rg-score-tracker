@@ -1,5 +1,5 @@
 // Pulls your best scores from fervidex.net's Score export and imports them,
-// the same way the /settings/iidx/import-json page does. Runs weekly from
+// the same way the /settings/iidx/import-json page does. Runs daily from
 // .github/workflows/iidx-fervidex-sync.yml; can also be run by hand.
 //
 // Steps: log in to fervidex.net with a headless browser, open Settings > Score
