@@ -1,5 +1,5 @@
-# Weekly import of your best scores from fervidex.net (db/iidx/fervidex/sync.mjs).
-# Runs Mondays at 1am New York time, or any time from Actions > IIDX Fervidex sync > Run workflow.
+# Daily import of your best scores from fervidex.net (db/iidx/fervidex/sync.mjs).
+# Runs every day at 2am New York time, or any time from Actions > IIDX Fervidex sync > Run workflow.
 #
 # Needs these repository secrets (Settings > Secrets and variables > Actions):
 #   FERVIDEX_USERNAME, FERVIDEX_PASSWORD        fervidex.net login
@@ -9,10 +9,10 @@ name: IIDX Fervidex sync
 
 on:
   schedule:
-    # Cron is UTC only: 05:00 UTC is 1am EDT, 06:00 UTC is 1am EST. The
-    # first step skips whichever one isn't 1am this week.
-    - cron: '0 5 * * 1'
-    - cron: '0 6 * * 1'
+    # Cron is UTC only: 06:00 UTC is 2am EDT, 07:00 UTC is 2am EST. The
+    # first step skips whichever one isn't 2am that day.
+    - cron: '0 6 * * *'
+    - cron: '0 7 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Pick the 1am New York run
+      - name: Pick the 2am New York run
         id: gate
         env:
           SCHEDULE: ${{ github.event.schedule }}
@@ -39,11 +39,11 @@ jobs:
           # Decided by the UTC offset, not the clock, so a late-starting run still goes.
           offset=$(TZ=America/New_York date +%z)
           if [ -z "$SCHEDULE" ] \
-            || { [ "$offset" = "-0400" ] && [ "$SCHEDULE" = "0 5 * * 1" ]; } \
-            || { [ "$offset" = "-0500" ] && [ "$SCHEDULE" = "0 6 * * 1" ]; }; then
+            || { [ "$offset" = "-0400" ] && [ "$SCHEDULE" = "0 6 * * *" ]; } \
+            || { [ "$offset" = "-0500" ] && [ "$SCHEDULE" = "0 7 * * *" ]; }; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Not 1am in New York for this run ($offset); skipping."
+            echo "Not 2am in New York for this run ($offset); skipping."
           fi
 
       - uses: actions/checkout@v6
